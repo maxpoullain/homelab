@@ -36,6 +36,7 @@ services:
       - "traefik.http.services.dashy.loadbalancer.server.port=80"
       - "traefik.http.middlewares.dashy.redirectregex.regex=https://corsaire.duckdns.org"
       - "traefik.http.middlewares.dashy.redirectregex.replacement=https://www.corsaire.duckdns.org"
+      - "traefik.http.middlewares.dashy.headers.accesscontrolalloworigin=*"
 
 networks:
   traefik:
