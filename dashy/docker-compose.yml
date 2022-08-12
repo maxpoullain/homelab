@@ -10,17 +10,17 @@ services:
     networks:
       - traefik
     volumes:
-      - "/data/dashy/conf.yml:/app/public/conf.yml"
-      - "/data/dashy/assets/favicon/favicon.ico:/app/public/favicon.ico"
-      - "/data/dashy/assets/favicon/favicon-32x32.png:/app/public/web-icons/favicon-32x32.png"
-      - "/data/dashy/assets/icons:/app/public/item-icons"
-      - "/data/dashy/assets:/app/public/assets"
+      - "./conf.yml:/app/public/conf.yml"
+      - "./assets/favicon/favicon.ico:/app/public/favicon.ico"
+      - "./assets/favicon/favicon-32x32.png:/app/public/web-icons/favicon-32x32.png"
+      - "./assets/icons:/app/public/item-icons"
+      - "./assets:/app/public/assets"
     environment:
       - GID=1000
       - UID=1000
       - NODE_ENV=production
     healthcheck:
-      test: ['CMD', 'node', '/app/services/healthcheck']
+      test: [ 'CMD', 'node', '/app/services/healthcheck' ]
       interval: 1m30s
       timeout: 10s
       retries: 3
