@@ -45,7 +45,7 @@ sections:
           hideDate: false
           customCityName: Saint-Malo
         id: 0_1012_clock
-  - name: Today's sea
+  - name: Live weather
     icon: fas fa-windsock
     displayData:
       sortBy: default
