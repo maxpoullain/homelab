@@ -20,19 +20,19 @@ sections:
     icon: fas fa-ship
     displayData:
       sortBy: default
-      rows: 2
-      cols: 2
+      rows: 1
+      cols: 1
       collapsed: false
       hideForGuests: false
     items: []
     widgets:
       - type: public-ip
         id: 0_1963_publicip
-  - name: Today's sea
-    icon: fas fa-windsock
+  - name: Local time
+    icon: fas fa-hourglass-half
     displayData:
       sortBy: default
-      rows: 2
+      rows: 1
       cols: 2
       collapsed: false
       hideForGuests: false
@@ -45,6 +45,16 @@ sections:
           hideDate: false
           customCityName: Saint-Malo
         id: 0_1012_clock
+  - name: Today's sea
+    icon: fas fa-windsock
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: false
+      hideForGuests: false
+    items: []
+    widgets:
       - type: weather
         options:
           apiKey: adab23796c7f8d7b30eb20a6e65d5429
