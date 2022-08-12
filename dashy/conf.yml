@@ -1,11 +1,5 @@
-pageInfo:
-  title: Corsaire Labs
-  description: Dashboard
-  navLinks: []
-  logo: assets/corsaire.png
 appConfig:
   routingMode: hash
-  theme: nord-frost
   language: en
   startingView: default
   defaultOpeningMethod: newtab
@@ -15,6 +9,15 @@ appConfig:
   faviconApi: allesedv
   layout: auto
   iconSize: small
+  theme: nord-frost
+  hideComponents:
+    hideSettings: true
+    hideFooter: true
+pageInfo:
+  title: Corsaire Labs
+  description: Dashboard
+  navLinks: []
+  logo: assets/corsaire.png
 sections:
   - name: Your ship's homeport
     icon: fas fa-ship
