@@ -28,11 +28,14 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dashy.entrypoints=https"
-      - "traefik.http.routers.dashy.rule=Host(`dashy.corsaire.duckdns.org`)"
+      - "traefik.http.routers.dashy.rule=Host(`dashy.corsaire.duckdns.org`, `www.corsaire.duckdns.org`, `home.corsaire.duckdns.org`, `corsaire.duckdns.org`)"
+      - "traefik.http.routers.dashy.middlewares=dashy"
       - "traefik.http.routers.dashy.tls=true"
       - "traefik.http.routers.dashy.tls.certresolver=acme"
       - "traefik.http.routers.dashy.service=dashy"
       - "traefik.http.services.dashy.loadbalancer.server.port=80"
+      - "traefik.http.middlewares.dashy.redirectregex.regex=https://corsaire.duckdns.org"
+      - "traefik.http.middlewares.dashy.redirectregex.replacement=https://www.corsaire.duckdns.org"
 
 networks:
   traefik:
