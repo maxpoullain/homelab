@@ -186,7 +186,7 @@ sections:
         target: newtab
         id: 1_525_brs
       - title: Crédit Agricole Normandie
-        icon: favicon-local
+        icon: ca.png
         description: 
         url: https://www.credit-agricole.fr/ca-normandie/particulier/acceder-a-mes-comptes.html
         target: newtab
@@ -204,7 +204,7 @@ sections:
         target: newtab
         id: 4_525_binance
       - title: Degiro
-        icon: favicon-allesedv
+        icon: degiro.png
         description: 
         url: https://www.degiro.fr/
         target: newtab
