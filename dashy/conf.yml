@@ -79,37 +79,37 @@ sections:
     items:
       - title: Reddit
         icon: favicon-local
-        description: 
+        description: "Network of communities"
         url: https://reddit.com/
         target: newtab
         id: 1_500_reddit
       - title: Github
         icon: favicon-local
-        description: Code hosting platform
+        description: "Code hosting platform"
         url: https://github.com/
         target: newtab
         id: 0_500_github
       - title: Amazon
         icon: favicon-local
-        description: 
+        description: "E-commerce site"
         url: https://www.amazon.fr/
         target: newtab
         id: 2_500_amazon
       - title: LinkedIn
-        icon: favicon-local
-        description: 
+        icon: linkedin.png
+        description: "Professional networking"
         url: https://www.linkedin.com/
         target: newtab
         id: 3_500_linkedin
       - title: Facebook
         icon: favicon-allesedv
-        description: 
+        description: "Connect with friends"
         url: https://www.facebook.com/
         target: newtab
         id: 4_500_facebook
       - title: KeeWeb
         icon: favicon-allesedv
-        description: 
+        description: "Cross-platform password manager"
         url: https://app.keeweb.info/
         target: newtab
         id: 5_500_keeweb
@@ -124,43 +124,43 @@ sections:
     items:
       - title: Twitch
         icon: favicon-local
-        description: 
+        description: "Games streaming service"
         url: https://www.twitch.tv/directory/following
         target: newtab
         id: 0_831_twitch
       - title: Youtube
-        icon: favicon-local
-        description: 
+        icon: youtube.png
+        description: "Enjoy the videos and music you love"
         url: https://www.youtube.com/feed/subscriptions
         target: newtab
         id: 1_831_youtube
       - title: F1 TV
         icon: favicon-local
-        description: 
+        description: "Enter the world of Formula 1"
         url: https://f1tv.formula1.com/
         target: newtab
         id: 2_831_ftv
       - title: Netflix
         icon: favicon-local
-        description: 
+        description: "Streaming video service"
         url: https://www.netflix.com/
         target: newtab
         id: 3_831_netflix
       - title: Prime Video
-        icon: favicon-local
-        description: 
+        icon: primevideo.png
+        description: "Streaming video service"
         url: https://www.primevideo.com/
         target: newtab
         id: 4_831_primevideo
       - title: Jellyfin
         icon: jellyfin.png
-        description: 
+        description: "Free software media system"
         url: https://jellyfin.corsaire.duckdns.org/
         target: newtab
         id: 5_831_jellyfin
       - title: Photoprism
         icon: photoprism.png
-        description: 
+        description: "Browse your life in pictures"
         url: https://photos.corsaire.duckdns.org/
         target: newtab
         id: 6_831_photoprism
@@ -175,43 +175,43 @@ sections:
     items:
       - title: Finary
         icon: favicon-local
-        description: 
+        description: "The ultimate portfolio tracker"
         url: https://app.finary.com/en
         target: newtab
         id: 0_525_finary
       - title: BRS
         icon: favicon-allesedv
-        description: 
+        description: "Banking service"
         url: https://clients.boursorama.com/connexion/
         target: newtab
         id: 1_525_brs
       - title: Crédit Agricole Normandie
         icon: ca.png
-        description: 
+        description: "Banking service"
         url: https://www.credit-agricole.fr/ca-normandie/particulier/acceder-a-mes-comptes.html
         target: newtab
         id: 2_525_crditagricolenormandie
       - title: JustETF
         icon: favicon-local
-        description: 
+        description: "Do-it-yourself investing made simple"
         url: https://www.justetf.com/en/
         target: newtab
         id: 3_525_justetf
       - title: Binance
         icon: favicon-allesedv
-        description: 
+        description: "Cryptocurrency exchange"
         url: https://www.binance.com/
         target: newtab
         id: 4_525_binance
       - title: Degiro
         icon: degiro.png
-        description: 
+        description: "Stock broker"
         url: https://www.degiro.fr/
         target: newtab
         id: 5_525_degiro
       - title: Wise
         icon: favicon-local
-        description: 
+        description: "Send money abroad"
         url: https://wise.com/
         target: newtab
         id: 6_525_wise
@@ -226,31 +226,31 @@ sections:
     items:
       - title: NAS
         icon: nas.png
-        description: 
+        description: "QNAP"
         url: https://nas.corsaire.duckdns.org/cgi-bin/
         target: newtab
         id: 0_1281_nas
       - title: Sonarr
         icon: sonarr.png
-        description: 
+        description: "TV show collection manager"
         url: https://series.corsaire.duckdns.org/
         target: newtab
         id: 1_1281_sonarr
       - title: Radarr
         icon: radarr.png
-        description: 
+        description: "Movie collection manager"
         url: https://movies.corsaire.duckdns.org/
         target: newtab
         id: 2_1281_radarr
       - title: Jackett
         icon: jackett.png
-        description: 
+        description: "Proxy server for Sonarr and Radarr"
         url: https://jackett.corsaire.duckdns.org/
         target: newtab
         id: 3_1281_jackett
       - title: Transmission
         icon: transmission.png
-        description: 
+        description: "BitTorrent client"
         url: https://seedbox.corsaire.duckdns.org/
         target: newtab
         id: 4_1281_transmission
@@ -265,49 +265,49 @@ sections:
     items:
       - title: Traefik
         icon: traefik.png
-        description: 
+        description: "Modern reverse proxy"
         url: https://traefik.corsaire.duckdns.org/
         target: newtab
         id: 0_1745_traefik
       - title: Portainer
         icon: portainer.png
-        description: 
+        description: "Docker management UI"
         url: https://portainer.corsaire.duckdns.org/
         target: newtab
         id: 1_1745_portainer
       - title: Grafana
         icon: grafana.png
-        description: 
+        description: "Analytics & monitoring solution"
         url: https://grafana.corsaire.duckdns.org/
         target: newtab
         id: 2_1745_grafana
       - title: WAN
         icon: wan.png
-        description: 
+        description: "ISP router"
         url: https://livebox.corsaire.duckdns.org/
         target: newtab
         id: 3_1745_wan
       - title: UptimeRobot
         icon: favicon-local
-        description: 
+        description: "Monitor websites"
         url: https://uptimerobot.com/
         target: newtab
         id: 4_1745_uptimerobot
       - title: Prometheus
         icon: prometheus.png
-        description: 
+        description: "Monitoring system & time series database
         url: https://prometheus.corsaire.duckdns.org/
         target: newtab
         id: 5_1745_prometheus
       - title: Syncthing
         icon: syncthing.png
-        description: 
+        description: "Continuous file synchronization program"
         url: https://sync.corsaire.duckdns.org/
         target: newtab
         id: 6_1745_syncthing
       - title: TVHeadEnd
         icon: tvheadend.png
-        description: 
+        description: "TV streaming server and recorder"
         url: https://tv.corsaire.duckdns.org/
         target: newtab
         id: 7_1745_tvheadend
