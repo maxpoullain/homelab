@@ -78,7 +78,7 @@ sections:
       hideForGuests: false
     items:
       - title: Reddit
-        icon: favicon-local
+        icon: reddit.png
         description: "Network of communities"
         url: https://reddit.com/
         target: newtab
@@ -90,7 +90,7 @@ sections:
         target: newtab
         id: 0_500_github
       - title: Amazon
-        icon: favicon-local
+        icon: amazon.png
         description: "E-commerce site"
         url: https://www.amazon.fr/
         target: newtab
