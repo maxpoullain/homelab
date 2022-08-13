@@ -295,7 +295,7 @@ sections:
         id: 4_1745_uptimerobot
       - title: Prometheus
         icon: prometheus.png
-        description: "Monitoring system & time series database
+        description: "Monitoring system & time series database"
         url: https://prometheus.corsaire.duckdns.org/
         target: newtab
         id: 5_1745_prometheus
