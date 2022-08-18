@@ -13,7 +13,7 @@ appConfig:
   disableConfiguration: false
   showSplashScreen: false
   disableContextMenu: true
-  websearch:
+  webSearch:
     searchEngine: duckduckgo
     openingMethod: newtab
 pageInfo:
