@@ -10,8 +10,9 @@ appConfig:
     hideSettings: true
     hideFooter: true
   routingMode: hash
-  disableConfiguration: false
-  showSplashScreen: false
+  disableConfiguration: true
+  showSplashScreen: false 
+  enableServiceWorker: true
   disableContextMenu: true
   webSearch:
     searchEngine: duckduckgo
@@ -20,7 +21,7 @@ pageInfo:
   title: Corsaire Labs
   description: Dashboard
   navLinks: []
-  logo: assets/corsaire.png
+  logo: ./assets/corsaire.png
 sections:
   - name: Your ship's homeport
     icon: fas fa-ship
