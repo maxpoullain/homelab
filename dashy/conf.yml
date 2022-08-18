@@ -10,8 +10,8 @@ appConfig:
     hideSettings: true
     hideFooter: true
   routingMode: hash
-  disableConfiguration: true
-  showSplashScreen: true
+  disableConfiguration: false
+  showSplashScreen: false
   disableContextMenu: true
   websearch:
     searchEngine: duckduckgo
@@ -34,7 +34,7 @@ sections:
     widgets:
       - type: public-ip
         id: 0_1963_publicip
-  - name: Live weather
+  - name: Local weather
     icon: fas fa-windsock
     displayData:
       sortBy: default
