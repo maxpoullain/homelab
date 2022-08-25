@@ -9,7 +9,7 @@ appConfig:
   hideComponents:
     hideSettings: true
     hideFooter: true
-  routingMode: hash
+  routingMode: history
   disableConfiguration: true
   showSplashScreen: false
   enableServiceWorker: false
