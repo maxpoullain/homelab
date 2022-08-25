@@ -11,8 +11,8 @@ appConfig:
     hideFooter: true
   routingMode: hash
   disableConfiguration: true
-  showSplashScreen: true 
-  enableServiceWorker: true
+  showSplashScreen: false
+  enableServiceWorker: false
   disableContextMenu: true
   webSearch:
     searchEngine: duckduckgo
@@ -136,7 +136,7 @@ sections:
         target: newtab
         id: 1_831_youtube
       - title: F1 TV
-        icon: favicon-local
+        icon: f1tv.png
         description: "Enter the world of Formula 1"
         url: https://f1tv.formula1.com/
         target: newtab
@@ -211,7 +211,7 @@ sections:
         target: newtab
         id: 5_525_degiro
       - title: Wise
-        icon: favicon-local
+        icon: wise.png
         description: "Send money abroad"
         url: https://wise.com/
         target: newtab
