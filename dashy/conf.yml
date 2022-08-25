@@ -11,7 +11,7 @@ appConfig:
     hideFooter: true
   routingMode: hash
   disableConfiguration: true
-  showSplashScreen: false 
+  showSplashScreen: true 
   enableServiceWorker: true
   disableContextMenu: true
   webSearch:
