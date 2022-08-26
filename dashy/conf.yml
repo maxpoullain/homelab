@@ -2,7 +2,6 @@ appConfig:
   language: en
   startingView: default
   defaultOpeningMethod: newtab
-  faviconApi: allesedv
   layout: auto
   iconSize: small
   theme: nord-frost
