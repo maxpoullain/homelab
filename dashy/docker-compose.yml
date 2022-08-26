@@ -19,6 +19,7 @@ services:
       - GID=1000
       - UID=1000
       - NODE_ENV=production
+      - BASE_URL=""
     healthcheck:
       test: [ 'CMD', 'node', '/app/services/healthcheck' ]
       interval: 1m30s
