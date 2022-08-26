@@ -13,13 +13,13 @@ services:
       - "./conf.yml:/app/public/conf.yml"
       - "./assets/favicon/favicon.ico:/app/public/favicon.ico"
       - "./assets/favicon/favicon-32x32.png:/app/public/web-icons/favicon-32x32.png"
+      - "./assets/favicon/favicon-16x16.png:/app/public/web-icons/favicon-16x16.png"
       - "./assets/icons:/app/public/item-icons"
       - "./assets:/app/public/assets"
     environment:
       - GID=1000
       - UID=1000
       - NODE_ENV=production
-      - BASE_URL="/"
     healthcheck:
       test: [ 'CMD', 'node', '/app/services/healthcheck' ]
       interval: 1m30s
@@ -35,7 +35,7 @@ services:
       - "traefik.http.routers.dashy.tls.certresolver=acme"
       - "traefik.http.routers.dashy.service=dashy"
       - "traefik.http.services.dashy.loadbalancer.server.port=80"
-      - "traefik.http.middlewares.dashy.redirectregex.regex=https://corsaire.duckdns.org"
+      - "traefik.http.middlewares.dashy.redirectregex.regex=https://(home.|dashy.)?corsaire.duckdns.org"
       - "traefik.http.middlewares.dashy.redirectregex.replacement=https://www.corsaire.duckdns.org"
 
 networks:
