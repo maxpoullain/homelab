@@ -9,7 +9,7 @@ appConfig:
   hideComponents:
     hideSettings: true
     hideFooter: true
-  routingMode: history
+  routingMode: hash
   disableConfiguration: true
   showSplashScreen: false
   enableServiceWorker: false
@@ -21,7 +21,7 @@ pageInfo:
   title: Corsaire Labs
   description: Dashboard
   navLinks: []
-  logo: ./assets/corsaire.png
+  logo: /assets/corsaire.png
 sections:
   - name: Your ship's homeport
     icon: fas fa-ship
@@ -85,7 +85,7 @@ sections:
         target: newtab
         id: 1_500_reddit
       - title: Github
-        icon: favicon-local
+        icon: reddit.png
         description: "Code hosting platform"
         url: https://github.com/
         target: newtab
@@ -103,13 +103,13 @@ sections:
         target: newtab
         id: 3_500_linkedin
       - title: Facebook
-        icon: favicon-allesedv
+        icon: linkedin.png
         description: "Connect with friends"
         url: https://www.facebook.com/
         target: newtab
         id: 4_500_facebook
       - title: KeeWeb
-        icon: favicon-allesedv
+        icon: facebook.png
         description: "Cross-platform password manager"
         url: https://app.keeweb.info/
         target: newtab
@@ -124,7 +124,7 @@ sections:
       hideForGuests: false
     items:
       - title: Twitch
-        icon: favicon-local
+        icon: twitch.png
         description: "Games streaming service"
         url: https://www.twitch.tv/directory/following
         target: newtab
@@ -142,7 +142,7 @@ sections:
         target: newtab
         id: 2_831_ftv
       - title: Netflix
-        icon: favicon-local
+        icon: netflix.png
         description: "Streaming video service"
         url: https://www.netflix.com/
         target: newtab
@@ -175,13 +175,13 @@ sections:
       hideForGuests: false
     items:
       - title: Finary
-        icon: favicon-local
+        icon: finary.png
         description: "The ultimate portfolio tracker"
         url: https://app.finary.com/en
         target: newtab
         id: 0_525_finary
       - title: BRS
-        icon: favicon-allesedv
+        icon: brs.png
         description: "Banking service"
         url: https://clients.boursorama.com/connexion/
         target: newtab
@@ -193,13 +193,13 @@ sections:
         target: newtab
         id: 2_525_crditagricolenormandie
       - title: JustETF
-        icon: favicon-local
+        icon: justetf.png
         description: "Do-it-yourself investing made simple"
         url: https://www.justetf.com/en/
         target: newtab
         id: 3_525_justetf
       - title: Binance
-        icon: favicon-allesedv
+        icon: binance.png
         description: "Cryptocurrency exchange"
         url: https://www.binance.com/
         target: newtab
@@ -289,7 +289,7 @@ sections:
         target: newtab
         id: 3_1745_wan
       - title: UptimeRobot
-        icon: favicon-local
+        icon: status.png
         description: "Monitor websites"
         url: https://uptimerobot.com/
         target: newtab
@@ -314,4 +314,4 @@ sections:
         id: 7_1745_tvheadend
 pages:
   - name: Extras
-    path: assets/config-extras.yml
+    path: /assets/config-extras.yml
