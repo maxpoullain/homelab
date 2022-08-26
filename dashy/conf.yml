@@ -12,7 +12,6 @@ appConfig:
   routingMode: hash
   disableConfiguration: true
   showSplashScreen: false
-  enableServiceWorker: false
   disableContextMenu: true
   webSearch:
     searchEngine: duckduckgo
