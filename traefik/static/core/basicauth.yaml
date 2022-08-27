@@ -4,24 +4,24 @@ http:
         traefik-auth:
             basicAuth:
                 users:
-                    - ENC[AES256_GCM,data:QdoTW/V8RawypKtvgFy6ugnJMWta1qCi4RcGKGYE/yAaH46c1w==,iv:w75b8/S/lYfWgK+CfClK20v3+OTsv9xiUrxEGQgKASE=,tag:oDgl6iHomQM4uVuEMG433A==,type:str]
+                    - ENC[AES256_GCM,data:EsQdepC2EdQ6DUBpRkCaB0IgmMfb9uBH6RxbU+LhPOI3gjGSZg==,iv:8lk+Hss++QmAVUGNST/I5aljT9BPEJY/BHi3wj0JI8Q=,tag:p9ReyZDBlCQp3oDrAsWveA==,type:str]
 sops:
     kms: []
     gcp_kms: []
     azure_kv: []
     hc_vault: []
     age:
-        - recipient: age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p
+        - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBlT2Jrclp1ZUJYUVJoV0lZ
-            cFZzcUhEU1hPS2l6eG5vTjZtRTBDRWRFWkEwCjhQMkRIRTkxR2ZpaDBoTmxYZTZJ
-            L3o4RmZBcW52MktPS3RsRVFIV1Z0VEUKLS0tIEJ2L05NUDNsR3kxMnlRajNJTTB4
-            VnpiZVpEZXFxUDgxWjhtbnNUUlBEV2sK5khougnAHi6IeDDrv0ldOodXhoICBtOf
-            A/f40yKCbUTRiVL2OY7W0rTvGQumgpDg/2Svo26z0JLirHyG8gGX1g==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAya2JnMCsxVURLSVpyQWcy
+            WERQbWFJUkJHdDZLbFE3QkVQclhXWnpnYTNrCjZIaHlBUEU1SHZyZ0JnZDZxZlVJ
+            citITm0rTC9IMjBQM29PZml2NjZ4aG8KLS0tIFJpcU8yS2s1eThBQmpaTjhNWWFQ
+            M2llbjR1eU9Mc1NpbHpwbGpyWEZ1UUkKVrpI3kqABz28Fi/buXH7A46rzwuHsCv7
+            kMFfqe3XKx3Fm8GFNUp17I7S/P4X785L6exkdparBIVShfWQVt/QmQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2022-08-27T10:48:15Z"
-    mac: ENC[AES256_GCM,data:LoFVXVBfN/mx6H00YEHgPt8nGAhsr03yFJBWk8cZOOd/je9z8Nwn/g+SHtyVBJf5EcId7gMUIfOGdGViq7s4P8sWEQmr2HcCMxelIYWo5ALiKaiFO4PdrxthRrTSLTxneeZJ5Lubtz4h/GudBOYVvPkfl+W1/hPYVaowV6Y/20E=,iv:tuPZubLXFZ5JGNJZVYw45blaNBJ7tH3/LjEv9xIuAAU=,tag:q9frFIF09k/Ddjs0FurdNg==,type:str]
+    lastmodified: "2022-08-27T11:03:53Z"
+    mac: ENC[AES256_GCM,data:FdCHDBsHpMg3WEdShpUVR6uRVdT6Tto6/paxG0vJoH3tVa5YE7/ITjIgCUveoDBuSg9sboFWnqg3T65VFwYzLoRqPcKvvCq2STWr6eenEMIdG2BKa8tiW4dPisfOuI1C4C2n40IzWLpvWV/RFicCkdPsK5MK0yta7iHZ/eymApo=,iv:fSIB8IcjoC9Bui2nF3ZOxOkTi45FryuOdhD1xk8qsro=,tag:hjbSsm+Lkap8LkDwgQ7PDQ==,type:str]
     pgp: []
     encrypted_regex: ^(.*PrivateKey.*|.*certificate.*|.*key.*|.*users.*)$
     version: 3.7.3
