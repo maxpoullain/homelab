@@ -15,7 +15,7 @@
    watch = true
    exposedByDefault = false
  [providers.file]
-   directory = "/etc/traefik/static"
+   directory = "/etc/traefik/statics"
    watch = true
 
 [entryPoints]
