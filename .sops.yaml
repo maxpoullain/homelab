@@ -1,3 +1,3 @@
 creation_rules:
-  - age: 'age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p'
+  - age: 'age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw'
     encrypted_regex: '^(.*PrivateKey.*|.*certificate.*|.*key.*|.*users.*)$'
