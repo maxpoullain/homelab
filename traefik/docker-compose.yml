@@ -20,7 +20,7 @@ services:
       - traefik.http.routers.traefik.rule=Host(`traefik.corsaire.duckdns.org`)
       - traefik.http.routers.traefik.tls
       - traefik.http.routers.traefik.tls.certresolver=acme
-      - traefik.http.routers.traefik.middlewares=traefik-auth
+      - traefik.http.routers.traefik.middlewares=traefik-auth@file
       - traefik.http.routers.traefik.service=api@internal
       - traefik.http.services.traefik.loadbalancer.server.port=443
 networks:
