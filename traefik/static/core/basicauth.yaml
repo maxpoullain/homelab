@@ -1,0 +1,36 @@
+# Declaring the basicauth user lists
+http:
+    middlewares:
+        traefik-auth:
+            basicAuth:
+                users:
+                    - ENC[AES256_GCM,data:mK0OQCqSKMh30dHXuTsa++evfdjXn+8GVGbKG2i2djZk8DnfqA==,iv:37pmF8pRL1mZHeKlvh9R4JePYESAbV9Se0GD5RuQzOY=,tag:lek0w552xwQ7l+qdw5v47g==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age: []
+    lastmodified: "2022-08-27T09:37:50Z"
+    mac: ENC[AES256_GCM,data:7hzH7CSjWZDMvVZnIXUQHjqL5h+Y8QMfICuFJhXnF2JDRwcmyhYXenGorB8kxMTtUHbPElbjufx+TdHanSOePzCxA3jzIZ/rPJpV+FUmlO+1NT/qLcanX+DHcEFW6nl3wYuov+iRJTgKaNbSj6UCxasBiEXoPjBcP21ffkN74Ik=,iv:vA3UFIQyP3bM7UTo/2vpp4DRp849fRtALibhYJ3dPB8=,tag:woENTL1CIO+JYSL6knPoZw==,type:str]
+    pgp:
+        - created_at: "2022-08-27T09:37:48Z"
+          enc: |
+            -----BEGIN PGP MESSAGE-----
+
+            hQGMAxoX1jv0QZh0AQwA062qsb3eNr52L70DazrFIqqsCp+2rzvp/DYYVXtVe8ZI
+            eT6uA9gaJWLM7oYCpCTq4I2UcfVgzXGjZ2u9ii/JXBA5ahI7SPRXR+JzUjxGJ2wG
+            oTgeZKC7/+15hRNopXg4Zb6nmQtI3z1d41R6sAMAhtrSusWHaOteEcfmn1Hifrgl
+            F1iF5fnC+DQ3oKJ0+/8lwFDzzf66PX4GRFaCYvntkAgWwxZ3X0QEjAQHYiwWK4+k
+            PnfjrtKa8q0aBI4jWgd3/SwtmFz5B6Ldvcw7EHEKI9uKLDEq/+zKVIqQs8di86IF
+            5UsQ/7zEOODZjf+e4cQmk6F3pp8DWp79Mns07HY5Hu4Cqed209DRRTU0pkrC1/R0
+            XF6VWotAcFuGGMe/9LZWIZt4rGD6G9htZ3ucv3T6Ua0qyDoJanb3/WflQ699Fqnt
+            LGqvswm/sTKobJyJ0gWFqEQ/NN55aA2wUSaOuKObBsDBnes38iHJzx0JbtGrkr3H
+            ajET2/+kjJ90adAClXsC0l4BOFnvnsebtAda9/LYEDKniQUfxp/8zJiqed+lpwUI
+            BPxYOILD54i9SWTDQQNHS4/F5jsYX+Tc5pvyLNjeaWoYnWh4Ix8C+4mh7sksFxqc
+            PLjy/fGaLsPqDGyqvkEw
+            =IWpN
+            -----END PGP MESSAGE-----
+          fp: 46FB5F9DE79897FBA0B4B19BFD15185C7FB3E916
+    encrypted_regex: ^(.*PrivateKey.*|.*certificate.*|.*key.*|.*users.*)$
+    version: 3.7.3

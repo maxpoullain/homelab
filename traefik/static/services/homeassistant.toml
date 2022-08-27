@@ -1,0 +1,13 @@
+#  to HomeAssistant
+
+[http.routers.homeassistant]
+  entryPoints = [ "https" ]
+  rule = "Host(`home.corsaire.duckdns.org`)"
+  service = "homeassistant"
+  priority = 1
+  [http.routers.homeassistant.tls]
+    certResolver = "acme"
+
+[http.services.homeassistant.loadBalancer]
+  [[http.services.homeassistant.loadBalancer.servers]]
+    url = "http://homelab:8123"
