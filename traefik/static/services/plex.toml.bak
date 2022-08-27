@@ -1,0 +1,13 @@
+#  to Plex 
+
+[http.routers.plex]
+  entryPoints = [ "https" ]
+  rule = "Host(`plex.corsair.bzh`)"
+  service = "plex"
+  priority = 1
+  [http.routers.plex.tls]
+    certResolver = "acme"
+
+[http.services.plex.loadBalancer]
+  [[http.services.plex.loadBalancer.servers]]
+    url = "http://172.17.0.1:32400"

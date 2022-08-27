@@ -1,0 +1,3 @@
+creation_rules:
+  - pgp: '46FB5F9DE79897FBA0B4B19BFD15185C7FB3E916'
+    encrypted_regex: '^(.*PrivateKey.*|.*certificate.*|.*key.*|.*users.*)$'
