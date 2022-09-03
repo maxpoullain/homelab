@@ -1,1 +1,2 @@
 traefik/logs/*
+traefik/acme/*
