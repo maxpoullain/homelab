@@ -310,6 +310,11 @@ sections:
         url: https://tv.corsaire.duckdns.org/
         target: newtab
         id: 7_1745_tvheadend
+      - title: Backblaze
+        icon: 
+        description: "Robust, scalable low cost cloud backup and storage services"
+        url: https://backblaze.com/
+        target: newtabx
 pages:
   - name: Extras
     path: /assets/config-extras.yml
