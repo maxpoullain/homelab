@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    mem_limit: 2048m
+    mem_limit: 3072m
     environment:
       - PUID=1000
       - PGID=1000
