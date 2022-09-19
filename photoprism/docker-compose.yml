@@ -61,7 +61,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.photos.entrypoints=https"
-      - "traefik.http.routers.photos.rule=Host(`photos.corsair.bzh`)"
+      - "traefik.http.routers.photos.rule=Host(`photos.corsaire.duckdns.org`)"
       - "traefik.http.routers.photos.tls=true"
       - "traefik.http.routers.photos.tls.certresolver=acme"
       - "traefik.docker.network=traefik"
