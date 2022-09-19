@@ -3,3 +3,5 @@ traefik/acme/*
 homeautomation/homeassistant/*
 photoprism/mariadb/*
 photoprism/storage/*
+tv/jellyfin/*
+tv/antennas/*
