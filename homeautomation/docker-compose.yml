@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - ./homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /dev/serial/by-id/:/dev/serial/by-id
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+      - no-new-privileges:true
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    environment:
+      DISABLE_JEMALLOC: "true"
+      PUID: 1000
+      PGID: 1000
+      TZ: "Europe/Paris"
+    network_mode: "host"
