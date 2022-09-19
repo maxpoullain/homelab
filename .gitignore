@@ -1,2 +1,3 @@
 traefik/logs/*
 traefik/acme/*
+homeautomation/homeassistant/*
