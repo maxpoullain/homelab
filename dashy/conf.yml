@@ -223,10 +223,10 @@ sections:
       collapsed: false
       hideForGuests: false
     items:
-      - title: Home Assistant
+      - title: Home
         icon: 
         description: ""
-        url: https://home.corsaire.duckdns.org/cgi-bin/
+        url: https://home.corsaire.duckdns.org/
         target: newtab
       - title: NAS
         icon: nas.png
