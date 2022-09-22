@@ -3,8 +3,8 @@ services:
 
   jellyfin:
     # image: linuxserver/jellyfin:arm32v7-10.7.7-1-ls155 
-    image: linuxserver/jellyfin:nightly
-    # image: linuxserver/jellyfin:arm32v7-latest 
+    # image: linuxserver/jellyfin:nightly
+    image: linuxserver/jellyfin:arm32v7-latest
     container_name: "jellyfin"
     restart: unless-stopped
     security_opt:
