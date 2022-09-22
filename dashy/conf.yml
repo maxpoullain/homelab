@@ -154,7 +154,7 @@ sections:
       - title: Jellyfin
         icon: jellyfin.png
         description: "Free software media system"
-        url: https://jellyfin.corsaire.duckdns.org/
+        url: https://tv.corsaire.duckdns.org/
         target: newtab
         id: 5_831_jellyfin
       - title: Photoprism
@@ -223,6 +223,11 @@ sections:
       collapsed: false
       hideForGuests: false
     items:
+      - title: Home Assistant
+        icon: 
+        description: ""
+        url: https://home.corsaire.duckdns.org/cgi-bin/
+        target: newtab
       - title: NAS
         icon: nas.png
         description: "QNAP"
