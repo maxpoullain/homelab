@@ -1,0 +1,143 @@
+version: "3.8"
+services:
+
+  transmission:
+    container_name: transmission
+    image: linuxserver/transmission:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "51413:51413"
+      - "51413:51413/udp"
+    volumes:
+      - "./transmission:/config"
+      - "./transmission/downloads:/downloads"
+      - "./transmission/watch:/watch"
+    env_file:
+      - secrets.env
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/Paris
+      - TRANSMISSION_WEB_UI=flood-for-transmission
+    cpus: 0.5
+    mem_limit: 512m
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.seedbox.entrypoints=https"
+      - "traefik.http.routers.seedbox.rule=Host(`seedbox.corsaire.duckdns.org`)"
+      - "traefik.http.routers.seedbox.tls=true"
+      - "traefik.http.routers.seedbox.tls.certresolver=acme"
+      - "traefik.http.routers.seedbox.service=seedbox"
+      - "traefik.http.services.seedbox.loadbalancer.server.port=9091"
+      - "traefik.docker.network=traefik"
+    networks:
+      - traefik
+
+  sonarr:
+    container_name: sonarr
+    image: linuxserver/sonarr:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - "./sonarr:/config"
+      - "./transmission/downloads:/downloads"
+      - "/mnt/nas/series:/tv"
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/Paris
+    cpus: 0.5
+    mem_limit: 512m
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.shows.entrypoints=https"
+      - "traefik.http.routers.shows.rule=Host(`shows.corsaire.duckdns.org`)"
+      - "traefik.http.routers.shows.tls=true"
+      - "traefik.http.routers.shows.tls.certresolver=acme"
+      - "traefik.http.routers.shows.service=shows"
+      - "traefik.http.services.shows.loadbalancer.server.port=8989"
+      - "traefik.docker.network=traefik"
+    networks:
+      - traefik
+
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - "./radarr:/config"
+      - "./transmission/downloads:/downloads"
+      - "/mnt/nas/movies:/movies"
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/Paris
+    cpus: 0.5
+    mem_limit: 512m
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.movies.entrypoints=https"
+      - "traefik.http.routers.movies.rule=Host(`movies.corsaire.duckdns.org`)"
+      - "traefik.http.routers.movies.tls=true"
+      - "traefik.http.routers.movies.tls.certresolver=acme"
+      - "traefik.http.routers.movies.service=movies"
+      - "traefik.http.services.movies.loadbalancer.server.port=7878"
+      - "traefik.docker.network=traefik"
+    networks:
+      - traefik
+
+  jackett:
+    container_name: jackett
+    image: linuxserver/jackett:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - "./jackett/config:/config"
+      - "./jackett/downloads:/downloads"
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/Paris
+    cpus: 0.5
+    mem_limit: 512m
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jackett.entrypoints=https"
+      - "traefik.http.routers.jackett.rule=Host(`jackett.corsaire.duckdns.org`)"
+      - "traefik.http.routers.jackett.tls=true"
+      - "traefik.http.routers.jackett.tls.certresolver=acme"
+      - "traefik.http.routers.jackett.service=jackett"
+      - "traefik.http.services.jackett.loadbalancer.server.port=9117"
+      - "traefik.docker.network=traefik"
+    networks:
+      - traefik
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+
+  flaresolverr:
+    container_name: flaresolverr
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/Paris
+      - LOG_LEVEL=info
+    #  - CAPTCHA_SOLVER=hcaptcha-solver
+    cpus: 0.5
+    mem_limit: 512m
+    networks:
+      - traefik
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+
+  traefik:
+    external: true
