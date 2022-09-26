@@ -91,6 +91,32 @@ services:
     networks:
       - traefik
 
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./readarr:/config
+      #- /path/to/books:/books #optional
+      #- /path/to/downloadclient-downloads:/downloads #optional
+    restart: unless-stopped
+    cpus: 0.5
+    mem_limit: 512m
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.books.entrypoints=https"
+      - "traefik.http.routers.books.rule=Host(`books.corsaire.duckdns.org`)"
+      - "traefik.http.routers.books.tls=true"
+      - "traefik.http.routers.books.tls.certresolver=acme"
+      - "traefik.http.routers.books.service=books"
+      - "traefik.http.services.books.loadbalancer.server.port=8787"
+      - "traefik.docker.network=traefik"
+    networks:
+      - traefik
+
   jackett:
     container_name: jackett
     image: linuxserver/jackett:latest
