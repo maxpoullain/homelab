@@ -1,7 +1,11 @@
-traefik/logs/*
-traefik/acme/*
 homeautomation/homeassistant/*
+media/jackett/*
+media/radarr/*
+media/sonarr/*
+media/transmission/*
 photoprism/mariadb/*
 photoprism/storage/*
-tv/jellyfin/*
+traefik/acme/*
+traefik/logs/*
 tv/antennas/*
+tv/jellyfin/*
