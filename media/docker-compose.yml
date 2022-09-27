@@ -112,6 +112,7 @@ services:
       - "traefik.http.routers.books.tls=true"
       - "traefik.http.routers.books.tls.certresolver=acme"
       - "traefik.http.routers.books.service=books"
+      - traefik.http.routers.books.middlewares=traefik-auth@file
       - "traefik.http.services.books.loadbalancer.server.port=8787"
       - "traefik.docker.network=traefik"
     networks:
