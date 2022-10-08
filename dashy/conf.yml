@@ -224,7 +224,7 @@ sections:
       hideForGuests: false
     items:
       - title: Home
-        icon: favicon-local
+        icon: favicon-mcapi
         description: "Open-source software for home automation"
         url: https://home.corsaire.duckdns.org/
         target: newtab
