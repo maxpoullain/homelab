@@ -224,7 +224,7 @@ sections:
       hideForGuests: false
     items:
       - title: Home
-        icon: favicon-mcapi
+        icon: favicon-local
         description: "Open-source software for home automation"
         url: https://home.corsaire.duckdns.org/
         target: newtab
@@ -249,7 +249,7 @@ sections:
       - title: Readarr
         icon: favicon-local
         description: ""
-        url: https://readarr.corsaire.duckdns.org/
+        url: https://books.corsaire.duckdns.org/
         target: newtab
       - title: Prowlarr
         icon: favicon-local
