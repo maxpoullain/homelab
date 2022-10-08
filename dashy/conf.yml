@@ -224,8 +224,8 @@ sections:
       hideForGuests: false
     items:
       - title: Home
-        icon: 
-        description: ""
+        icon: favicon
+        description: "Open-source software for home automation"
         url: https://home.corsaire.duckdns.org/
         target: newtab
       - title: NAS
@@ -237,7 +237,7 @@ sections:
       - title: Sonarr
         icon: sonarr.png
         description: "TV show collection manager"
-        url: https://series.corsaire.duckdns.org/
+        url: https://shows.corsaire.duckdns.org/
         target: newtab
         id: 1_1281_sonarr
       - title: Radarr
@@ -316,7 +316,7 @@ sections:
         target: newtab
         id: 7_1745_tvheadend
       - title: Backblaze
-        icon: 
+        icon: favicon
         description: "Robust, scalable low cost cloud backup and storage services"
         url: https://backblaze.com/
         target: newtabx
