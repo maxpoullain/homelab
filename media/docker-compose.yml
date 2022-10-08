@@ -102,7 +102,7 @@ services:
     volumes:
       - "./readarr:/config"
       - "./transmission/downloads:/downloads"
-      - "/mnt/nas/max/ebooks/raw:/books"
+      - "/mnt/nas/max/ebooks/calibre:/books"
     restart: unless-stopped
     cpus: 0.5
     mem_limit: 512m
