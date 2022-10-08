@@ -14,6 +14,7 @@ services:
       - "./transmission:/config"
       - "./transmission/downloads:/downloads"
       - "./transmission/watch:/watch"
+      - "/mnt/nas/max/seedbox:/seedbox"
     env_file:
       - secrets.env
     environment:
@@ -127,8 +128,6 @@ services:
       - TZ=Europe/London
     volumes:
       - "./prowlarr:/config"
-      - "./transmission/downloads:/downloads"
-      - "/mnt/nas/max/downloads:/prowlarr"
     restart: unless-stopped
     cpus: 0.5
     mem_limit: 512m
