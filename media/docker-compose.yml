@@ -127,6 +127,8 @@ services:
       - TZ=Europe/London
     volumes:
       - "./prowlarr:/config"
+      - "./transmission/downloads:/downloads"
+      - "/mnt/nas/max/downloads:/prowlarr"
     restart: unless-stopped
     cpus: 0.5
     mem_limit: 512m
