@@ -246,6 +246,16 @@ sections:
         url: https://movies.corsaire.duckdns.org/
         target: newtab
         id: 2_1281_radarr
+      - title: Readarr
+        icon: favicon-local
+        description: ""
+        url: https://readarr.corsaire.duckdns.org/
+        target: newtab
+      - title: Prowlarr
+        icon: favicon-local
+        description: ""
+        url: https://prowlarr.corsaire.duckdns.org/
+        target: newtab
       - title: Jackett
         icon: jackett.png
         description: "Proxy server for Sonarr and Radarr"
