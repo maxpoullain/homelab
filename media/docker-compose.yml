@@ -99,9 +99,9 @@ services:
       - PGID=1000
       - TZ=Europe/London
     volumes:
-      - ./readarr:/config
-      #- /path/to/books:/books #optional
-      #- /path/to/downloadclient-downloads:/downloads #optional
+      - "./readarr:/config"
+      - "./transmission/downloads:/downloads"
+      - "/mnt/nas/max/ebooks/raw:/books"
     restart: unless-stopped
     cpus: 0.5
     mem_limit: 512m
