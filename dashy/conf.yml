@@ -224,7 +224,7 @@ sections:
       hideForGuests: false
     items:
       - title: Home
-        icon: favicon
+        icon: favicon-local
         description: "Open-source software for home automation"
         url: https://home.corsaire.duckdns.org/
         target: newtab
@@ -319,7 +319,7 @@ sections:
         icon: favicon
         description: "Robust, scalable low cost cloud backup and storage services"
         url: https://backblaze.com/
-        target: newtabx
+        target: newtab
 pages:
   - name: Extras
     path: /assets/config-extras.yml
