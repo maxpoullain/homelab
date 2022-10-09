@@ -143,6 +143,25 @@ services:
     networks:
       - traefik
 
+  flaresolverr:
+    container_name: flaresolverr
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/Paris
+      - LOG_LEVEL=info
+    #  - CAPTCHA_SOLVER=hcaptcha-solver
+    cpus: 0.5
+    mem_limit: 512m
+    networks:
+      - traefik
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+
 networks:
   traefik:
     external: true
