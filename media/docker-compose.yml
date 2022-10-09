@@ -102,6 +102,7 @@ services:
     volumes:
       - "./readarr:/config"
       - "./transmission/downloads:/downloads"
+      - "/mnt/nas/max/seedbox:/seedbox"
       - "/mnt/nas/max/ebooks/calibre:/books"
     restart: unless-stopped
     cpus: 0.5
@@ -113,7 +114,6 @@ services:
       - "traefik.http.routers.books.tls=true"
       - "traefik.http.routers.books.tls.certresolver=acme"
       - "traefik.http.routers.books.service=books"
-      - traefik.http.routers.books.middlewares=traefik-auth@file
       - "traefik.http.services.books.loadbalancer.server.port=8787"
       - "traefik.docker.network=traefik"
     networks:
@@ -142,24 +142,7 @@ services:
       - "traefik.docker.network=traefik"
     networks:
       - traefik
-  # flaresolverr:
-  #   container_name: flaresolverr
-  #   image: ghcr.io/flaresolverr/flaresolverr:latest
-  #   restart: unless-stopped
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   environment:
-  #     - PGID=1000
-  #     - PUID=1000
-  #     - TZ=Europe/Paris
-  #     - LOG_LEVEL=info
-  #   #  - CAPTCHA_SOLVER=hcaptcha-solver
-  #   cpus: 0.5
-  #   mem_limit: 512m
-  #   networks:
-  #     - traefik
-  #   sysctls:
-  #     - net.ipv6.conf.all.disable_ipv6=1
+
 networks:
   traefik:
     external: true
