@@ -142,6 +142,9 @@ services:
       - "traefik.docker.network=traefik"
     networks:
       - traefik
+    dns:
+      - 1.1.1.1
+      - 192.168.1.1
 
   flaresolverr:
     container_name: flaresolverr
