@@ -139,18 +139,6 @@ sections:
         url: https://f1tv.formula1.com/
         target: newtab
         id: 2_831_ftv
-      - title: Netflix
-        icon: netflix.png
-        description: "Streaming video service"
-        url: https://www.netflix.com/
-        target: newtab
-        id: 3_831_netflix
-      - title: Prime Video
-        icon: primevideo.png
-        description: "Streaming video service"
-        url: https://www.primevideo.com/
-        target: newtab
-        id: 4_831_primevideo
       - title: Jellyfin
         icon: jellyfin.png
         description: "Free software media system"
@@ -163,6 +151,18 @@ sections:
         url: https://photos.corsaire.duckdns.org/
         target: newtab
         id: 6_831_photoprism
+      - title: Prime Video
+        icon: primevideo.png
+        description: "Streaming video service"
+        url: https://www.primevideo.com/
+        target: newtab
+        id: 4_831_primevideo
+      - title: Netflix
+        icon: netflix.png
+        description: "Streaming video service"
+        url: https://www.netflix.com/
+        target: newtab
+        id: 3_831_netflix
   - name: Booty
     icon: fas fa-coins
     displayData:
@@ -175,7 +175,7 @@ sections:
       - title: Finary
         icon: finary.png
         description: "The ultimate portfolio tracker"
-        url: https://app.finary.com/en
+        url: https://app.finary.com/fr
         target: newtab
         id: 0_525_finary
       - title: BRS
@@ -184,7 +184,7 @@ sections:
         url: https://clients.boursorama.com/connexion/
         target: newtab
         id: 1_525_brs
-      - title: Crédit Agricole Normandie
+      - title: Crédit Agricole
         icon: ca.png
         description: "Banking service"
         url: https://www.credit-agricole.fr/ca-normandie/particulier/acceder-a-mes-comptes.html
@@ -223,8 +223,8 @@ sections:
       collapsed: false
       hideForGuests: false
     items:
-      - title: Home
-        icon: favicon-local
+      - title: Home Assistant
+        icon: homeassistant.png
         description: "Open-source software for home automation"
         url: https://home.corsaire.duckdns.org/
         target: newtab
@@ -247,21 +247,15 @@ sections:
         target: newtab
         id: 2_1281_radarr
       - title: Readarr
-        icon: favicon-local
+        icon: readarr.png
         description: ""
         url: https://books.corsaire.duckdns.org/
         target: newtab
       - title: Prowlarr
-        icon: favicon-local
+        icon: prowlarr.png
         description: ""
         url: https://prowlarr.corsaire.duckdns.org/
         target: newtab
-      - title: Jackett
-        icon: jackett.png
-        description: "Proxy server for Sonarr and Radarr"
-        url: https://jackett.corsaire.duckdns.org/
-        target: newtab
-        id: 3_1281_jackett
       - title: Transmission
         icon: transmission.png
         description: "BitTorrent client"
@@ -283,48 +277,18 @@ sections:
         url: https://traefik.corsaire.duckdns.org/
         target: newtab
         id: 0_1745_traefik
-      - title: Portainer
-        icon: portainer.png
-        description: "Docker management UI"
-        url: https://portainer.corsaire.duckdns.org/
-        target: newtab
-        id: 1_1745_portainer
-      - title: Grafana
-        icon: grafana.png
-        description: "Analytics & monitoring solution"
-        url: https://grafana.corsaire.duckdns.org/
-        target: newtab
-        id: 2_1745_grafana
       - title: WAN
         icon: wan.png
         description: "ISP router"
         url: https://livebox.corsaire.duckdns.org/
         target: newtab
         id: 3_1745_wan
-      - title: UptimeRobot
-        icon: status.png
-        description: "Monitor websites"
-        url: https://uptimerobot.com/
-        target: newtab
-        id: 4_1745_uptimerobot
-      - title: Prometheus
-        icon: prometheus.png
-        description: "Monitoring system & time series database"
-        url: https://prometheus.corsaire.duckdns.org/
-        target: newtab
-        id: 5_1745_prometheus
       - title: Syncthing
         icon: syncthing.png
         description: "Continuous file synchronization program"
         url: https://sync.corsaire.duckdns.org/
         target: newtab
         id: 6_1745_syncthing
-      - title: TVHeadEnd
-        icon: tvheadend.png
-        description: "TV streaming server and recorder"
-        url: https://tv.corsaire.duckdns.org/
-        target: newtab
-        id: 7_1745_tvheadend
       - title: Backblaze
         icon: favicon
         description: "Robust, scalable low cost cloud backup and storage services"
