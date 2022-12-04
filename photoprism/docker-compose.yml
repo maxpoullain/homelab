@@ -55,7 +55,9 @@ services:
     working_dir: "/photoprism"
     volumes:
       - "./storage:/photoprism/storage"
-      - "/mnt/nas/photos/Max:/photoprism/originals/Max"
+      - "/mnt/nas/media/Photos/Max:/photoprism/originals/Max"
+      - "/mnt/nas/media/Photos/Sixtine:/photoprism/originals/Sixtine"
+      - "/mnt/nas/media/Photos/JD:/photoprism/originals/JD"
       # Mounting the import folder is optional (see docs):
       # - "~/Import:/photoprism/import"
     labels:
