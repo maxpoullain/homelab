@@ -9,5 +9,4 @@ photoprism/mariadb/*
 photoprism/storage/*
 traefik/acme/*
 traefik/logs/*
-tv/antennas/*
 tv/jellyfin/*
