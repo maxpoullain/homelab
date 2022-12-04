@@ -16,8 +16,8 @@ services:
       - "44"
     volumes:
       - ./jellyfin/config:/config
-      - /mnt/nas/series:/tv
-      - /mnt/nas/movies:/movies
+      - /mnt/nas/media/Shows:/shows
+      - /mnt/nas/media/Movies:/movies
     devices:
       - /dev/vchiq:/dev/vchiq
       - /dev/video10:/dev/video10
