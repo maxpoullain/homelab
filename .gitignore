@@ -3,6 +3,7 @@ media/jackett/*
 media/radarr/*
 media/readarr*
 media/sonarr/*
+media/prowlarr/*
 media/transmission/*
 photoprism/mariadb/*
 photoprism/storage/*
