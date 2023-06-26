@@ -1,3 +1,8 @@
+automation/n8n/binaryData/*
+automation/n8n/config
+automation/n8n/database.sqlite
+automation/n8n/n8nEvent*
+dashy/conf.yaml
 homeautomation/homeassistant/*
 media/jackett/*
 media/radarr/*
@@ -9,4 +14,5 @@ photoprism/mariadb/*
 photoprism/storage/*
 traefik/acme/*
 traefik/logs/*
+traefik/statics/core/basicauth.yaml
 tv/jellyfin/*
