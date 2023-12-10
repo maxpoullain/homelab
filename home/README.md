@@ -1,4 +1,4 @@
-# Home automation
+# Home
 
 ```
 docker-compose up -d

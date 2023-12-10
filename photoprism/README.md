@@ -5,6 +5,6 @@ docker network create --driver bridge photoprism
 ```
 
 ```
-sops -d -i secrets.env
+sops -d secrets.encrypted.env > secrets.env
 docker-compose up -d
 ```

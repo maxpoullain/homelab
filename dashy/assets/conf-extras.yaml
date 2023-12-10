@@ -1,4 +1,21 @@
 ---
+appConfig:
+  language: en
+  startingView: default
+  defaultOpeningMethod: newtab
+  layout: auto
+  iconSize: small
+  theme: nord-frost
+  hideComponents:
+    hideSettings: true
+    hideFooter: true
+  routingMode: hash
+  disableConfiguration: true
+  showSplashScreen: false
+  disableContextMenu: true
+  webSearch:
+    searchEngine: duckduckgo
+    openingMethod: newtab
 pageInfo:
   title: Corsaire Labs
   description: Extras
