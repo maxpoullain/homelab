@@ -2,10 +2,10 @@ version: '3.8'
 services:
 
   homeassistant:
-    container_name: homeassistant
+    container_name: ha
     image: "ghcr.io/home-assistant/home-assistant:stable"
     volumes:
-      - ./homeassistant:/config
+      - ./ha:/config
       - /etc/localtime:/etc/localtime:ro
       - /dev/serial/by-id/:/dev/serial/by-id
     restart: unless-stopped

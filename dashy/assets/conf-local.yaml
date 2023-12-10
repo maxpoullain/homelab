@@ -1,0 +1,300 @@
+---
+appConfig:
+  language: en
+  startingView: default
+  defaultOpeningMethod: newtab
+  layout: auto
+  iconSize: small
+  theme: nord-frost
+  hideComponents:
+    hideSettings: true
+    hideFooter: true
+  routingMode: hash
+  disableConfiguration: true
+  showSplashScreen: false
+  disableContextMenu: true
+  webSearch:
+    searchEngine: duckduckgo
+    openingMethod: newtab
+pageInfo:
+  title: Corsaire Labs
+  description: Local
+  logo: /assets/corsaire.png
+  #navLinks: []
+sections:
+  - name: Your ship's homeport
+    icon: fas fa-ship
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: false
+      hideForGuests: false
+    items: []
+    widgets:
+      - type: public-ip
+        id: 0_1963_publicip
+  - name: Local weather
+    icon: fas fa-windsock
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: false
+      hideForGuests: false
+    items: []
+    widgets:
+      - type: weather
+        options:
+          apiKey: adab23796c7f8d7b30eb20a6e65d5429
+          city: St-Malo
+          units: metric
+          hideDetails: false
+        id: 1_1012_weather
+  - name: Local time
+    icon: fas fa-hourglass-half
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 2
+      collapsed: false
+      hideForGuests: false
+    items: []
+    widgets:
+      - type: clock
+        options:
+          timeZone: Europe/Paris
+          format: en-GB
+          hideDate: false
+          customCityName: Saint-Malo
+        id: 0_1012_clock
+  - name: Docks
+    icon: fas fa-anchor
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: false
+      hideForGuests: false
+    items:
+      - title: Reddit
+        icon: reddit.png
+        description: "Network of communities"
+        url: https://reddit.com/
+        target: newtab
+        id: 1_500_reddit
+      - title: Github
+        icon: github.png
+        description: "Code hosting platform"
+        url: https://github.com/
+        target: newtab
+        id: 0_500_github
+      - title: Amazon
+        icon: amazon.png
+        description: "E-commerce site"
+        url: https://www.amazon.fr/
+        target: newtab
+        id: 2_500_amazon
+      - title: LinkedIn
+        icon: linkedin.png
+        description: "Professional networking"
+        url: https://www.linkedin.com/
+        target: newtab
+        id: 3_500_linkedin
+      - title: Facebook
+        icon: facebook.png
+        description: "Connect with friends"
+        url: https://www.facebook.com/
+        target: newtab
+        id: 4_500_facebook
+      - title: KeeWeb
+        icon: keeweb.png
+        description: "Cross-platform password manager"
+        url: https://app.keeweb.info/
+        target: newtab
+        id: 5_500_keeweb
+  - name: Shanties
+    icon: fas fa-music
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: false
+      hideForGuests: false
+    items:
+      - title: Twitch
+        icon: twitch.png
+        description: "Games streaming service"
+        url: https://www.twitch.tv/directory/following
+        target: newtab
+        id: 0_831_twitch
+      - title: Youtube
+        icon: youtube.png
+        description: "Enjoy the videos and music you love"
+        url: https://www.youtube.com/feed/subscriptions
+        target: newtab
+        id: 1_831_youtube
+      - title: F1 TV
+        icon: f1tv.png
+        description: "Enter the world of Formula 1"
+        url: https://f1tv.formula1.com/
+        target: newtab
+        id: 2_831_ftv
+      - title: Jellyfin
+        icon: jellyfin.png
+        description: "Free software media system"
+        url: http://homelab:8096/
+        target: newtab
+        id: 5_831_jellyfin
+      - title: Photoprism
+        icon: photoprism.png
+        description: "Browse your life in pictures"
+        url: https://photos.corsaire.duckdns.org/
+        target: newtab
+        id: 6_831_photoprism
+      - title: Prime Video
+        icon: primevideo.png
+        description: "Streaming video service"
+        url: https://www.primevideo.com/
+        target: newtab
+        id: 4_831_primevideo
+      - title: Netflix
+        icon: netflix.png
+        description: "Streaming video service"
+        url: https://www.netflix.com/
+        target: newtab
+        id: 3_831_netflix
+  - name: Booty
+    icon: fas fa-coins
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: false
+      hideForGuests: false
+    items:
+      - title: Finary
+        icon: finary.png
+        description: "The ultimate portfolio tracker"
+        url: https://app.finary.com/fr
+        target: newtab
+        id: 0_525_finary
+      - title: BRS
+        icon: brs.png
+        description: "Banking service"
+        url: https://clients.boursorama.com/connexion/
+        target: newtab
+        id: 1_525_brs
+      - title: Crédit Agricole
+        icon: ca.png
+        description: "Banking service"
+        url: https://www.credit-agricole.fr/ca-normandie/particulier/acceder-a-mes-comptes.html
+        target: newtab
+        id: 2_525_crditagricolenormandie
+      - title: JustETF
+        icon: justetf.png
+        description: "Do-it-yourself investing made simple"
+        url: https://www.justetf.com/en/
+        target: newtab
+        id: 3_525_justetf
+      - title: Binance
+        icon: binance.png
+        description: "Cryptocurrency exchange"
+        url: https://www.binance.com/
+        target: newtab
+        id: 4_525_binance
+      - title: Degiro
+        icon: degiro.png
+        description: "Stock broker"
+        url: https://www.degiro.fr/
+        target: newtab
+        id: 5_525_degiro
+      - title: Wise
+        icon: wise.png
+        description: "Send money abroad"
+        url: https://wise.com/
+        target: newtab
+        id: 6_525_wise
+  - name: Down the Hatch
+    icon: fas fa-skull-crossbones
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: false
+      hideForGuests: false
+    items:
+      - title: Home Assistant
+        icon: homeassistant.png
+        description: "Open-source software for home automation"
+        url: http://homelab:8123
+        target: newtab
+      - title: NAS
+        icon: nas.png
+        description: "QNAP"
+        url: http://nas:8080/
+        target: newtab
+        id: 0_1281_nas
+      - title: Sonarr
+        icon: sonarr.png
+        description: "TV show collection manager"
+        url: https://shows.corsaire.duckdns.org/
+        target: newtab
+        id: 1_1281_sonarr
+      - title: Radarr
+        icon: radarr.png
+        description: "Movie collection manager"
+        url: https://movies.corsaire.duckdns.org/
+        target: newtab
+        id: 2_1281_radarr
+      - title: Readarr
+        icon: readarr.png
+        description: ""
+        url: https://books.corsaire.duckdns.org/
+        target: newtab
+      - title: Prowlarr
+        icon: prowlarr.png
+        description: ""
+        url: https://prowlarr.corsaire.duckdns.org/
+        target: newtab
+      - title: Transmission
+        icon: transmission.png
+        description: "BitTorrent client"
+        url: https://seedbox.corsaire.duckdns.org/
+        target: newtab
+        id: 4_1281_transmission
+  - name: Captain's Quarters
+    icon: fas fa-dharmachakra
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: false
+      hideForGuests: false
+    items:
+      - title: Traefik
+        icon: traefik.png
+        description: "Modern reverse proxy"
+        url: https://traefik.corsaire.duckdns.org/
+        target: newtab
+        id: 0_1745_traefik
+      - title: WAN
+        icon: wan.png
+        description: "ISP router"
+        url: http://livebox/
+        target: newtab
+        id: 3_1745_wan
+      - title: Syncthing
+        icon: syncthing.png
+        description: "Continuous file synchronization program"
+        url: https://sync.corsaire.duckdns.org/
+        target: newtab
+        id: 6_1745_syncthing
+      - title: Backblaze
+        icon: favicon
+        description: "Robust, scalable low cost cloud backup and storage services"
+        url: https://backblaze.com/
+        target: newtab
+pages:
+  - name: Extras
+    path: /assets/config-extras.yml

@@ -1,3 +1,4 @@
+---
 appConfig:
   language: en
   startingView: default
@@ -17,9 +18,9 @@ appConfig:
     openingMethod: newtab
 pageInfo:
   title: Corsaire Labs
-  description: Dashboard
-  navLinks: []
+  description: Work
   logo: /assets/corsaire.png
+  #navLinks: []
 sections:
   - name: Your ship's homeport
     icon: fas fa-ship
