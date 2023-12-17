@@ -5,6 +5,6 @@ docker network create --driver bridge traefik
 ```
 
 ```
-sops -d statics/core/basicauth.encrypted.yaml > statics/core/basicauth.yaml
-docker-compose up -d
+sops --input-type yaml --output-type yaml -d statics/core/basicauth.yaml.encrypted > statics/core/basicauth.yaml
+docker compose up -d
 ```
