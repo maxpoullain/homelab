@@ -9,8 +9,8 @@ media/prowlarr/*
 media/transmission/*
 photoprism/mariadb/*
 photoprism/storage/*
-tools/duckdns/duck.env
-tools/duckdns/duck.log
+tools/scripts/duckdns/duck.env
+tools/scripts/duckdns/duck.log
 traefik/acme/*
 traefik/logs/*
 traefik/statics/core/basicauth.yaml
