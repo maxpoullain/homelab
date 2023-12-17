@@ -1,3 +1,3 @@
 creation_rules:
   - age: 'age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw'
-    encrypted_regex: '^(.*apiKey.*|.*PHOTOPRISM.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN*.)$'
+    encrypted_regex: '^(.*apiKey.*|.*PHOTOPRISM.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*Address.*|.*PrivateKey.*|.*DNS.*|.*PublicKey.*|.*PresharedKey.*|.*Endpoint.*)$'

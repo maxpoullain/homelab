@@ -1,15 +1,48 @@
 version: "3.8"
 services:
 
-  transmission:
-    container_name: transmission
-    image: linuxserver/transmission:latest
+  wireguard:
+    container_name: wireguard
+    image: linuxserver/wireguard:version-v1.0.20210914
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    ports:
-      - "51413:51413"
-      - "51413:51413/udp"
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv4.conf.all.src_valid_mark=1
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - ./wg0.conf:/config/wg_confs/wg0.conf
+      - /lib/modules:/lib/modules
+    cpus: 0.5
+    mem_limit: 512m
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.seedbox.entrypoints=https"
+      - "traefik.http.routers.seedbox.rule=Host(`seedbox.corsaire.duckdns.org`)"
+      - "traefik.http.routers.seedbox.tls=true"
+      - "traefik.http.routers.seedbox.tls.certresolver=acme"
+      - "traefik.http.routers.seedbox.service=seedbox"
+      - "traefik.http.services.seedbox.loadbalancer.server.port=9091"
+      - "traefik.docker.network=traefik"
+    networks:
+      - traefik
+
+  transmission:
+    container_name: transmission
+    image: linuxserver/transmission:4.0.4
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    network_mode: "service:wireguard"
+    depends_on:
+      - wireguard
     volumes:
       - "./transmission:/config"
       - "./transmission/downloads:/downloads"
@@ -24,17 +57,6 @@ services:
       - TRANSMISSION_WEB_UI=flood-for-transmission
     cpus: 0.5
     mem_limit: 512m
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.seedbox.entrypoints=https"
-      - "traefik.http.routers.seedbox.rule=Host(`seedbox.corsaire.duckdns.org`)"
-      - "traefik.http.routers.seedbox.tls=true"
-      - "traefik.http.routers.seedbox.tls.certresolver=acme"
-      - "traefik.http.routers.seedbox.service=seedbox"
-      - "traefik.http.services.seedbox.loadbalancer.server.port=9091"
-      - "traefik.docker.network=traefik"
-    networks:
-      - traefik
 
   sonarr:
     container_name: sonarr
@@ -144,7 +166,7 @@ services:
       - traefik
     dns:
       - 1.1.1.1
-      - 192.168.1.1
+      - 1.0.0.1
 
   flaresolverr:
     container_name: flaresolverr
