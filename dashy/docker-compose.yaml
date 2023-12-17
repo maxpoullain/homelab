@@ -10,7 +10,7 @@ services:
     networks:
       - traefik
     volumes:
-      - "./conf.yml:/app/public/conf.yml"
+      - "./conf.yaml:/app/public/conf.yml"
       - "./assets/favicon/favicon.ico:/app/public/favicon.ico"
       - "./assets/favicon/favicon-32x32.png:/app/public/web-icons/favicon-32x32.png"
       - "./assets/favicon/favicon-16x16.png:/app/public/web-icons/favicon-16x16.png"
