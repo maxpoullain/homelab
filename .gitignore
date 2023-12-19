@@ -1,7 +1,8 @@
 **/secrets.env
 dashy/conf.yaml
 home/ha/*
-media/wg0.conf
+media/wireguard/mam.cookies
+media/wireguard/wg0.conf
 media/jackett/*
 media/radarr/*
 media/readarr*
