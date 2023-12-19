@@ -1,8 +1,9 @@
 version: "3.8"
+
 services:
   traefik:
-    image: traefik:v2.10
     container_name: traefik
+    image: traefik:v2.10
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -23,6 +24,7 @@ services:
       - traefik.http.routers.traefik.middlewares=traefik-auth@file
       - traefik.http.routers.traefik.service=api@internal
       - traefik.http.services.traefik.loadbalancer.server.port=443
+
 networks:
   traefik:
     external: true
