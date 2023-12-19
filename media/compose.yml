@@ -5,6 +5,8 @@ services:
     container_name: wireguard
     image: linuxserver/wireguard:version-v1.0.20210914
     restart: unless-stopped
+    cpus: 0.5
+    mem_limit: 512m
     security_opt:
       - no-new-privileges:true
     cap_add:
@@ -13,31 +15,37 @@ services:
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv4.conf.all.src_valid_mark=1
+    networks:
+      - traefik
+    volumes:
+      - ./wireguard/wg0.conf:/config/wg_confs/wg0.conf
+      - /lib/modules:/lib/modules
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Paris
-    volumes:
-      - ./wg0.conf:/config/wg_confs/wg0.conf
-      - /lib/modules:/lib/modules
-    cpus: 0.5
-    mem_limit: 512m
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
       - "traefik.http.routers.seedbox.entrypoints=https"
       - "traefik.http.routers.seedbox.rule=Host(`seedbox.corsaire.duckdns.org`)"
       - "traefik.http.routers.seedbox.tls=true"
       - "traefik.http.routers.seedbox.tls.certresolver=acme"
       - "traefik.http.routers.seedbox.service=seedbox"
       - "traefik.http.services.seedbox.loadbalancer.server.port=9091"
-      - "traefik.docker.network=traefik"
-    networks:
-      - traefik
+      - "traefik.http.routers.prowlarr.entrypoints=https"
+      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.corsaire.duckdns.org`)"
+      - "traefik.http.routers.prowlarr.tls=true"
+      - "traefik.http.routers.prowlarr.tls.certresolver=acme"
+      - "traefik.http.routers.prowlarr.service=prowlarr"
+      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
 
   transmission:
     container_name: transmission
     image: linuxserver/transmission:4.0.4
     restart: unless-stopped
+    cpus: 0.5
+    mem_limit: 512m
     security_opt:
       - no-new-privileges:true
     network_mode: "service:wireguard"
@@ -45,9 +53,11 @@ services:
       - wireguard
     volumes:
       - "./transmission:/config"
-      - "./transmission/downloads:/downloads"
       - "./transmission/watch:/watch"
-      - "/mnt/nas/max/seedbox:/seedbox"
+      - "./transmission/downloads:/downloads"
+      - "/mnt/nas/media/Shows:/tv"
+      - "/mnt/nas/media/Movies:/movies"
+      - "/mnt/nas/max/ebooks/calibre:/books"
     env_file:
       - secrets.env
     environment:
@@ -55,25 +65,64 @@ services:
       - PUID=1000
       - TZ=Europe/Paris
       - TRANSMISSION_WEB_UI=flood-for-transmission
+
+  prowlarr:
+    container_name: prowlarr
+    image: lscr.io/linuxserver/prowlarr:develop
+    restart: unless-stopped
     cpus: 0.5
     mem_limit: 512m
+    security_opt:
+      - no-new-privileges:true
+    network_mode: "service:wireguard"
+    depends_on:
+      - wireguard
+    volumes:
+      - "./prowlarr:/config"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+
+  flaresolverr:
+    container_name: flaresolverr
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    restart: unless-stopped
+    cpus: 1
+    mem_limit: 256m
+    security_opt:
+      - no-new-privileges:true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+    network_mode: "service:wireguard"
+    depends_on:
+      - prowlarr
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/Paris
+      - LOG_LEVEL=info
 
   sonarr:
     container_name: sonarr
     image: linuxserver/sonarr:latest
     restart: unless-stopped
+    cpus: 1
+    mem_limit: 1024m
     security_opt:
       - no-new-privileges:true
+    networks:
+      - traefik
+    depends_on:
+      - prowlarr
     volumes:
       - "./sonarr:/config"
       - "./transmission/downloads:/downloads"
-      - "/mnt/nas/series:/tv"
+      - "/mnt/nas/media/Shows:/tv"
     environment:
       - PGID=1000
       - PUID=1000
       - TZ=Europe/Paris
-    cpus: 0.5
-    mem_limit: 512m
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.shows.entrypoints=https"
@@ -83,25 +132,27 @@ services:
       - "traefik.http.routers.shows.service=shows"
       - "traefik.http.services.shows.loadbalancer.server.port=8989"
       - "traefik.docker.network=traefik"
-    networks:
-      - traefik
 
   radarr:
     container_name: radarr
     image: linuxserver/radarr:latest
     restart: unless-stopped
+    cpus: 1
+    mem_limit: 1024m
     security_opt:
       - no-new-privileges:true
+    networks:
+      - traefik
+    depends_on:
+      - prowlarr
     volumes:
       - "./radarr:/config"
       - "./transmission/downloads:/downloads"
-      - "/mnt/nas/movies:/movies"
+      - "/mnt/nas/media/Movies:/movies"
     environment:
       - PGID=1000
       - PUID=1000
       - TZ=Europe/Paris
-    cpus: 0.5
-    mem_limit: 512m
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.movies.entrypoints=https"
@@ -111,24 +162,27 @@ services:
       - "traefik.http.routers.movies.service=movies"
       - "traefik.http.services.movies.loadbalancer.server.port=7878"
       - "traefik.docker.network=traefik"
-    networks:
-      - traefik
 
   readarr:
-    image: lscr.io/linuxserver/readarr:develop
     container_name: readarr
+    image: lscr.io/linuxserver/readarr:develop
+    restart: unless-stopped
+    cpus: 0.5
+    mem_limit: 512m
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik
+    depends_on:
+      - prowlarr
+    volumes:
+      - "./readarr:/config"
+      - "./transmission/downloads:/downloads"
+      - "/mnt/nas/max/ebooks/calibre:/books"
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/London
-    volumes:
-      - "./readarr:/config"
-      - "./transmission/downloads:/downloads"
-      - "/mnt/nas/max/seedbox:/seedbox"
-      - "/mnt/nas/max/ebooks/calibre:/books"
-    restart: unless-stopped
-    cpus: 0.5
-    mem_limit: 512m
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.books.entrypoints=https"
@@ -138,54 +192,6 @@ services:
       - "traefik.http.routers.books.service=books"
       - "traefik.http.services.books.loadbalancer.server.port=8787"
       - "traefik.docker.network=traefik"
-    networks:
-      - traefik
-
-  prowlarr:
-    image: lscr.io/linuxserver/prowlarr:develop
-    container_name: prowlarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
-    volumes:
-      - "./prowlarr:/config"
-    restart: unless-stopped
-    cpus: 0.5
-    mem_limit: 512m
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.prowlarr.entrypoints=https"
-      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.corsaire.duckdns.org`)"
-      - "traefik.http.routers.prowlarr.tls=true"
-      - "traefik.http.routers.prowlarr.tls.certresolver=acme"
-      - "traefik.http.routers.prowlarr.service=prowlarr"
-      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
-      - "traefik.docker.network=traefik"
-    networks:
-      - traefik
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
-
-  flaresolverr:
-    container_name: flaresolverr
-    image: ghcr.io/flaresolverr/flaresolverr:latest
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - PGID=1000
-      - PUID=1000
-      - TZ=Europe/Paris
-      - LOG_LEVEL=info
-    #  - CAPTCHA_SOLVER=hcaptcha-solver
-    cpus: 0.5
-    mem_limit: 512m
-    networks:
-      - traefik
-    sysctls:
-      - net.ipv6.conf.all.disable_ipv6=1
 
 networks:
   traefik:
