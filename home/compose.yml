@@ -1,18 +1,19 @@
 version: '3.8'
-services:
 
+services:
   homeassistant:
     container_name: ha
     image: "ghcr.io/home-assistant/home-assistant:stable"
-    volumes:
-      - ./ha:/config
-      - /etc/localtime:/etc/localtime:ro
-      - /dev/serial/by-id/:/dev/serial/by-id
     restart: unless-stopped
     security_opt:
       - seccomp:unconfined
       - apparmor:unconfined
       - no-new-privileges:true
+    network_mode: "host"
+    volumes:
+      - ./ha:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /dev/serial/by-id/:/dev/serial/by-id
     devices:
       - /dev/ttyUSB0:/dev/ttyUSB0
     environment:
@@ -20,4 +21,3 @@ services:
       PUID: 1000
       PGID: 1000
       TZ: "Europe/Paris"
-    network_mode: "host"
