@@ -57,7 +57,7 @@ services:
       - "./transmission/downloads:/downloads"
       - "/mnt/nas/media/Shows:/tv"
       - "/mnt/nas/media/Movies:/movies"
-      - "/mnt/nas/max/ebooks/calibre:/books"
+      - "/mnt/nas/media/Books/raw:/books"
       - "/mnt/nas/max/seedbox:/seedbox"
     env_file:
       - secrets.env
@@ -179,7 +179,7 @@ services:
     volumes:
       - "./readarr:/config"
       - "./transmission/downloads:/downloads"
-      - "/mnt/nas/max/ebooks/calibre:/books"
+      - "/mnt/nas/media/Books/raw:/books"
     environment:
       - PUID=1000
       - PGID=1000
