@@ -10,12 +10,12 @@ services:
       - apparmor:unconfined
       - no-new-privileges:true
     network_mode: "host"
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
     volumes:
       - ./ha:/config
       - /etc/localtime:/etc/localtime:ro
       - /dev/serial/by-id/:/dev/serial/by-id
-    devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
     environment:
       DISABLE_JEMALLOC: "true"
       PUID: 1000
