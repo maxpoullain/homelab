@@ -16,12 +16,7 @@ services:
     networks:
       - traefik
     volumes:
-      - "./conf.yaml:/app/public/conf.yml"
-      - "./assets/favicon/favicon.ico:/app/public/favicon.ico"
-      - "./assets/favicon/favicon-32x32.png:/app/public/web-icons/favicon-32x32.png"
-      - "./assets/favicon/favicon-16x16.png:/app/public/web-icons/favicon-16x16.png"
-      - "./assets/icons:/app/public/item-icons"
-      - "./assets:/app/public/assets"
+      - "./public:/app/public"
     environment:
       - GID=1000
       - UID=1000
