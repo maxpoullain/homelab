@@ -1,0 +1,36 @@
+---
+pageInfo:
+  title: Corsaire Labs
+  description: Work
+  logo: corsaire.png
+  #navLinks: []
+sections:
+  - name: Your ship's homeport
+    icon: fas fa-ship
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: false
+      hideForGuests: false
+    items: []
+    widgets:
+      - type: public-ip
+        id: 0_1963_publicip
+  - name: Local time
+    icon: fas fa-hourglass-half
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 2
+      collapsed: false
+      hideForGuests: false
+    items: []
+    widgets:
+      - type: clock
+        options:
+          timeZone: Europe/Paris
+          format: en-GB
+          hideDate: false
+          customCityName: Saint-Malo
+        id: 0_1012_clock

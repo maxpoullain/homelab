@@ -1,5 +1,5 @@
 **/secrets.env
-dashy/conf.yaml
+dashy/public/conf.yml
 home/ha/*
 media/wireguard/mam.cookies
 media/wireguard/wg0.conf
