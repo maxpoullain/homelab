@@ -13,18 +13,27 @@ services:
     networks:
       - traefik
     volumes:
+      - ./glances/glances.conf:/glances/conf/glances.conf
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/os-release:/etc/os-release:ro
     environment:
-      - "GLANCES_OPT=-w"
+      - "GLANCES_OPT=-C /glances/conf/glances.conf -w"
+      - "TZ=Europe/Paris"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.glances.entrypoints=https"
       - "traefik.http.routers.glances.rule=Host(`health.corsaire.duckdns.org`)"
       - "traefik.http.routers.glances.tls=true"
       - "traefik.http.routers.glances.tls.certresolver=acme"
-      - "traefik.http.services.glances.loadbalancer.server.port=61208"
       - "traefik.http.routers.glances.middlewares=traefik-auth@file"
+      - "traefik.http.services.glances.loadbalancer.server.port=61208"
+      - "traefik.http.middlewares.glances.headers.accesscontrolallowmethods=GET,OPTIONS,PUT"
+      - "traefik.http.middlewares.glances.headers.accesscontrolallowcredentials=true"
+      - "traefik.http.middlewares.glances.headers.accesscontrolallowheaders=*"
+      - "traefik.http.middlewares.glances.headers.accesscontrolalloworiginlist=https://www.corsaire.duckdns.org"
+      - "traefik.http.middlewares.glances.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.glances.headers.addvaryheader=true"
+      - "traefik.http.routers.glances.middlewares=glances@docker"
       - "traefik.docker.network=traefik"
 
 networks:
