@@ -1,0 +1,50 @@
+---
+pageInfo:
+  title: Corsaire Labs
+  description: Hobbies
+  logo: ./img/corsaire.png
+  footerText: <a data-v-001d966c="" href="https://github.com/maxpoullain/homelab" target="_blank">Corsaire Labs code</a>
+sections:
+  - name: Your ship's homeport
+    icon: fas fa-ship
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: false
+    items: []
+    widgets:
+      - type: public-ip
+        id: 0_1963_publicip
+  - name: Local time
+    icon: fas fa-hourglass-half
+    displayData:
+      sortBy: default
+      rows: 1
+      cols: 2
+      collapsed: false
+    items: []
+    widgets:
+      - type: clock
+        options:
+          timeZone: Europe/Paris
+          format: en-GB
+          hideDate: false
+          customCityName: Saint-Malo
+        id: 0_1012_clock
+  - name: F1
+    icon: fas fa-flag-checkered
+    displayData:
+      hideForGuests: true
+      sortBy: default
+      rows: 1
+      cols: 1
+      collapsed: true
+    items: []
+    widgets:
+      - type: sports-scores
+        options:
+          leagueId: 4370
+          pastOrFuture: future
+          limit: 6
+          hideImage: false

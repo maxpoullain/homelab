@@ -4,22 +4,35 @@ appConfig:
     defaultOpeningMethod: newtab
     layout: auto
     iconSize: small
-    theme: nord-frost
+    cssThemes:
+        - nord-custom
+    theme: nord-custom
     hideComponents:
         hideSettings: true
-        hideFooter: true
-    routingMode: hash
-    disableConfiguration: true
+        hideFooter: false
+    routingMode: history
+    disableConfigurationForNonAdmin: true
     showSplashScreen: false
-    disableContextMenu: true
+    disableContextMenu: false
     webSearch:
         searchEngine: duckduckgo
         openingMethod: newtab
+    auth:
+        users:
+            - user: ENC[AES256_GCM,data:qoUI,iv:Jbz/GHxnsc9aOVoe/XyNI7eetVJqOKztSmdtMmXnSbM=,tag:hMxr7CiisbyisQpYvY4cPQ==,type:str]
+              hash: ENC[AES256_GCM,data:Y+5l6hYKvCECg4n7W9zmqfftdXTfNsmeYp/5vemOgCzvTTl8sD01v24wUGjnwuA+Re14w5FYSLL78jiMqq9HGw==,iv:VgLU0DEiCtWORyuszoaIIYip/WhoR5LmSeVTHjOeBiU=,tag:g6b0HoJuo/qh7wLZ46gUQg==,type:str]
+              type: ENC[AES256_GCM,data:rTKih3o=,iv:qcBavq6bnS72SVDNtphqKBeoGiWN0J5q3j5L4C3EO/w=,tag:UXyN404jYb8Oev1K7hsiBw==,type:str]
+        enableGuestAccess: true
 pageInfo:
     title: Corsaire Labs
     description: Dashboard
-    navLinks: []
-    logo: /assets/corsaire.png
+    logo: ./img/corsaire.png
+    footerText: <a data-v-001d966c="" href="https://github.com/maxpoullain/homelab" target="_blank">Corsaire Labs code</a>
+pages:
+    - name: Hobbies
+      path: hobbies.yml
+    - name: Work
+      path: work.yml
 sections:
     - name: Your ship's homeport
       icon: fas fa-ship
@@ -28,36 +41,17 @@ sections:
         rows: 1
         cols: 1
         collapsed: false
-        hideForGuests: false
       items: []
       widgets:
         - type: public-ip
           id: 0_1963_publicip
-    - name: Local weather
-      icon: fas fa-windsock
-      displayData:
-        sortBy: default
-        rows: 1
-        cols: 1
-        collapsed: false
-        hideForGuests: false
-      items: []
-      widgets:
-        - type: weather
-          options:
-            apiKey: ENC[AES256_GCM,data:oTR1lciWaOkt1m4IxaCunHX2bB+JGXzAc6E8o7Zgs4E=,iv:KiscNe1cHXT/iLwTPJIAfQKlIOQuMyT0Kpw0uXgcmO4=,tag:yD3qx3JqaCHahAK+5fMwxQ==,type:str]
-            city: St-Malo
-            units: metric
-            hideDetails: false
-          id: 1_1012_weather
-    - name: Local time
+    - name: Corsaire time
       icon: fas fa-hourglass-half
       displayData:
         sortBy: default
         rows: 1
         cols: 2
         collapsed: false
-        hideForGuests: false
       items: []
       widgets:
         - type: clock
@@ -67,6 +61,22 @@ sections:
             hideDate: false
             customCityName: Saint-Malo
           id: 0_1012_clock
+    - name: Corsaire weather
+      icon: fas fa-windsock
+      displayData:
+        sortBy: default
+        rows: 1
+        cols: 1
+        collapsed: false
+      items: []
+      widgets:
+        - type: weather
+          options:
+            apiKey: ENC[AES256_GCM,data:FX5KwlLzl8Jmd10yHpIRpyiMtckAi1uUoQ68JH82AVA=,iv:550JqO1CCeydwSKG1MEsNjRBRT2+AOc6HEV7rHF0gX0=,tag:4A3NGL9/v5KO98JW84nmkg==,type:str]
+            city: St-Malo
+            units: metric
+            hideDetails: false
+          id: 1_1012_weather
     - name: Docks
       icon: fas fa-anchor
       displayData:
@@ -74,7 +84,6 @@ sections:
         rows: 1
         cols: 1
         collapsed: false
-        hideForGuests: false
       items:
         - title: Reddit
           icon: reddit.png
@@ -119,7 +128,6 @@ sections:
         rows: 1
         cols: 1
         collapsed: false
-        hideForGuests: false
       items:
         - title: Twitch
           icon: twitch.png
@@ -143,12 +151,14 @@ sections:
           icon: jellyfin.png
           description: Free software media system
           url: https://tv.corsaire.duckdns.org/
+          statusCheck: true
           target: newtab
           id: 5_831_jellyfin
         - title: Photoprism
           icon: photoprism.png
           description: Browse your life in pictures
           url: https://photos.corsaire.duckdns.org/
+          statusCheck: true
           target: newtab
           id: 6_831_photoprism
         - title: Prime Video
@@ -170,7 +180,6 @@ sections:
         rows: 1
         cols: 1
         collapsed: false
-        hideForGuests: false
       items:
         - title: Finary
           icon: finary.png
@@ -190,18 +199,6 @@ sections:
           url: https://www.credit-agricole.fr/ca-normandie/particulier/acceder-a-mes-comptes.html
           target: newtab
           id: 2_525_crditagricolenormandie
-        - title: JustETF
-          icon: justetf.png
-          description: Do-it-yourself investing made simple
-          url: https://www.justetf.com/en/
-          target: newtab
-          id: 3_525_justetf
-        - title: Binance
-          icon: binance.png
-          description: Cryptocurrency exchange
-          url: https://www.binance.com/
-          target: newtab
-          id: 4_525_binance
         - title: Degiro
           icon: degiro.png
           description: Stock broker
@@ -221,47 +218,54 @@ sections:
         rows: 1
         cols: 1
         collapsed: false
-        hideForGuests: false
       items:
         - title: Home Assistant
           icon: homeassistant.png
           description: Open-source software for home automation
           url: https://home.corsaire.duckdns.org/
+          statusCheck: true
           target: newtab
         - title: NAS
           icon: nas.png
           description: QNAP
           url: https://nas.corsaire.duckdns.org/cgi-bin/
+          statusCheck: true
           target: newtab
           id: 0_1281_nas
+        - title: Transmission
+          icon: transmission.png
+          description: BitTorrent client
+          url: https://seedbox.corsaire.duckdns.org/
+          statusCheck: true
+          statusCheckAcceptCodes: "401"
+          target: newtab
+          id: 4_1281_transmission
         - title: Sonarr
           icon: sonarr.png
           description: TV show collection manager
           url: https://shows.corsaire.duckdns.org/
+          statusCheck: true
           target: newtab
           id: 1_1281_sonarr
         - title: Radarr
           icon: radarr.png
           description: Movie collection manager
           url: https://movies.corsaire.duckdns.org/
+          statusCheck: true
           target: newtab
           id: 2_1281_radarr
         - title: Readarr
           icon: readarr.png
           description: ""
           url: https://books.corsaire.duckdns.org/
+          statusCheck: true
           target: newtab
         - title: Prowlarr
           icon: prowlarr.png
           description: ""
           url: https://prowlarr.corsaire.duckdns.org/
+          statusCheck: true
           target: newtab
-        - title: Transmission
-          icon: transmission.png
-          description: BitTorrent client
-          url: https://seedbox.corsaire.duckdns.org/
-          target: newtab
-          id: 4_1281_transmission
     - name: Captain's Quarters
       icon: fas fa-dharmachakra
       displayData:
@@ -269,40 +273,27 @@ sections:
         rows: 1
         cols: 1
         collapsed: false
-        hideForGuests: false
       items:
         - title: Traefik
           icon: traefik.png
           description: Modern reverse proxy
           url: https://traefik.corsaire.duckdns.org/
+          statusCheck: true
+          statusCheckAcceptCodes: "401"
           target: newtab
           id: 0_1745_traefik
         - title: WAN
           icon: wan.png
           description: ISP router
           url: https://livebox.corsaire.duckdns.org/
+          statusCheck: true
           target: newtab
           id: 3_1745_wan
-        - title: Syncthing
-          icon: syncthing.png
-          description: Continuous file synchronization program
-          url: https://sync.corsaire.duckdns.org/
-          target: newtab
-          id: 6_1745_syncthing
         - title: Backblaze
           icon: favicon
           description: Robust, scalable low cost cloud backup and storage services
           url: https://backblaze.com/
           target: newtab
-pages:
-    - name: Main
-      path: /conf.yml
-    - name: Local
-      path: /assets/conf-local.yml
-    - name: Work
-      path: /assets/conf-work.yml
-    - name: Extras
-      path: /assets/conf-extras.yml
 sops:
     kms: []
     gcp_kms: []
@@ -312,14 +303,14 @@ sops:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBWN1VrYnNWMkdwcHNzNER0
-            cUpDNUlYK2lMQUNucExuRDN5S3hNUlE2b21rCmRmSVlPZEVYNDlHQmN6ZVl0TzY3
-            VHlrMVptc2loelhDeWFobWhXMGJXb3cKLS0tIDM1SldnQk9NN05NckhiNEx5L0Zj
-            a3l0ZnpLNXpFRzVrbDc1WTRkSHByUWMK/Cx1yIydsUlqsk6kBDZpJGO6W/2duj2c
-            QBg+hGcV6+H9n00LexQYcL8qDvGNdyXabhfWh9TtF3U0VoepPwFqhA==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBjV0tlczZiUDlHanlaOUp1
+            ajdyTlJRQ1hXeWhMS2R6VlVmdENucVZPZGpvCnR5TVg1T3gxMXZxdzZ0R3RudWg4
+            QVZhWGZRR29lZ2xDdzFuRGRLV1dZaVkKLS0tIFFqRUJoMk1QWWNDbHVXd0pNQlk0
+            KzMxbURZRTJvSUIzT2U3bkdMbklJNlkKkKsHlk1wWqXojO0mJg3m0sLcu7i9q3tS
+            F6YW8kCHwF6DkFuXfDFktP7SlxWjjN3N1CgOrIgrci/BMg+c2100lA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2023-06-25T21:47:09Z"
-    mac: ENC[AES256_GCM,data:Fx+oQ8p9BpOKSBjfQirRrKae4W6MAK3Ni8eQUTh3/jYZNFhNzYwR6sa4DEVPas+rIkOIJl1A5WCOHkLh9nShxztfxc2O9yRry3MfvTz78t3HYQB27XNRAliJnNSWDr+pa4r1bVRvqx7nQT7uf8QIMevRQTaZiPWqRetiuVCiBGA=,iv:QK1DmfFFbnHd77KovUtJUgdBBFk322N0tbea8iEZXV0=,tag:Dhvg1D95BKWFZCesJD7Dlg==,type:str]
+    lastmodified: "2024-01-25T15:22:04Z"
+    mac: ENC[AES256_GCM,data:p3PCOGpb3OflLdPVmkBTxUXWVbRKj7DY8LAh9b8jqKyyC8uZCbeSFVTkDj20yoRJ9TsQSfFj+7ODOZ2N79kaZBQS1BrOn2GTvco1PGpTxCIge6QvKsRa3V/k3cs+5ag0GqHYUpbhW7B11lqHdke1s3cnWvIVjgm0UeCJEgHjOL4=,iv:erl+DNRsurpPUYrL2AFsOS+rQJHidgocYobY4csg8HM=,tag:wlvqXHRvgmrPLwYVcaiQYQ==,type:str]
     pgp: []
-    encrypted_regex: ^(.*apiKey.*|.*PHOTOPRISM.*|.*USER.*|.*PASS.*|.*users.*)$
-    version: 3.7.3
+    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*PHOTOPRISM.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*Address.*|.*PrivateKey.*|.*DNS.*|.*PostUp.*|.*PublicKey.*|.*PresharedKey.*|.*Endpoint.*)$
+    version: 3.8.1
