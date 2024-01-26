@@ -2,8 +2,8 @@
 pageInfo:
   title: Corsaire Labs
   description: Hobbies
-  logo: ./img/corsaire.png
-  footerText: <a data-v-001d966c="" href="https://github.com/maxpoullain/homelab" target="_blank">Corsaire Labs code</a>
+  logo: /img/corsaire.png
+  footerText: <a data-v-001d966c="" href="https://github.com/maxpoullain/homelab" target="_blank">Corsaire Labs source code</a>
 sections:
   - name: Your ship's homeport
     icon: fas fa-ship
