@@ -3,7 +3,7 @@ services:
 
   glances:
     container_name: glances
-    image: nicolargo/glances:latest
+    image: nicolargo/glances:latest-full
     restart: unless-stopped
     pid: host
     cpus: 0.5
@@ -14,8 +14,9 @@ services:
       - traefik
     volumes:
       - ./glances/glances.conf:/glances/conf/glances.conf
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/os-release:/etc/os-release:ro
+      - /mnt/nas/media:/mnt/nas/media:ro
     environment:
       - "GLANCES_OPT=-C /glances/conf/glances.conf -w"
       - "TZ=Europe/Paris"
