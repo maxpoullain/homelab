@@ -20,6 +20,7 @@ services:
       - "./config/conf.yml:/app/public/conf.yml"
       - "./config/work.yml:/app/public/work.yml"
       - "./config/hobbies.yml:/app/public/hobbies.yml"
+      - "./config/health.yml:/app/public/health.yml"
       - "./config/icons:/app/public/item-icons"
       - "./config/themes/custom.scss:/app/src/styles/user-defined-themes.scss"
       - "./config/img/corsaire.png:/app/public/img/corsaire.png"

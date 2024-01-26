@@ -1,5 +1,6 @@
 **/secrets.env
 dashy/config/conf.yml
+dashy/config/health.yml
 home/ha/*
 media/wireguard/mam.cookies
 media/wireguard/wg0.conf

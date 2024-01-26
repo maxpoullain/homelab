@@ -19,20 +19,22 @@ appConfig:
         openingMethod: newtab
     auth:
         users:
-            - user: ENC[AES256_GCM,data:qoUI,iv:Jbz/GHxnsc9aOVoe/XyNI7eetVJqOKztSmdtMmXnSbM=,tag:hMxr7CiisbyisQpYvY4cPQ==,type:str]
-              hash: ENC[AES256_GCM,data:Y+5l6hYKvCECg4n7W9zmqfftdXTfNsmeYp/5vemOgCzvTTl8sD01v24wUGjnwuA+Re14w5FYSLL78jiMqq9HGw==,iv:VgLU0DEiCtWORyuszoaIIYip/WhoR5LmSeVTHjOeBiU=,tag:g6b0HoJuo/qh7wLZ46gUQg==,type:str]
-              type: ENC[AES256_GCM,data:rTKih3o=,iv:qcBavq6bnS72SVDNtphqKBeoGiWN0J5q3j5L4C3EO/w=,tag:UXyN404jYb8Oev1K7hsiBw==,type:str]
+            - user: ENC[AES256_GCM,data:aIdw,iv:/8S4bGajeMVccXlw3yg2ZLnYA2XYoY+PN8kVTxrL9uI=,tag:bHrIRmWu6JTKrXdMsjFc3g==,type:str]
+              hash: ENC[AES256_GCM,data:4ZgChu3HfQ9/F95IGJvv0W8KxB2K6xZg4VRwYHC1Hz88uJcvxARju96IcZyylLUWGHeFeAR3a8fN/IlXe9EdOg==,iv:8p/u9R/6nUzsw+QxpyUhJYF4run58s0Z7dgjvN4Dhq0=,tag:GC0RZ7ai+VHChfRAsHLwdw==,type:str]
+              type: ENC[AES256_GCM,data:pYXoP3g=,iv:866ZD7Iwe4ujew40ZmTiD0ztZ30TwpQMgghJBHSwRXA=,tag:h7v7l+NyZPP3Ci96XKjRDw==,type:str]
         enableGuestAccess: true
-pageInfo:
-    title: Corsaire Labs
-    description: Dashboard
-    logo: ./img/corsaire.png
-    footerText: <a data-v-001d966c="" href="https://github.com/maxpoullain/homelab" target="_blank">Corsaire Labs code</a>
 pages:
     - name: Hobbies
       path: hobbies.yml
     - name: Work
       path: work.yml
+    - name: Health
+      path: health.yml
+pageInfo:
+    title: Corsaire Labs
+    description: Dashboard
+    logo: /img/corsaire.png
+    footerText: <a data-v-001d966c="" href="https://github.com/maxpoullain/homelab" target="_blank">Corsaire Labs source code</a>
 sections:
     - name: Your ship's homeport
       icon: fas fa-ship
@@ -59,6 +61,7 @@ sections:
             timeZone: Europe/Paris
             format: en-GB
             hideDate: false
+            hideSeconds: true
             customCityName: Saint-Malo
           id: 0_1012_clock
     - name: Corsaire weather
@@ -72,7 +75,7 @@ sections:
       widgets:
         - type: weather
           options:
-            apiKey: ENC[AES256_GCM,data:FX5KwlLzl8Jmd10yHpIRpyiMtckAi1uUoQ68JH82AVA=,iv:550JqO1CCeydwSKG1MEsNjRBRT2+AOc6HEV7rHF0gX0=,tag:4A3NGL9/v5KO98JW84nmkg==,type:str]
+            apiKey: ENC[AES256_GCM,data:+vCzBn5AXNDqoFyheSMTul8509Dcr51vbsf2zdDjPmM=,iv:0Rl2du/d1IdbuLj5yLEWE0MrATPvUSKqcRCrJVwSXE0=,tag:dtWDJavLx5BHT3riOutx7w==,type:str]
             city: St-Malo
             units: metric
             hideDetails: false
@@ -81,6 +84,7 @@ sections:
       icon: fas fa-anchor
       displayData:
         sortBy: default
+        itemSize: large
         rows: 1
         cols: 1
         collapsed: false
@@ -119,6 +123,12 @@ sections:
           icon: keeweb.png
           description: Cross-platform password manager
           url: https://app.keeweb.info/
+          target: newtab
+          id: 5_500_keeweb
+        - title: Notion
+          icon: notion.png
+          description: Productivity and note-taking app
+          url: https://www.notion.so/
           target: newtab
           id: 5_500_keeweb
     - name: Shanties
@@ -211,8 +221,8 @@ sections:
           url: https://wise.com/
           target: newtab
           id: 6_525_wise
-    - name: Down the Hatch
-      icon: fas fa-skull-crossbones
+    - name: Captain's Quarters
+      icon: fas fa-dharmachakra
       displayData:
         sortBy: default
         rows: 1
@@ -266,14 +276,6 @@ sections:
           url: https://prowlarr.corsaire.duckdns.org/
           statusCheck: true
           target: newtab
-    - name: Captain's Quarters
-      icon: fas fa-dharmachakra
-      displayData:
-        sortBy: default
-        rows: 1
-        cols: 1
-        collapsed: false
-      items:
         - title: Traefik
           icon: traefik.png
           description: Modern reverse proxy
@@ -282,6 +284,13 @@ sections:
           statusCheckAcceptCodes: "401"
           target: newtab
           id: 0_1745_traefik
+        - title: Glances
+          icon: glances.png
+          description: Cross-platform system monitoring tool written in Python
+          url: https://health.corsaire.duckdns.org/
+          statusCheck: true
+          statusCheckAcceptCodes: "401"
+          target: newtab
         - title: WAN
           icon: wan.png
           description: ISP router
@@ -303,14 +312,14 @@ sops:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBjV0tlczZiUDlHanlaOUp1
-            ajdyTlJRQ1hXeWhMS2R6VlVmdENucVZPZGpvCnR5TVg1T3gxMXZxdzZ0R3RudWg4
-            QVZhWGZRR29lZ2xDdzFuRGRLV1dZaVkKLS0tIFFqRUJoMk1QWWNDbHVXd0pNQlk0
-            KzMxbURZRTJvSUIzT2U3bkdMbklJNlkKkKsHlk1wWqXojO0mJg3m0sLcu7i9q3tS
-            F6YW8kCHwF6DkFuXfDFktP7SlxWjjN3N1CgOrIgrci/BMg+c2100lA==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBwcG5FWWlkTHAzOUdBUzlP
+            UDQvR3Y0NHdnQVRKVTg0RnlTcmVZbTVhakFjCndORk9MQUlKRzlUc1pBU3htNnBq
+            anVSMHJDODh5Y3pXajBSVlI4UTFhMFkKLS0tIEwzaGt2aXZIV09Fa0lCUWI0cnBI
+            WkdyUHl2TTJaSUg0dUkyaUxIUHkza3MKHAJ6dSkRvvZhWSvHQ268P7YwRwKUa8EE
+            0NQTN2tuHGOJnllsp7RF+iMN8Ya8NlJygGk8qPwbUq0tpQcsuM/Y0Q==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-01-25T15:22:04Z"
-    mac: ENC[AES256_GCM,data:p3PCOGpb3OflLdPVmkBTxUXWVbRKj7DY8LAh9b8jqKyyC8uZCbeSFVTkDj20yoRJ9TsQSfFj+7ODOZ2N79kaZBQS1BrOn2GTvco1PGpTxCIge6QvKsRa3V/k3cs+5ag0GqHYUpbhW7B11lqHdke1s3cnWvIVjgm0UeCJEgHjOL4=,iv:erl+DNRsurpPUYrL2AFsOS+rQJHidgocYobY4csg8HM=,tag:wlvqXHRvgmrPLwYVcaiQYQ==,type:str]
+    lastmodified: "2024-01-26T10:49:15Z"
+    mac: ENC[AES256_GCM,data:/z6e4WYhlqPQlm8FCfmqIr7c6sZAL5KKDbtaPIfEfssmsID82vBsn7bX2m6mgPJyVczBP2wMQddOkr7qWGlijA4NRWKiudf9HiifoHbXtYEu+rO9+AqGFA934Man0r0mdfhLQ7FHAtQqD3GIn9O4sTr/4NDWZFOSu11X8qpCBiU=,iv:AKUvigXgzKy21wJqSjGb9p64j5VGuUMXsTgfw9jRqIY=,tag:i4Cu5Oxpmxo4Qy+iBsRhwQ==,type:str]
     pgp: []
-    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*PHOTOPRISM.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*Address.*|.*PrivateKey.*|.*DNS.*|.*PostUp.*|.*PublicKey.*|.*PresharedKey.*|.*Endpoint.*)$
+    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*PHOTOPRISM.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*Address.*|.*PrivateKey.*|.*DNS.*|.*PostUp.*|.*PublicKey.*|.*PresharedKey.*|.*Endpoint.*)$
     version: 3.8.1

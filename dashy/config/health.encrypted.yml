@@ -1,0 +1,170 @@
+pageInfo:
+    title: Corsaire Labs
+    description: Health
+    logo: /img/corsaire.png
+    footerText: <a data-v-001d966c="" href="https://github.com/maxpoullain/homelab" target="_blank">Corsaire Labs source code</a>
+sections:
+    - name: Restricted access
+      icon: fas fa-ban
+      displayData:
+        showForUsers:
+            - noone
+        collapsed: false
+      items:
+        - title: Login
+          icon: fas fa-arrow-right-to-bracket
+          description: Please login
+          url: https://www.corsaire.duckdns.org/login
+          target: sametab
+    - name: System Alerts
+      icon: fas fa-sensor-alert
+      displayData:
+        hideForGuests: true
+        cols: 2
+        rows: 1
+      widgets:
+        - type: gl-alerts
+          options:
+            hostname: https://health.corsaire.duckdns.org
+            username: max
+            password: ENC[AES256_GCM,data:DeNooDgBmCd7bA==,iv:5o6wEeiz4VP26dgLqvZFpd4dthvgalGZIDzjdkFYn6I=,tag:eYMDbRxLYhF9fXTHX69TLw==,type:str]
+    - name: IP Address
+      icon: fas fa-globe
+      displayData:
+        hideForGuests: true
+        cols: 2
+        rows: 1
+      widgets:
+        - type: gl-ip-address
+          options:
+            !!merge <<:
+                hostname: https://health.corsaire.duckdns.org
+                username: max
+                password: ENC[AES256_GCM,data:RVPC+yJNBofMuw==,iv:rorFfLZKx3VewQTe3ly92Vx0EfsgZAFM0rlk2iRBTZo=,tag:fvKP7ijkzsL6Y2yH08tU3g==,type:str]
+    - name: CPU Usage
+      icon: fas fa-tachometer
+      displayData:
+        hideForGuests: true
+        rows: 2
+      widgets:
+        - type: gl-current-cpu
+          options:
+            !!merge <<:
+                hostname: https://health.corsaire.duckdns.org
+                username: max
+                password: ENC[AES256_GCM,data:tT8UrlMg14u6kw==,iv:vpPvQ6dePkaLPJCJ/WdQXUuhf5iGGxi4cAnHLxf6MoA=,tag:Ml3w4bVf/JJMnvy5utnl6A==,type:str]
+        - type: gl-cpu-temp
+          options:
+            !!merge <<:
+                hostname: https://health.corsaire.duckdns.org
+                username: max
+                password: ENC[AES256_GCM,data:Yd3ElX+x+eennQ==,iv:nt6iejdPu1Mromdxo0El/xP9+hwxAydIk5OOqbjadsk=,tag:w0fz6ZbQdKvHUw+YoLXdng==,type:str]
+          units: C
+        - type: gl-current-cores
+          options:
+            !!merge <<:
+                hostname: https://health.corsaire.duckdns.org
+                username: max
+                password: ENC[AES256_GCM,data:7Lim6i1rrLPZSg==,iv:zNBLWmgfk1CLzQCi1rh3xnyKGq5wusC0MVaTu4Yd7zY=,tag:nIpJXX1AVfIDtDHqyg/3KA==,type:str]
+    - name: CPU History
+      icon: fas fa-microchip
+      displayData:
+        hideForGuests: true
+        cols: 2
+      widgets:
+        - type: gl-cpu-history
+          options:
+            !!merge <<:
+                hostname: https://health.corsaire.duckdns.org
+                username: max
+                password: ENC[AES256_GCM,data:drhCPQXsF0DEOQ==,iv:R4dNJ6x10BCs2o0F4bt/5ubeo3kUUQqgDqM+LLnAzSw=,tag:JISx+00bRxM1dLsIOEY49w==,type:str]
+            limit: 60
+    - name: System Load
+      icon: fas fa-tasks-alt
+      displayData:
+        hideForGuests: true
+      widgets:
+        - type: gl-system-load
+          options:
+            !!merge <<:
+                hostname: https://health.corsaire.duckdns.org
+                username: max
+                password: ENC[AES256_GCM,data:/jkcHFeCLeqcwA==,iv:tuijBXyQLlgIBDa+Ad7fhi4TrJz6Um1MwYEZ9WwhfPU=,tag:rtq6QRZP21z5GhGmDLUB4A==,type:str]
+    - name: Memory Usage
+      icon: fas fa-memory
+      displayData:
+        hideForGuests: true
+      widgets:
+        - type: gl-current-mem
+          options:
+            !!merge <<:
+                hostname: https://health.corsaire.duckdns.org
+                username: max
+                password: ENC[AES256_GCM,data:XYBRg+uxp1bVLQ==,iv:zRW56wG9Ahvu75VI1V+umWcjRS/Ho8YhdHznCZp/NBg=,tag:HvN0T0BD5W/qPz6tmOXTmw==,type:str]
+    - name: Disk Space
+      icon: fas fa-hdd
+      displayData:
+        hideForGuests: true
+      widgets:
+        - type: gl-disk-space
+          options:
+            !!merge <<:
+                hostname: https://health.corsaire.duckdns.org
+                username: max
+                password: ENC[AES256_GCM,data:zCzH4pynGYxLIw==,iv:vIyTGMLsERbInnu7n0IgVqR75lvu+oBbTN8dYRlo7As=,tag:dXitZIIpBWjMSIPVItw/wA==,type:str]
+    - name: Network Interfaces
+      icon: fas fa-ethernet
+      displayData:
+        hideForGuests: true
+      widgets:
+        - type: gl-network-interfaces
+          options:
+            !!merge <<:
+                hostname: https://health.corsaire.duckdns.org
+                username: max
+                password: ENC[AES256_GCM,data:nUf7/OGrgO72yA==,iv:91cs4U1NFtgg52i94OSqUXfAhDQfmvizuGXyVS4d5vw=,tag:IUBEj2xL4d0k1NK/H0ZB8w==,type:str]
+            limit: 500
+    - name: Network Traffic
+      icon: fas fa-exchange
+      displayData:
+        hideForGuests: true
+        cols: 2
+      widgets:
+        - type: gl-network-traffic
+          options:
+            !!merge <<:
+                hostname: https://health.corsaire.duckdns.org
+                username: max
+                password: ENC[AES256_GCM,data:+TOW8y+KNA3fzw==,iv:eAA1lb9z0sacoXTIfxwjtE34c8FD8v/l+eCiplp/TVE=,tag:Ya3bsGAvOqE8X6FS9gYqyw==,type:str]
+            limit: 500
+    - name: Disk IO
+      icon: fas fa-disc-drive
+      displayData:
+        hideForGuests: true
+      widgets:
+        - type: gl-disk-io
+          options:
+            !!merge <<:
+                hostname: https://health.corsaire.duckdns.org
+                username: max
+                password: ENC[AES256_GCM,data:ktky+/bQFzueMQ==,iv:wAYpXcH4+e6dy0mUCXWt8jfpbnrlRCqoyA8zd8+2+Iw=,tag:h5NRrkA7MhYDkZJcBQPblA==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB5QjNkREdBMkhJZ25EZCtx
+            Wkk2SG53Y2JrY0Q4NURnZGlWQnZsdkdvTUFFCk0rVVVkNVlkOWtqM3dhUlUzZXBN
+            aGQ4Nkw0enA5TWdXNVJkM1RuUVFFYzAKLS0tIFFCb3BMbnlEN1Z4SE01OG5tUlU2
+            eUxNQnhHM0NiblE5Y0tlc3JyTkRiWmMKI+xF0JXIvV9z96d+cWnzqmjWSaETWEf9
+            fYXLYG2ywSo2RVeTkizbM7DdLFywIu3lOeUgw4DTinFT7rLJgK5z8A==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-01-26T10:49:21Z"
+    mac: ENC[AES256_GCM,data:l0kMAUs7Ve30P7Ck6Bg0a731V6DEAcyDFVKw2eH1RCYma++nB8Aq5DHDuOkALEuMSrwW1BuDXZqZ6eoFwGlYHfHYhVRzRY+67Orsyan42eNNA7v/tUco5iZX6EyPQkyIQe7JAT7dKfPSeJRRbopwR7DN31uk805pooYdDCEey2w=,iv:RLFMZKNcT7+LBDnzkTWotDWEXNbH2Yamy+Hpj+YQr1o=,tag:RVglDmXKA6li9eUwMGnHRw==,type:str]
+    pgp: []
+    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*PHOTOPRISM.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*Address.*|.*PrivateKey.*|.*DNS.*|.*PostUp.*|.*PublicKey.*|.*PresharedKey.*|.*Endpoint.*)$
+    version: 3.8.1
