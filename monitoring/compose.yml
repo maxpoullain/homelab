@@ -30,7 +30,7 @@ services:
       - "traefik.http.services.glances.loadbalancer.server.port=61208"
       - "traefik.http.middlewares.glances.headers.accesscontrolallowmethods=GET,OPTIONS,PUT"
       - "traefik.http.middlewares.glances.headers.accesscontrolallowcredentials=true"
-      - "traefik.http.middlewares.glances.headers.accesscontrolallowheaders=*"
+      - "traefik.http.middlewares.glances.headers.accesscontrolallowheaders=Authorization"
       - "traefik.http.middlewares.glances.headers.accesscontrolalloworiginlist=https://www.corsaire.duckdns.org"
       - "traefik.http.middlewares.glances.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.glances.headers.addvaryheader=true"
