@@ -88,4 +88,58 @@ html[data-theme='nord-custom'] {
             }
         }
     }
+
+    //
+    // Widgets hacks
+    //
+
+    // rss-feed
+    .feed-text {
+        margin-top: -9%;
+    }
+
+    .feed-title {
+        visibility: hidden;
+        position: relative;
+    }
+
+    .feed-title:after {
+        visibility: visible;
+        position: absolute;
+        left: 0;
+        content: "France 24";
+    }
+
+    .post-date {
+        display: none !important;
+    }
+
+    .post-body {
+        display: none !important;
+    }
+
+    // sports-scores
+    .past-or-future {
+        display: none !important;
+    }
+
+    .match-thumbnail-wrap {
+        max-height: 4rem !important;
+    }
+
+    .match-thumbnail {
+        margin-top: 0 !important;
+    }
+
+    .score {
+        display: none !important;
+    }
+
+    div.match-row:nth-child(n+3)>div.match-info>p.status {
+        display: none !important;
+    }
+
+    .league {
+        display: none !important;
+    }
 }

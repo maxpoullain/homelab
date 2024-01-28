@@ -1,27 +1,20 @@
 appConfig:
-    language: en
-    startingView: default
-    defaultOpeningMethod: newtab
-    layout: auto
     iconSize: small
     cssThemes:
         - nord-custom
     theme: nord-custom
     hideComponents:
         hideSettings: true
-        hideFooter: false
     routingMode: history
     disableConfigurationForNonAdmin: true
-    showSplashScreen: false
-    disableContextMenu: false
     webSearch:
         searchEngine: duckduckgo
         openingMethod: newtab
     auth:
         users:
-            - user: ENC[AES256_GCM,data:aIdw,iv:/8S4bGajeMVccXlw3yg2ZLnYA2XYoY+PN8kVTxrL9uI=,tag:bHrIRmWu6JTKrXdMsjFc3g==,type:str]
-              hash: ENC[AES256_GCM,data:4ZgChu3HfQ9/F95IGJvv0W8KxB2K6xZg4VRwYHC1Hz88uJcvxARju96IcZyylLUWGHeFeAR3a8fN/IlXe9EdOg==,iv:8p/u9R/6nUzsw+QxpyUhJYF4run58s0Z7dgjvN4Dhq0=,tag:GC0RZ7ai+VHChfRAsHLwdw==,type:str]
-              type: ENC[AES256_GCM,data:pYXoP3g=,iv:866ZD7Iwe4ujew40ZmTiD0ztZ30TwpQMgghJBHSwRXA=,tag:h7v7l+NyZPP3Ci96XKjRDw==,type:str]
+            - user: ENC[AES256_GCM,data:2Yu/,iv:xKxKVjMthipReyGSP6OxScuVHUZt5pOPrwnmhkAp3p4=,tag:1ujTL3Q+3vu9t0n6pv+kCA==,type:str]
+              hash: ENC[AES256_GCM,data:SJzQX3DZK28Isyr0zoDcGvOE0m6WVBOJvAJB6QGWMzMb6t8kDnR5XaQhtkOOIn+I08eMpTVUukM7AkjS+X28Dw==,iv:gW6xaYAiZ4F+B0oMrTtt2BeekVqUKQhpJdEGad5C28w=,tag:OhfNWq21Xe1JODNjVGgLmQ==,type:str]
+              type: ENC[AES256_GCM,data:Q1/CXCc=,iv:D8NNYDKQsUVLW0xrV8bKBTzrFMu34Q/xRyfwpnUWLEA=,tag:lr0ilOjOosxVrseCbuP5/g==,type:str]
         enableGuestAccess: true
 pages:
     - name: Hobbies
@@ -36,273 +29,210 @@ pageInfo:
     logo: /img/corsaire.png
     footerText: <a data-v-001d966c="" href="https://github.com/maxpoullain/homelab" target="_blank">Corsaire Labs source code</a>
 sections:
-    - name: Your ship's homeport
-      icon: fas fa-ship
+    - name: Today's sea
+      icon: fas fa-windsock
       displayData:
-        sortBy: default
-        rows: 1
-        cols: 1
-        collapsed: false
-      items: []
-      widgets:
-        - type: public-ip
-          id: 0_1963_publicip
-    - name: Corsaire time
-      icon: fas fa-hourglass-half
-      displayData:
-        sortBy: default
-        rows: 1
-        cols: 2
-        collapsed: false
-      items: []
+        rows: 2
       widgets:
         - type: clock
           options:
             timeZone: Europe/Paris
-            format: en-GB
-            hideDate: false
+            format: fr-FR
             hideSeconds: true
             customCityName: Saint-Malo
-          id: 0_1012_clock
-    - name: Corsaire weather
-      icon: fas fa-windsock
-      displayData:
-        sortBy: default
-        rows: 1
-        cols: 1
-        collapsed: false
-      items: []
-      widgets:
         - type: weather
           options:
-            apiKey: ENC[AES256_GCM,data:+vCzBn5AXNDqoFyheSMTul8509Dcr51vbsf2zdDjPmM=,iv:0Rl2du/d1IdbuLj5yLEWE0MrATPvUSKqcRCrJVwSXE0=,tag:dtWDJavLx5BHT3riOutx7w==,type:str]
+            apiKey: ENC[AES256_GCM,data:zRdMeqL7xjwDx65rjWYNvXj7hK5fwB7dpZTYsY4Mqes=,iv:XORTtFKBeXM9kYoeQQg8+Yp/wIvYY9eVoq6MBPe3uos=,tag:Bjwp7lyPlwwEMhwCDxqy0Q==,type:str]
             city: St-Malo
             units: metric
-            hideDetails: false
-          id: 1_1012_weather
+        - type: crypto-watch-list
+          options:
+            currency: EUR
+            assets:
+                - bitcoin
+                - ethereum
+        - type: stock-price-chart
+          options:
+            apiKey: ENC[AES256_GCM,data:nalLhsrGyQL5AX/WvMRHyg==,iv:BuH2gp7ZcfrB0fMk7nKe3KjHsg2ZO8MvOxkzvI3ruDI=,tag:/iqxEywhbkatnh4WkL9V4w==,type:str]
+            stock: MSFT
+            chartHeight: 180
     - name: Docks
       icon: fas fa-anchor
-      displayData:
-        sortBy: default
-        itemSize: large
-        rows: 1
-        cols: 1
-        collapsed: false
       items:
-        - title: Reddit
-          icon: reddit.png
-          description: Network of communities
-          url: https://reddit.com/
-          target: newtab
-          id: 1_500_reddit
-        - title: Github
-          icon: github.png
-          description: Code hosting platform
-          url: https://github.com/
-          target: newtab
-          id: 0_500_github
-        - title: Amazon
-          icon: amazon.png
-          description: E-commerce site
-          url: https://www.amazon.fr/
-          target: newtab
-          id: 2_500_amazon
-        - title: LinkedIn
-          icon: linkedin.png
-          description: Professional networking
-          url: https://www.linkedin.com/
-          target: newtab
-          id: 3_500_linkedin
-        - title: Facebook
-          icon: facebook.png
-          description: Connect with friends
-          url: https://www.facebook.com/
-          target: newtab
-          id: 4_500_facebook
-        - title: KeeWeb
-          icon: keeweb.png
-          description: Cross-platform password manager
-          url: https://app.keeweb.info/
-          target: newtab
-          id: 5_500_keeweb
         - title: Notion
           icon: notion.png
           description: Productivity and note-taking app
           url: https://www.notion.so/
-          target: newtab
-          id: 5_500_keeweb
+        - title: Reddit
+          icon: reddit.png
+          description: Network of communities
+          url: https://reddit.com/
+        - title: Github
+          icon: github.png
+          description: Code hosting platform
+          url: https://github.com/
+        - title: Amazon
+          icon: amazon.png
+          description: E-commerce site
+          url: https://www.amazon.fr/
+        - title: Meteo France
+          icon: favicon
+          description: French national meteorological service
+          url: https://meteofrance.com/
+        - title: LinkedIn
+          icon: linkedin.png
+          description: Professional networking
+          url: https://www.linkedin.com/
+        - title: Facebook
+          icon: facebook.png
+          description: Connect with friends
+          url: https://www.facebook.com/
     - name: Shanties
       icon: fas fa-music
-      displayData:
-        sortBy: default
-        rows: 1
-        cols: 1
-        collapsed: false
       items:
         - title: Twitch
           icon: twitch.png
           description: Games streaming service
           url: https://www.twitch.tv/directory/following
-          target: newtab
-          id: 0_831_twitch
         - title: Youtube
           icon: youtube.png
           description: Enjoy the videos and music you love
           url: https://www.youtube.com/feed/subscriptions
-          target: newtab
-          id: 1_831_youtube
-        - title: F1 TV
-          icon: f1tv.png
-          description: Enter the world of Formula 1
-          url: https://f1tv.formula1.com/
-          target: newtab
-          id: 2_831_ftv
         - title: Jellyfin
           icon: jellyfin.png
           description: Free software media system
           url: https://tv.corsaire.duckdns.org/
           statusCheck: true
-          target: newtab
-          id: 5_831_jellyfin
         - title: Photoprism
           icon: photoprism.png
           description: Browse your life in pictures
           url: https://photos.corsaire.duckdns.org/
           statusCheck: true
-          target: newtab
-          id: 6_831_photoprism
         - title: Prime Video
           icon: primevideo.png
           description: Streaming video service
           url: https://www.primevideo.com/
-          target: newtab
-          id: 4_831_primevideo
         - title: Netflix
           icon: netflix.png
           description: Streaming video service
           url: https://www.netflix.com/
-          target: newtab
-          id: 3_831_netflix
+        - title: F1 TV
+          icon: f1tv.png
+          description: Enter the world of Formula 1
+          url: https://f1tv.formula1.com/
+    - name: The 7 seas
+      icon: fas fa-skull-crossbones
+      displayData:
+        rows: 4
+      widgets:
+        - type: public-holidays
+          options:
+            country: fr
+            holidayType: all
+            monthsToShow: 4
+            lang: fr
+        - type: rss-feed
+          options:
+            rssUrl: https://www.france24.com/fr/rss
+            limit: 6
+            orderDirection: asc
     - name: Booty
       icon: fas fa-coins
-      displayData:
-        sortBy: default
-        rows: 1
-        cols: 1
-        collapsed: false
       items:
         - title: Finary
           icon: finary.png
           description: The ultimate portfolio tracker
           url: https://app.finary.com/fr
-          target: newtab
-          id: 0_525_finary
-        - title: BRS
+        - title: BoursoBank
           icon: brs.png
           description: Banking service
           url: https://clients.boursorama.com/connexion/
-          target: newtab
-          id: 1_525_brs
         - title: Crédit Agricole
           icon: ca.png
           description: Banking service
           url: https://www.credit-agricole.fr/ca-normandie/particulier/acceder-a-mes-comptes.html
-          target: newtab
-          id: 2_525_crditagricolenormandie
         - title: Degiro
           icon: degiro.png
           description: Stock broker
           url: https://www.degiro.fr/
-          target: newtab
-          id: 5_525_degiro
         - title: Wise
           icon: wise.png
           description: Send money abroad
           url: https://wise.com/
-          target: newtab
-          id: 6_525_wise
     - name: Captain's Quarters
       icon: fas fa-dharmachakra
       displayData:
-        sortBy: default
-        rows: 1
-        cols: 1
-        collapsed: false
+        rows: 2
       items:
         - title: Home Assistant
           icon: homeassistant.png
           description: Open-source software for home automation
           url: https://home.corsaire.duckdns.org/
           statusCheck: true
-          target: newtab
         - title: NAS
           icon: nas.png
           description: QNAP
           url: https://nas.corsaire.duckdns.org/cgi-bin/
           statusCheck: true
-          target: newtab
-          id: 0_1281_nas
-        - title: Transmission
-          icon: transmission.png
-          description: BitTorrent client
-          url: https://seedbox.corsaire.duckdns.org/
-          statusCheck: true
-          statusCheckAcceptCodes: "401"
-          target: newtab
-          id: 4_1281_transmission
-        - title: Sonarr
-          icon: sonarr.png
-          description: TV show collection manager
-          url: https://shows.corsaire.duckdns.org/
-          statusCheck: true
-          target: newtab
-          id: 1_1281_sonarr
-        - title: Radarr
-          icon: radarr.png
-          description: Movie collection manager
-          url: https://movies.corsaire.duckdns.org/
-          statusCheck: true
-          target: newtab
-          id: 2_1281_radarr
-        - title: Readarr
-          icon: readarr.png
-          description: ""
-          url: https://books.corsaire.duckdns.org/
-          statusCheck: true
-          target: newtab
-        - title: Prowlarr
-          icon: prowlarr.png
-          description: ""
-          url: https://prowlarr.corsaire.duckdns.org/
-          statusCheck: true
-          target: newtab
         - title: Traefik
           icon: traefik.png
           description: Modern reverse proxy
           url: https://traefik.corsaire.duckdns.org/
           statusCheck: true
           statusCheckAcceptCodes: "401"
-          target: newtab
-          id: 0_1745_traefik
         - title: Glances
           icon: glances.png
           description: Cross-platform system monitoring tool written in Python
           url: https://health.corsaire.duckdns.org/
           statusCheck: true
           statusCheckAcceptCodes: "401"
-          target: newtab
         - title: WAN
           icon: wan.png
           description: ISP router
           url: https://livebox.corsaire.duckdns.org/
           statusCheck: true
-          target: newtab
-          id: 3_1745_wan
+        - title: Transmission
+          icon: transmission.png
+          description: BitTorrent client
+          url: https://seedbox.corsaire.duckdns.org/
+          statusCheck: true
+          statusCheckAcceptCodes: "401"
+        - title: Sonarr
+          icon: sonarr.png
+          description: TV show collection manager
+          url: https://shows.corsaire.duckdns.org/
+          statusCheck: true
+        - title: Radarr
+          icon: radarr.png
+          description: Movie collection manager
+          url: https://movies.corsaire.duckdns.org/
+          statusCheck: true
+        - title: Readarr
+          icon: readarr.png
+          description: Books collection manager
+          url: https://books.corsaire.duckdns.org/
+          statusCheck: true
+        - title: Prowlarr
+          icon: prowlarr.png
+          description: Arr indexer manager/proxy
+          url: https://prowlarr.corsaire.duckdns.org/
+          statusCheck: true
+        - title: AirVPN
+          icon: favicon
+          description: OpenVPN and WireGuard based VPN operated by activists in defense of net neutrality, privacy and against censorship.
+          url: https://airvpn.org/
         - title: Backblaze
           icon: favicon
           description: Robust, scalable low cost cloud backup and storage services
           url: https://backblaze.com/
-          target: newtab
+        - title: KeeWeb
+          icon: keeweb.png
+          description: Cross-platform password manager
+          url: https://app.keeweb.info/
+    - name: Your ship
+      icon: fas fa-ship
+      widgets:
+        - type: public-ip
 sops:
     kms: []
     gcp_kms: []
@@ -312,14 +242,14 @@ sops:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBwcG5FWWlkTHAzOUdBUzlP
-            UDQvR3Y0NHdnQVRKVTg0RnlTcmVZbTVhakFjCndORk9MQUlKRzlUc1pBU3htNnBq
-            anVSMHJDODh5Y3pXajBSVlI4UTFhMFkKLS0tIEwzaGt2aXZIV09Fa0lCUWI0cnBI
-            WkdyUHl2TTJaSUg0dUkyaUxIUHkza3MKHAJ6dSkRvvZhWSvHQ268P7YwRwKUa8EE
-            0NQTN2tuHGOJnllsp7RF+iMN8Ya8NlJygGk8qPwbUq0tpQcsuM/Y0Q==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBTdkhHT0RXK0VEVTUyTkJs
+            TW4yWXJLaTgzZFdpU2xab3ZCYUFxM1JrS3hJCmZGdStYV1crNmJCTldLWDdJblpL
+            czBiRWpXdGppZXo2US9mMVZ6ZWRialEKLS0tIDJESyttdEwvZnlaaVc1Ni9qQVZS
+            aHJybWxiMTk2TVlyU3R1WmI1d2dTaVEKE0PXexVr/gQUeSNYJ3bR5V5pbHVQDGm9
+            tq1cGFthzoyw8h7XlD0NLFBseBeFyg1DnNvOJZVtJ5Vw9306CmEqGQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-01-26T10:49:15Z"
-    mac: ENC[AES256_GCM,data:/z6e4WYhlqPQlm8FCfmqIr7c6sZAL5KKDbtaPIfEfssmsID82vBsn7bX2m6mgPJyVczBP2wMQddOkr7qWGlijA4NRWKiudf9HiifoHbXtYEu+rO9+AqGFA934Man0r0mdfhLQ7FHAtQqD3GIn9O4sTr/4NDWZFOSu11X8qpCBiU=,iv:AKUvigXgzKy21wJqSjGb9p64j5VGuUMXsTgfw9jRqIY=,tag:i4Cu5Oxpmxo4Qy+iBsRhwQ==,type:str]
+    lastmodified: "2024-01-28T18:35:37Z"
+    mac: ENC[AES256_GCM,data:Gtrl3oZltBA6XOMs/NNF1sPRqQKXW9MEAABjnSD73xPqCa7/F5EciHoQO1vvEyHbh7h9tb0CUKbxbD9BQOt0uPrcpoVbpsoT2XWP29TOj1Y4tG1XD/ElH6bSyJ3iZXpZMPJ7Cp4VpmGHpyL+0rKfwOBfQc5vR8GC5BBwT58tN/0=,iv:/QOVCNBWfKKKIAN8idMQ3T0zJi1EOXGwYIswy7fn074=,tag:6JH4kBKOUbdbnynTuUvrow==,type:str]
     pgp: []
     encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*PHOTOPRISM.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*Address.*|.*PrivateKey.*|.*DNS.*|.*PostUp.*|.*PublicKey.*|.*PresharedKey.*|.*Endpoint.*)$
     version: 3.8.1

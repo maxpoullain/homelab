@@ -5,44 +5,14 @@ pageInfo:
   logo: /img/corsaire.png
   footerText: <a data-v-001d966c="" href="https://github.com/maxpoullain/homelab" target="_blank">Corsaire Labs source code</a>
 sections:
-  - name: Your ship's homeport
-    icon: fas fa-ship
-    displayData:
-      sortBy: default
-      rows: 1
-      cols: 1
-      collapsed: false
-    items: []
-    widgets:
-      - type: public-ip
-        id: 0_1963_publicip
-  - name: Local time
-    icon: fas fa-hourglass-half
-    displayData:
-      sortBy: default
-      rows: 1
-      cols: 3
-      collapsed: false
-    items: []
-    widgets:
-      - type: clock
-        options:
-          timeZone: Europe/Paris
-          format: en-GB
-          hideDate: false
-          customCityName: Saint-Malo
-        id: 0_1012_clock
-  - name: Restricted
-    icon: fas fa-hourglass-half
+
+  - name: Restricted access
+    icon: fas fa-ban
     displayData:
       showForUsers: [noone]
-      sortBy: default
-      rows: 1
-      cols: 4
-      collapsed: false
     items:
       - title: Login
-        #icon: finary.png
+        icon: fas fa-user
         description: "Please login"
         url: https://www.corsaire.duckdns.org/login
         target: sametab
