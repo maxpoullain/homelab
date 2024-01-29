@@ -1,21 +1,22 @@
 appConfig:
+    webSearch:
+        searchEngine: duckduckgo
+        openingMethod: newtab
+    faviconApi: iconhorse
+    auth:
+        users:
+            - user: ENC[AES256_GCM,data:kyCe,iv:G4mCpBrzykUxcbP+LrDGmpuETkPsnPT/lkexFYtwgj0=,tag:O9nPZ+Unk5og0lN4rc9NJQ==,type:str]
+              hash: ENC[AES256_GCM,data:q7wXbZkIufpP5uOodw7/PR97LQlw7Qh76hWzGzZWBDSRA4qFW8nyaE5Z3oahEUs/O6V7wc0jBUI3rkt9iUCA3w==,iv:vn5uHTTgi4FlB63vpy93i7xPRl52wCNX4KigLq+vR0U=,tag:ZqjARVPrFbWBJ3m1YGJoJQ==,type:str]
+              type: ENC[AES256_GCM,data:HY8Nz44=,iv:xkuibYLihXiRuGsJuOwXKcQz7XrBKDp5t7ljCtVZeB0=,tag:CbNujcxCjqdPD2uIev55ZA==,type:str]
+        enableGuestAccess: true
     iconSize: small
+    theme: nord-custom
     cssThemes:
         - nord-custom
-    theme: nord-custom
     hideComponents:
         hideSettings: true
     routingMode: history
     disableConfigurationForNonAdmin: true
-    webSearch:
-        searchEngine: duckduckgo
-        openingMethod: newtab
-    auth:
-        users:
-            - user: ENC[AES256_GCM,data:2Yu/,iv:xKxKVjMthipReyGSP6OxScuVHUZt5pOPrwnmhkAp3p4=,tag:1ujTL3Q+3vu9t0n6pv+kCA==,type:str]
-              hash: ENC[AES256_GCM,data:SJzQX3DZK28Isyr0zoDcGvOE0m6WVBOJvAJB6QGWMzMb6t8kDnR5XaQhtkOOIn+I08eMpTVUukM7AkjS+X28Dw==,iv:gW6xaYAiZ4F+B0oMrTtt2BeekVqUKQhpJdEGad5C28w=,tag:OhfNWq21Xe1JODNjVGgLmQ==,type:str]
-              type: ENC[AES256_GCM,data:Q1/CXCc=,iv:D8NNYDKQsUVLW0xrV8bKBTzrFMu34Q/xRyfwpnUWLEA=,tag:lr0ilOjOosxVrseCbuP5/g==,type:str]
-        enableGuestAccess: true
 pages:
     - name: Hobbies
       path: hobbies.yml
@@ -42,7 +43,7 @@ sections:
             customCityName: Saint-Malo
         - type: weather
           options:
-            apiKey: ENC[AES256_GCM,data:zRdMeqL7xjwDx65rjWYNvXj7hK5fwB7dpZTYsY4Mqes=,iv:XORTtFKBeXM9kYoeQQg8+Yp/wIvYY9eVoq6MBPe3uos=,tag:Bjwp7lyPlwwEMhwCDxqy0Q==,type:str]
+            apiKey: ENC[AES256_GCM,data:0BlF1ozSPHSrgdprR3HAN4fxaZ4isjzHoZKsy8b8aB4=,iv:M+JWNa01LRgylqEt+topqtLVvhYzAeF41jsy21DLdUE=,tag:cKsKXcL6nNgz2LnMMHl+BQ==,type:str]
             city: St-Malo
             units: metric
         - type: crypto-watch-list
@@ -53,7 +54,7 @@ sections:
                 - ethereum
         - type: stock-price-chart
           options:
-            apiKey: ENC[AES256_GCM,data:nalLhsrGyQL5AX/WvMRHyg==,iv:BuH2gp7ZcfrB0fMk7nKe3KjHsg2ZO8MvOxkzvI3ruDI=,tag:/iqxEywhbkatnh4WkL9V4w==,type:str]
+            apiKey: ENC[AES256_GCM,data:R4TU2H8bSP4lq8k+OjWy9g==,iv:XCo7ZKtS3h0ljv59XHJ31KgEt86qaWbI61ajSyqKCAM=,tag:Fu6o6sItlpdwznFhhIqx6g==,type:str]
             stock: MSFT
             chartHeight: 180
     - name: Docks
@@ -242,14 +243,14 @@ sops:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBTdkhHT0RXK0VEVTUyTkJs
-            TW4yWXJLaTgzZFdpU2xab3ZCYUFxM1JrS3hJCmZGdStYV1crNmJCTldLWDdJblpL
-            czBiRWpXdGppZXo2US9mMVZ6ZWRialEKLS0tIDJESyttdEwvZnlaaVc1Ni9qQVZS
-            aHJybWxiMTk2TVlyU3R1WmI1d2dTaVEKE0PXexVr/gQUeSNYJ3bR5V5pbHVQDGm9
-            tq1cGFthzoyw8h7XlD0NLFBseBeFyg1DnNvOJZVtJ5Vw9306CmEqGQ==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBTNG1RNENDZm0zeURDeloz
+            dk9DT25ITG5SQzlhOVo3Uy81RDhzRE84TWk4CmxiVG1FdmFzZ1FtNlV3YnVSd2xq
+            dkpQcGFvbEJycC9aNmJRWk80KzJqc00KLS0tIG45TXlCYTBBU2Nyd1MwN0VTQk9X
+            a1hkcktIa2J3SjgrTCtTcVFNQzRvOEkKTCgop5ffibvbnoLY8qszELt/nsl3KRgi
+            7sgyVWudaqKR7Nkc3EKYL0KIeUW4swtfaAoNu3Lv+qHU7nFFPjRLcg==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-01-28T18:35:37Z"
-    mac: ENC[AES256_GCM,data:Gtrl3oZltBA6XOMs/NNF1sPRqQKXW9MEAABjnSD73xPqCa7/F5EciHoQO1vvEyHbh7h9tb0CUKbxbD9BQOt0uPrcpoVbpsoT2XWP29TOj1Y4tG1XD/ElH6bSyJ3iZXpZMPJ7Cp4VpmGHpyL+0rKfwOBfQc5vR8GC5BBwT58tN/0=,iv:/QOVCNBWfKKKIAN8idMQ3T0zJi1EOXGwYIswy7fn074=,tag:6JH4kBKOUbdbnynTuUvrow==,type:str]
+    lastmodified: "2024-01-29T08:54:30Z"
+    mac: ENC[AES256_GCM,data:jLMb+EKEMSZXT5/oKlOvsvticWxv7IK+HcUgv2Dh05AcNEsTvhN37dVbmFvgztCV3OOZ5pMW6NoJqseOSuGLTHFJXtZQuyz/zNt/smiHuZtnmfdqTaQBsSSICW39lVLMMlGXX0RapafN0RTrAu4kmQDO3OUrTbVXtmubO6lfyX4=,iv:Z/LqEj4p2tvA1aZqvmqsDy8SIKoBC7msHWZcdwVDP80=,tag:GF8hFgylOKbGHBSP0F/2Hg==,type:str]
     pgp: []
     encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*PHOTOPRISM.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*Address.*|.*PrivateKey.*|.*DNS.*|.*PostUp.*|.*PublicKey.*|.*PresharedKey.*|.*Endpoint.*)$
     version: 3.8.1

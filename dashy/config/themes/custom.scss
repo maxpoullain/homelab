@@ -142,4 +142,9 @@ html[data-theme='nord-custom'] {
     .league {
         display: none !important;
     }
+
+    // gl-ip-address
+    div.ip-row:nth-child(n+3) {
+        display: none !important;
+    }
 }
