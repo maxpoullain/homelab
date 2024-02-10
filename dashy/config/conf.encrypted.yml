@@ -2,12 +2,18 @@ appConfig:
     webSearch:
         searchEngine: duckduckgo
         openingMethod: newtab
+        searchBangs:
+            gg: https://www.google.com/search?q=
+            yt: https://www.youtube.com/results?search_query=
+            maps: https://www.google.fr/maps/search/
+            wiki: https://en.wikipedia.org/w/?search=
+            trans: https://translate.google.com/?sl=en&tl=fr&text=
     faviconApi: iconhorse
     auth:
         users:
-            - user: ENC[AES256_GCM,data:kyCe,iv:G4mCpBrzykUxcbP+LrDGmpuETkPsnPT/lkexFYtwgj0=,tag:O9nPZ+Unk5og0lN4rc9NJQ==,type:str]
-              hash: ENC[AES256_GCM,data:q7wXbZkIufpP5uOodw7/PR97LQlw7Qh76hWzGzZWBDSRA4qFW8nyaE5Z3oahEUs/O6V7wc0jBUI3rkt9iUCA3w==,iv:vn5uHTTgi4FlB63vpy93i7xPRl52wCNX4KigLq+vR0U=,tag:ZqjARVPrFbWBJ3m1YGJoJQ==,type:str]
-              type: ENC[AES256_GCM,data:HY8Nz44=,iv:xkuibYLihXiRuGsJuOwXKcQz7XrBKDp5t7ljCtVZeB0=,tag:CbNujcxCjqdPD2uIev55ZA==,type:str]
+            - user: ENC[AES256_GCM,data:bs5U,iv:0sWj5O0HrX9VJ6TnKjnyhWw3XxpXQQE1DPnVt7UhldI=,tag:HXXG/MFX3fpduVkwsa/KhA==,type:str]
+              hash: ENC[AES256_GCM,data:Sn/bO6wC/clvZ0+u/w5CyQZL+PkyXDbYgSYvWyD2vYBcK/Ng+P9P5K/vtO1DIshp/7wAanHJjIq3Fvg5atRfcg==,iv:5/+epw44er0Ky70/5tUIl9LqK4hqJTl6w6LKXNwkIDk=,tag:5ONJQsETUV96bGRoEcK2XQ==,type:str]
+              type: ENC[AES256_GCM,data:K2PKrh4=,iv:EQk0zia2LOe7D94kR5wMMlaOYo6d1umC8yfY7uWCCn8=,tag:yu74oCFpA0g9fVNsa2TaXw==,type:str]
         enableGuestAccess: true
     iconSize: small
     theme: nord-custom
@@ -43,53 +49,19 @@ sections:
             customCityName: Saint-Malo
         - type: weather
           options:
-            apiKey: ENC[AES256_GCM,data:0BlF1ozSPHSrgdprR3HAN4fxaZ4isjzHoZKsy8b8aB4=,iv:M+JWNa01LRgylqEt+topqtLVvhYzAeF41jsy21DLdUE=,tag:cKsKXcL6nNgz2LnMMHl+BQ==,type:str]
+            apiKey: ENC[AES256_GCM,data:SkoQJDfTzsdo7QTgNTjDaKu3cnp/f4bSeee/AQBHwIE=,iv:npJnhvp1VHfQwiOLZRpL9EwA3qS1KCm99UUljJiFf8o=,tag:KUj7Vo3JQtvg4Ol/Itep9g==,type:str]
             city: St-Malo
             units: metric
-        - type: crypto-watch-list
+        - type: weather-forecast
           options:
-            currency: EUR
-            assets:
-                - bitcoin
-                - ethereum
-        - type: stock-price-chart
-          options:
-            apiKey: ENC[AES256_GCM,data:R4TU2H8bSP4lq8k+OjWy9g==,iv:XCo7ZKtS3h0ljv59XHJ31KgEt86qaWbI61ajSyqKCAM=,tag:Fu6o6sItlpdwznFhhIqx6g==,type:str]
-            stock: MSFT
-            chartHeight: 180
-    - name: Docks
-      icon: fas fa-anchor
-      items:
-        - title: Notion
-          icon: notion.png
-          description: Productivity and note-taking app
-          url: https://www.notion.so/
-        - title: Reddit
-          icon: reddit.png
-          description: Network of communities
-          url: https://reddit.com/
-        - title: Github
-          icon: github.png
-          description: Code hosting platform
-          url: https://github.com/
-        - title: Amazon
-          icon: amazon.png
-          description: E-commerce site
-          url: https://www.amazon.fr/
-        - title: Meteo France
-          icon: favicon
-          description: French national meteorological service
-          url: https://meteofrance.com/
-        - title: LinkedIn
-          icon: linkedin.png
-          description: Professional networking
-          url: https://www.linkedin.com/
-        - title: Facebook
-          icon: facebook.png
-          description: Connect with friends
-          url: https://www.facebook.com/
+            city: St-Malo
+            znumDays: 6
+            apiKey: ENC[AES256_GCM,data:wQuW+o0glkJ+Q6Fb/3mU1kI9u+XU/t2ytqP3oFV8VhM=,iv:Ygtt1779zdwaHAI4e9El3Qqi2irdehVofmq37GIPWvg=,tag:f+O8Ll5JBlLIsd4n4Ctxig==,type:str]
+            units: metric
     - name: Shanties
       icon: fas fa-music
+      displayData:
+        rows: 1
       items:
         - title: Twitch
           icon: twitch.png
@@ -121,34 +93,20 @@ sections:
           icon: f1tv.png
           description: Enter the world of Formula 1
           url: https://f1tv.formula1.com/
-    - name: The 7 seas
-      icon: fas fa-skull-crossbones
-      displayData:
-        rows: 4
-      widgets:
-        - type: public-holidays
-          options:
-            country: fr
-            holidayType: all
-            monthsToShow: 4
-            lang: fr
-        - type: rss-feed
-          options:
-            rssUrl: https://www.france24.com/fr/rss
-            limit: 6
-            orderDirection: asc
     - name: Booty
       icon: fas fa-coins
+      displayData:
+        rows: 1
       items:
         - title: Finary
           icon: finary.png
           description: The ultimate portfolio tracker
-          url: https://app.finary.com/fr
+          url: https://app.finary.com/v2
         - title: BoursoBank
           icon: brs.png
           description: Banking service
           url: https://clients.boursorama.com/connexion/
-        - title: Crédit Agricole
+        - title: CA
           icon: ca.png
           description: Banking service
           url: https://www.credit-agricole.fr/ca-normandie/particulier/acceder-a-mes-comptes.html
@@ -160,12 +118,51 @@ sections:
           icon: wise.png
           description: Send money abroad
           url: https://wise.com/
+    - name: Your ship
+      icon: fas fa-ship
+      displayData:
+        rows: 1
+      widgets:
+        - type: public-ip
+    - name: Docks
+      icon: fas fa-anchor
+      displayData:
+        rows: 1
+      items:
+        - title: Notion
+          icon: notion.png
+          description: Productivity and note-taking app
+          url: https://www.notion.so/
+        - title: Reddit
+          icon: reddit.png
+          description: Network of communities
+          url: https://reddit.com/
+        - title: Github
+          icon: github.png
+          description: Code hosting platform
+          url: https://github.com/
+        - title: Amazon
+          icon: amazon.png
+          description: E-commerce site
+          url: https://www.amazon.fr/
+        - title: Meteo France
+          icon: favicon
+          description: French national meteorological service
+          url: https://meteofrance.com/previsions-meteo-france/saint-malo/35400
+        - title: LinkedIn
+          icon: linkedin.png
+          description: Professional networking
+          url: https://www.linkedin.com/
+        - title: Facebook
+          icon: facebook.png
+          description: Connect with friends
+          url: https://www.facebook.com/
     - name: Captain's Quarters
       icon: fas fa-dharmachakra
       displayData:
         rows: 2
       items:
-        - title: Home Assistant
+        - title: HA
           icon: homeassistant.png
           description: Open-source software for home automation
           url: https://home.corsaire.duckdns.org/
@@ -230,10 +227,28 @@ sections:
           icon: keeweb.png
           description: Cross-platform password manager
           url: https://app.keeweb.info/
-    - name: Your ship
-      icon: fas fa-ship
+    - name: The 7 seas
+      icon: fas fa-skull-crossbones
+      displayData:
+        rows: 3
       widgets:
-        - type: public-ip
+        - type: rss-feed
+          options:
+            rssUrl: https://www.france24.com/fr/rss
+            limit: 6
+            orderDirection: asc
+        - type: public-holidays
+          options:
+            country: fr
+            holidayType: all
+            monthsToShow: 4
+            lang: fr
+    - name: Catch of the day
+      icon: fas fa-fish
+      displayData:
+        rows: 1
+      widgets:
+        - type: joke
 sops:
     kms: []
     gcp_kms: []
@@ -243,14 +258,14 @@ sops:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBTNG1RNENDZm0zeURDeloz
-            dk9DT25ITG5SQzlhOVo3Uy81RDhzRE84TWk4CmxiVG1FdmFzZ1FtNlV3YnVSd2xq
-            dkpQcGFvbEJycC9aNmJRWk80KzJqc00KLS0tIG45TXlCYTBBU2Nyd1MwN0VTQk9X
-            a1hkcktIa2J3SjgrTCtTcVFNQzRvOEkKTCgop5ffibvbnoLY8qszELt/nsl3KRgi
-            7sgyVWudaqKR7Nkc3EKYL0KIeUW4swtfaAoNu3Lv+qHU7nFFPjRLcg==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBleUg4UmVtYUdDcFUweUI0
+            MXBSeWI5ZERLcDVuMEJ5Uyt2TUgzUFJFc1Q4CnFlaDBBNm5wdXcxZVN4U1V2MnA1
+            dUtERFErOFd6elRZdStoTytNZFpCV1EKLS0tIGp3M1FBSTZWeHcvN2dYTGhhK0Rh
+            Rlk3Q2xGUlVOTVpjdnpWQ083UWcvczAK2+sT0kvwGNBsw4I09anhmpVUT3EY6lVj
+            QpzvZeCNfVCLlgcDlx7G/df67Dnp6dClGfGPTLgR87whlNGsZhTjbA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-01-29T08:54:30Z"
-    mac: ENC[AES256_GCM,data:jLMb+EKEMSZXT5/oKlOvsvticWxv7IK+HcUgv2Dh05AcNEsTvhN37dVbmFvgztCV3OOZ5pMW6NoJqseOSuGLTHFJXtZQuyz/zNt/smiHuZtnmfdqTaQBsSSICW39lVLMMlGXX0RapafN0RTrAu4kmQDO3OUrTbVXtmubO6lfyX4=,iv:Z/LqEj4p2tvA1aZqvmqsDy8SIKoBC7msHWZcdwVDP80=,tag:GF8hFgylOKbGHBSP0F/2Hg==,type:str]
+    lastmodified: "2024-02-10T17:09:59Z"
+    mac: ENC[AES256_GCM,data:2iZGcDjcA+f+lCwEMaRH+xVs8fb9PbN9mehogwEytzsL8Ssf2LyPGUEozniREcB2/gfsTtsz9N4DgD8yRzsgvpsV4G2gsZFKOtmH1wW3exm5Kypo3rgV/vjjI1Olm9zn2U/DBjMisR3YKrzKu0iqxSX+PlXr2If9lQuI/Z3gcSk=,iv:fBZUiLrno/U0xmE9UjxenOyfA6cjQ6SSbJWhui1hpXc=,tag:0vLAicJ+XMcRR8rQd6gZ8Q==,type:str]
     pgp: []
     encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*PHOTOPRISM.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*Address.*|.*PrivateKey.*|.*DNS.*|.*PostUp.*|.*PublicKey.*|.*PresharedKey.*|.*Endpoint.*)$
     version: 3.8.1
