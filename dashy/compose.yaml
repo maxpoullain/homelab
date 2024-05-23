@@ -3,7 +3,7 @@ version: '3.8'
 services:
   dashy:
     container_name: dashy
-    image: lissy93/dashy:latest
+    image: lissy93/dashy:2.1.1
     command: [ "yarn", "build-and-start" ]
     restart: unless-stopped
     cpus: 3
@@ -27,8 +27,11 @@ services:
       - "./config/themes/custom.scss:/app/src/styles/user-defined-themes.scss"
       - "./config/img/corsaire.png:/app/public/img/corsaire.png"
       - "./config/img/favicon.ico:/app/public/img/icons/favicon.ico"
+      - "./config/img/favicon.ico:/app/public/favicon.ico"
       - "./config/img/favicon-16x16.png:/app/public/img/icons/favicon-16x16.png"
+      - "./config/img/favicon-16x16.png:/app/public/web-icons//favicon-16x16.png"
       - "./config/img/favicon-32x32.png:/app/public/img/icons/favicon-32x32.png"
+      - "./config/img/favicon-32x32.png:/app/public/web-icons/favicon-32x32.png"
     environment:
       - GID=1000
       - UID=1000
