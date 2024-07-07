@@ -149,6 +149,10 @@ sections:
         description: Vente TCG
         url: https://ecardstore.fr/
         id: 9_222_ecardstore
+      - title: Cartes Normandes
+        icon: favicon
+        description: Magasin de jeux de cartes de plateaux à Caen
+        url: https://www.cartes-normandes.com/
       - title: InvestCollect
         icon: favicon
         description: La Ligue du Jeu by Invest Collect
