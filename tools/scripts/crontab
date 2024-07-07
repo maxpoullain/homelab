@@ -1,1 +1,2 @@
 */5 * * * * /data/homelab/tools/duckdns/duck.sh >/dev/null 2>&1
+*/30 * * * *    cd /mnt/nas/media/Photos && chmod -R 774 */Camera\ Upload
