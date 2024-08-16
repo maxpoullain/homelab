@@ -11,9 +11,9 @@ appConfig:
     faviconApi: iconhorse
     auth:
         users:
-            - user: ENC[AES256_GCM,data:bs5U,iv:0sWj5O0HrX9VJ6TnKjnyhWw3XxpXQQE1DPnVt7UhldI=,tag:HXXG/MFX3fpduVkwsa/KhA==,type:str]
-              hash: ENC[AES256_GCM,data:Sn/bO6wC/clvZ0+u/w5CyQZL+PkyXDbYgSYvWyD2vYBcK/Ng+P9P5K/vtO1DIshp/7wAanHJjIq3Fvg5atRfcg==,iv:5/+epw44er0Ky70/5tUIl9LqK4hqJTl6w6LKXNwkIDk=,tag:5ONJQsETUV96bGRoEcK2XQ==,type:str]
-              type: ENC[AES256_GCM,data:K2PKrh4=,iv:EQk0zia2LOe7D94kR5wMMlaOYo6d1umC8yfY7uWCCn8=,tag:yu74oCFpA0g9fVNsa2TaXw==,type:str]
+            - user: ENC[AES256_GCM,data:rBhe,iv:bOpC3QalBLor+fDnNGoNtMH3m8JHrxlv4pUj8aaKzbQ=,tag:NaXuN0C8RVhesE0wJLZx3Q==,type:str]
+              hash: ENC[AES256_GCM,data:2F29aD0KGafQF1CMTOGh3Ae92ceoGNvrtU5cmLN4LG888NbRspYSBe+QYncC8Ytyt79sCyyQllHAPAwvBP8/4Q==,iv:7JhNk6DgCzyC0tw/2M8yA+OG2A/NkuDa6BsBxhVp3i0=,tag:e8SJzJ+0VTd2SYYYDDa35w==,type:str]
+              type: ENC[AES256_GCM,data:+l52pNk=,iv:p42rBk1xTlELOTqRUt4206JEL5LYOxeOxEykGc7YXnM=,tag:MsPti57A9X7SBl0quaIAOQ==,type:str]
         enableGuestAccess: true
     iconSize: small
     theme: nord-custom
@@ -49,14 +49,14 @@ sections:
             customCityName: Saint-Malo
         - type: weather
           options:
-            apiKey: ENC[AES256_GCM,data:SkoQJDfTzsdo7QTgNTjDaKu3cnp/f4bSeee/AQBHwIE=,iv:npJnhvp1VHfQwiOLZRpL9EwA3qS1KCm99UUljJiFf8o=,tag:KUj7Vo3JQtvg4Ol/Itep9g==,type:str]
+            apiKey: ENC[AES256_GCM,data:JayYOug8hnYN+ZkVPNMIpowJKyL1xBH0t1dXeyy1RaU=,iv:5Ud7g1yjloYC4xPIFOM9+jWYz1Ts01Gb3AfUZV4qvEk=,tag:na03qBtMPhW/xaE2VU8v3Q==,type:str]
             city: St-Malo
             units: metric
         - type: weather-forecast
           options:
             city: St-Malo
             znumDays: 6
-            apiKey: ENC[AES256_GCM,data:wQuW+o0glkJ+Q6Fb/3mU1kI9u+XU/t2ytqP3oFV8VhM=,iv:Ygtt1779zdwaHAI4e9El3Qqi2irdehVofmq37GIPWvg=,tag:f+O8Ll5JBlLIsd4n4Ctxig==,type:str]
+            apiKey: ENC[AES256_GCM,data:/R01S0ZnSYXu1Waih2CyyHFREnGn4lBsJaIdXx58Y+c=,iv:E1hgwfseHLVKI3qPvyOXkiBgW9E6GfluT0SpBxPbbh0=,tag:7xjLE94TygYW28GlW84AKQ==,type:str]
             units: metric
     - name: Shanties
       icon: fas fa-music
@@ -76,9 +76,9 @@ sections:
           description: Free software media system
           url: https://tv.corsaire.duckdns.org/
           statusCheck: true
-        - title: Photoprism
-          icon: photoprism.png
-          description: Browse your life in pictures
+        - title: Immich
+          icon: immich.png
+          description: High performance self-hosted photo and video management solution
           url: https://photos.corsaire.duckdns.org/
           statusCheck: true
         - title: Prime Video
@@ -249,6 +249,8 @@ sections:
         rows: 1
       widgets:
         - type: joke
+          options:
+            safeMode: true
 sops:
     kms: []
     gcp_kms: []
@@ -258,14 +260,14 @@ sops:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBleUg4UmVtYUdDcFUweUI0
-            MXBSeWI5ZERLcDVuMEJ5Uyt2TUgzUFJFc1Q4CnFlaDBBNm5wdXcxZVN4U1V2MnA1
-            dUtERFErOFd6elRZdStoTytNZFpCV1EKLS0tIGp3M1FBSTZWeHcvN2dYTGhhK0Rh
-            Rlk3Q2xGUlVOTVpjdnpWQ083UWcvczAK2+sT0kvwGNBsw4I09anhmpVUT3EY6lVj
-            QpzvZeCNfVCLlgcDlx7G/df67Dnp6dClGfGPTLgR87whlNGsZhTjbA==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBHbEtNelVVSG1EN1psN0hM
+            K0Yzb0JNalEyK1dXRTVCTmtEbGdHdisvamdNCnZjV29Sa3cxVnF5blFDcDFoMEs0
+            MXM0dHhpSjdaN2gxc2RteHJPdmxMME0KLS0tIHl1bzcyTDFPNDRWQ1JwVE4xa3V2
+            NWlIMjZLTmY1QmdpK3dKWkF0cERsMVUKgAeEpehBYiU91BA1GfOK73pGXjcf+wDM
+            aZT0810AWxkq5QYWtUYx1i6HiwdWrgmzIOe5ftfOfmJKRil5E+xb5Q==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-02-10T17:09:59Z"
-    mac: ENC[AES256_GCM,data:2iZGcDjcA+f+lCwEMaRH+xVs8fb9PbN9mehogwEytzsL8Ssf2LyPGUEozniREcB2/gfsTtsz9N4DgD8yRzsgvpsV4G2gsZFKOtmH1wW3exm5Kypo3rgV/vjjI1Olm9zn2U/DBjMisR3YKrzKu0iqxSX+PlXr2If9lQuI/Z3gcSk=,iv:fBZUiLrno/U0xmE9UjxenOyfA6cjQ6SSbJWhui1hpXc=,tag:0vLAicJ+XMcRR8rQd6gZ8Q==,type:str]
+    lastmodified: "2024-08-16T03:50:53Z"
+    mac: ENC[AES256_GCM,data:MCq/kLU+Dhj+A3Tx5blsgTntqeywHE7llNpxnHrqMKQ2fxqULP1p7Rz4dntVZt7i8LhW0FB0ohRH4fgf7P1fYkD0W6pQYdqLqmkjT1jao1fOv16wAPinMKN7dnCnrle9MBzgpz6zd17XYb2ZZfXFX46ksk5U3Z0jxi37UbTPVr0=,iv:UotasPumLTjUjz6awSlwyCoiGZknP7cXTjxUFzWPzd4=,tag:3SIdu3MhcEJJlVQmAOVbcA==,type:str]
     pgp: []
-    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*PHOTOPRISM.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*Address.*|.*PrivateKey.*|.*DNS.*|.*PostUp.*|.*PublicKey.*|.*PresharedKey.*|.*Endpoint.*)$
+    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*DB_PASSWORD.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*DNS.*|.*POST_UP.*|.*PRE_DOWN.*)$
     version: 3.8.1
