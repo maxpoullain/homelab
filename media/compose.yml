@@ -53,8 +53,8 @@ services:
     container_name: transmission
     image: linuxserver/transmission:latest
     restart: unless-stopped
-    cpus: 0.5
-    mem_limit: 512m
+    cpus: 2
+    mem_limit: 1024m
     security_opt:
       - no-new-privileges:true
     network_mode: "service:wireguard"
@@ -78,6 +78,31 @@ services:
       - TZ=Europe/Paris
       - TRANSMISSION_WEB_UI=flood-for-transmission
 
+  flaresolverr:
+    container_name: flaresolverr
+    image: 21hsmw/flaresolverr:nodriver #ghcr.io/flaresolverr/flaresolverr:pr-1282
+    restart: unless-stopped
+    cpus: 4
+    mem_limit: 1024m
+    security_opt:
+      - no-new-privileges:true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+    network_mode: "service:wireguard"
+    depends_on:
+      wireguard:
+        condition: service_healthy
+        restart: true
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/Paris
+      - LOG_LEVEL=info
+      - LANG=fr_FR
+      - BROWSER_TIMEOUT=240
+      - NO_SANDBOX=True
+      - HOST=127.0.0.1
+
   prowlarr:
     container_name: prowlarr
     image: lscr.io/linuxserver/prowlarr:develop
@@ -91,31 +116,14 @@ services:
       wireguard:
         condition: service_healthy
         restart: true
+      flaresolverr:
+        condition: service_started
     volumes:
       - "./prowlarr:/config"
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/London
-
-  flaresolverr:
-    container_name: flaresolverr
-    image: ghcr.io/flaresolverr/flaresolverr:latest
-    restart: unless-stopped
-    cpus: 2
-    mem_limit: 256m
-    security_opt:
-      - no-new-privileges:true
-    sysctls:
-      - net.ipv6.conf.all.disable_ipv6=1
-    network_mode: "service:wireguard"
-    depends_on:
-      - prowlarr
-    environment:
-      - PGID=1000
-      - PUID=1000
-      - TZ=Europe/Paris
-      - LOG_LEVEL=info
 
   sonarr:
     container_name: sonarr
