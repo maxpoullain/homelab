@@ -25,7 +25,7 @@ sections:
           options:
             hostname: https://health.corsaire.duckdns.org
             username: max
-            password: ENC[AES256_GCM,data:qvCr4hJPWA9L8g==,iv:uVNxMleHK6rgafKcBdL/WnZBEJ1jM6QXr+dDj4fzRPs=,tag:ITr2Jh4o1hhIBdZP0vb+sQ==,type:str]
+            password: ENC[AES256_GCM,data:yFDdvYxDRj6ALg==,iv:OAwqoBXStSzS0OC0ODDlquSJYy/amxeYDth2aNNGFI8=,tag:1IOnGOW0E80fox+hqGb6bw==,type:str]
     - name: Client IP
       icon: fas fa-desktop
       displayData:
@@ -42,7 +42,7 @@ sections:
             !!merge <<:
                 hostname: https://health.corsaire.duckdns.org
                 username: max
-                password: ENC[AES256_GCM,data:YV3EaVoulDLiew==,iv:NxWK5T1yYUBydQdncfPiYUyT+7Ws8gjldyGwAvJGh28=,tag:hYhiJ8Gn35LeOv4QFJ569w==,type:str]
+                password: ENC[AES256_GCM,data:hP9pRcYvIJqwew==,iv:ttdcEcCNu5P8Ijy7r0fnffAG31YV2QsbFy7gQDrXUp4=,tag:GEfbpqOMjh1/jWSgGf7x0A==,type:str]
     - name: CPU Usage
       icon: fas fa-tachometer
       displayData:
@@ -54,20 +54,20 @@ sections:
             !!merge <<:
                 hostname: https://health.corsaire.duckdns.org
                 username: max
-                password: ENC[AES256_GCM,data:uOlaS3SIcysbvQ==,iv:qDLFn8nOZABET1OkgIKErcDc8QHzH8EuN/CIUJyAWuk=,tag:OqS/jI8b7ou7MT6qHMX88w==,type:str]
+                password: ENC[AES256_GCM,data:oEUbdDJSoTLdQQ==,iv:hfKKpkTlryhZPF6zD0wub3RA2tKZeyKdf26DJbi7zrI=,tag:wH5fbQiZP+FKmw8cPvBbCA==,type:str]
         - type: gl-cpu-temp
           options:
             !!merge <<:
                 hostname: https://health.corsaire.duckdns.org
                 username: max
-                password: ENC[AES256_GCM,data:gn9zR2ewEC7HUw==,iv:mJY+W82ItFis1IMMQ2kpE5GN4ULuaXrRWubgvtvbL/o=,tag:lm3BoZXpxSquxsw3mBqNCA==,type:str]
+                password: ENC[AES256_GCM,data:wZNvXZVklmmu6g==,iv:cG4wXL9u+O1WkhxuAM5IDz+i2ygfhAq+4dCmcnTqVQA=,tag:EUTvfbdgSqxELsTVDG8sug==,type:str]
           units: C
         - type: gl-current-cores
           options:
             !!merge <<:
                 hostname: https://health.corsaire.duckdns.org
                 username: max
-                password: ENC[AES256_GCM,data:GbGo/u2zZx9JhQ==,iv:eE9h+ev9mKtNRQ1X04cnap6N6IXzE+kY0moMuHw1Up8=,tag:ryovJ+X7G06tG22VkCbfxA==,type:str]
+                password: ENC[AES256_GCM,data:5VW1ymq8NVcjrg==,iv:tEqSRp4/BA+eEirwC4kYec+7yK33WRsC4pqcvvIhFAs=,tag:i6sTQSR+P5kLiE1KkSybEA==,type:str]
     - name: CPU History
       icon: fas fa-microchip
       displayData:
@@ -79,7 +79,7 @@ sections:
             !!merge <<:
                 hostname: https://health.corsaire.duckdns.org
                 username: max
-                password: ENC[AES256_GCM,data:HXg1Gf4smo6KuQ==,iv:mLcRCoElEM5e7med0E1kRO6E6cK6iwDWPALWgYmC/94=,tag:YXYjUlGDMpKWzAPR+4+HgQ==,type:str]
+                password: ENC[AES256_GCM,data:CQJHsk94XBY9og==,iv:IJg5YBsr8yC1Qly/iRnnSRLJJYc4iRBrjXR2KMBmwM8=,tag:R/8v0riC/9/EE3QOvvA1Rg==,type:str]
             limit: 60
     - name: Disk Space
       icon: fas fa-hdd
@@ -91,7 +91,7 @@ sections:
             !!merge <<:
                 hostname: https://health.corsaire.duckdns.org
                 username: max
-                password: ENC[AES256_GCM,data:I9R4H03kaiGZJQ==,iv:4rHzjmDgcY/qiaO+ls58Z9eQuzw4cEXT9aTRYBn87os=,tag:z2GXsfdiRCRxvhosmVp90w==,type:str]
+                password: ENC[AES256_GCM,data:aeN6pvP7oCRmMg==,iv:gIxU7zFwRbPQSxIc4cuMNK/bMH+I2BKTsXqpZwX7T9k=,tag:YrvAVZxEDYF0RFQ7X/XPxQ==,type:str]
     - name: Memory Usage
       icon: fas fa-memory
       displayData:
@@ -102,7 +102,7 @@ sections:
             !!merge <<:
                 hostname: https://health.corsaire.duckdns.org
                 username: max
-                password: ENC[AES256_GCM,data:gn98TKGnkHvNvA==,iv:sx9+jG0F6rV97uwlBvlK+mNx0HYrOu8Ql4E/wIVBio8=,tag:5Clyz0ScaBWR9GeQnNJeSg==,type:str]
+                password: ENC[AES256_GCM,data:sD4vHZatJ11YBQ==,iv:LfTkMHwF/951jAT8peG3zIdTUVRw3NXnwzzbSI8kTkQ=,tag:fmTj7c9nTUGts3u3wQFSSA==,type:str]
     - name: System Load
       icon: fas fa-tasks-alt
       displayData:
@@ -113,7 +113,7 @@ sections:
             !!merge <<:
                 hostname: https://health.corsaire.duckdns.org
                 username: max
-                password: ENC[AES256_GCM,data:1KebGNGE6kM00w==,iv:WCrgehHZRLEAPis1TaE1vkUVRcXFyFidzfhkLk7zNos=,tag:QBI3nQV/g/GkRKik3+QR7A==,type:str]
+                password: ENC[AES256_GCM,data:TV9XRrP6VGfbpQ==,iv:Oux5YMLp72vdX0HRZDvPbbRbPU7hrZIXv4nq3voUvIA=,tag:ZjD2tau1IsW2PVSzBwyqwg==,type:str]
     - name: Disk IO
       icon: fas fa-disc-drive
       displayData:
@@ -124,7 +124,7 @@ sections:
             !!merge <<:
                 hostname: https://health.corsaire.duckdns.org
                 username: max
-                password: ENC[AES256_GCM,data:c6/7MGpKhko/xg==,iv:6aNlwt7YMpvBVjkRzdErG+oocHHBiqkC+drQjmH2cR8=,tag:TjCSBOKNEOKjYWFtE3OveA==,type:str]
+                password: ENC[AES256_GCM,data:jMqMUB2fmbS+OQ==,iv:XopI6fIdwvSFF/t6qQbE66hkLXhoIHIAtOe5MDek1iE=,tag:Tse1CE98+VjMHVjRffS2+w==,type:str]
 sops:
     kms: []
     gcp_kms: []
@@ -134,14 +134,14 @@ sops:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBCcGtNdkpmbjNsa2xsNzUz
-            NTh5N3RwaThLT0FLQnNaQXIxcjBlYllTMEJBCmNsVWY1cXo3OTYweW4vY0FncDJU
-            Unlnd1NmMldQN0FQRUg4dmZRdEpHbUEKLS0tIGNTNWFHa0JiZE0zalNTb01EUWlD
-            eDZFL3NHMnhVdW5jSktFSndaRXJnR1UKQ5tJeYJaRk/BOxzLP69RVYLxiT3mDgaU
-            6nCw0BngP/yDojDu56u3auqAMqYi1unIHgClPhbNKrKNW+cE6/eqaQ==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAydjU4aS9xSHE4c3N3RHJs
+            NDlyUGIzV3MrZ1RLRksxVVlIN2FmNkhkRFFRCkVYNks4WU5qaUMrTWlSUFo4TUdD
+            aExBYWpsUVBvK2ZFVE1sY2o5V0lmZEEKLS0tIGRGQWZaaitBSmJTdklTa3BFRVNI
+            dXpYL2p4UGV6VGZRS080bEM2c2pKQnMKQYh+csdjRxQXdSU5ysdnClbSMySrFHSF
+            o5dXgMQN6pAnYZtY1VpOdUYS+OvL9Zt+duBvQaa+3tdNbPZEw3ypOQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-01-28T18:37:23Z"
-    mac: ENC[AES256_GCM,data:aEMel3i/LLCWoEBBmc/Y4wF9k1w3VX3ud4oQYwhqfWW0p/Y0QhcfaLyXmAhSPMC81hCtltozb9dCSFC/+08SZBnlwE+BfXT4zg6+7e8xApg3O1n0gARJ9WHovgtPGnKiCma+cEeXphoLGK+TN9H2qQ75yHbj8f9WeIbBp6adwAE=,iv:pbNkD7xgzwfIR5zTXt8q+UMEAg/F/xom/28+fTqHUp4=,tag:H+Aofb6DW4y/cqIgFN3mBw==,type:str]
+    lastmodified: "2024-10-16T12:17:18Z"
+    mac: ENC[AES256_GCM,data:3uvYp7GYzB2x1RY2RiRUpG+/E6ij7jV4P7lzDtPJhBxEaCjbzjIJKg59TbdZbKjjHvwnEovoxF4sfc2aWsiXwIHJxx3UrV1KHPkEc1D1IAFsRPfDs9lxEXjNG+5X25oF+6n7/icrxesBbV4z2HFquTt5Q9CoA6icz76DCHTecwk=,iv:5h1sKGdtG5KaQd1unoVrSvE5SDuqa/nr2XdOj8tOLFA=,tag:GqtE3vwAcnMSquDJ0arwbA==,type:str]
     pgp: []
-    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*PHOTOPRISM.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*Address.*|.*PrivateKey.*|.*DNS.*|.*PostUp.*|.*PublicKey.*|.*PresharedKey.*|.*Endpoint.*)$
-    version: 3.8.1
+    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*DB_PASSWORD.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*DNS.*|.*POST_UP.*|.*PRE_DOWN.*)$
+    version: 3.9.1
