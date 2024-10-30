@@ -6,13 +6,12 @@ services:
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
     restart: unless-stopped
     stop_grace_period: 10s
-    cpus: 2
+    cpus: 3
     mem_limit: 2048m
     security_opt:
       - seccomp:unconfined
       - apparmor:unconfined
       - no-new-privileges:true
-    command: [ 'start.sh', 'immich' ]
     depends_on:
       - redis
       - database
@@ -37,34 +36,6 @@ services:
       - "traefik.http.routers.photos.tls.certresolver=acme"
       - "traefik.docker.network=traefik"
 
-  immich-microservices:
-    container_name: immich_microservices
-    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
-    command: [ 'start.sh', 'microservices' ]
-    volumes:
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - /mnt/nas/media/Photos:/usr/src/app/upload/library
-      - /mnt/nas/media/Photos/Max:/library/Max:ro
-      - /mnt/nas/media/Photos/Sixtine:/library/Sixtine:ro
-      - /mnt/nas/media/Photos/JD:/library/JD:ro
-      - /mnt/nas/media/Photos/Stephanie:/library/Stephanie:ro
-      - /etc/localtime:/etc/localtime:ro
-    env_file:
-      - .env
-    depends_on:
-      - redis
-      - database
-    restart: unless-stopped
-    stop_grace_period: 5s
-    cpus: 2
-    mem_limit: 2048m
-    security_opt:
-      - seccomp:unconfined
-      - apparmor:unconfined
-      - no-new-privileges:true
-    networks:
-      - immich
-
   immich-machine-learning:
     container_name: immich_machine_learning
     image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
@@ -80,9 +51,11 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+    healthcheck:
+      disable: false
     stop_grace_period: 5s
-    cpus: 1
-    mem_limit: 1024m
+    cpus: 2
+    mem_limit: 4096m
     security_opt:
       - seccomp:unconfined
       - apparmor:unconfined
@@ -92,7 +65,7 @@ services:
 
   redis:
     container_name: immich_redis
-    image: docker.io/redis:6.2-alpine@sha256:328fe6a5822256d065debb36617a8169dbfbd77b797c525288e465f56c1d392b
+    image: docker.io/redis:6.2-alpine@sha256:2ba50e1ac3a0ea17b736ce9db2b0a9f6f8b85d4c27d5f5accc6a416d8f42c6d5
     healthcheck:
       test: redis-cli ping || exit 1
     restart: unless-stopped
@@ -129,23 +102,7 @@ services:
       - seccomp:unconfined
       - apparmor:unconfined
       - no-new-privileges:true
-    command:
-      [
-        "postgres",
-        "-c",
-        "shared_preload_libraries=vectors.so",
-        "-c",
-        'search_path="$$user", public, vectors',
-        "-c",
-        "logging_collector=on",
-        "-c",
-        "max_wal_size=2GB",
-        "-c",
-        "shared_buffers=512MB",
-        "-c",
-        "wal_compression=on"
-      ]
-
+    command: [ 'postgres', '-c', 'shared_preload_libraries=vectors.so', '-c', 'search_path="$$user", public, vectors', '-c', 'logging_collector=on', '-c', 'max_wal_size=2GB', '-c', 'shared_buffers=512MB', '-c', 'wal_compression=on' ]
     networks:
       - immich
 
