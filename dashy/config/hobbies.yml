@@ -284,17 +284,17 @@ sections:
           limit: 5
           hideImage: false
         id: 0_119_sportsscores
-    filteredItems:
-      - title: F1 TV
-        icon: f1tv.png
-        description: Enter the world of Formula 1
-        url: https://f1tv.formula1.com/
-        id: 0_119_ftv
-      - title: F1 Calendar
-        icon: favicon
-        description: Races, Qualifying & Practice Sessions
-        url: https://f1calendar.com/
-        id: 1_119_fcalendar
+    # filteredItems:
+    #   - title: F1 TV
+    #     icon: f1tv.png
+    #     description: Enter the world of Formula 1
+    #     url: https://f1tv.formula1.com/
+    #     id: 0_119_ftv
+    #   - title: F1 Calendar
+    #     icon: favicon
+    #     description: Races, Qualifying & Practice Sessions
+    #     url: https://f1calendar.com/
+    #     id: 1_119_fcalendar
   - name: Karting
     icon: fas fa-trophy
     displayData:

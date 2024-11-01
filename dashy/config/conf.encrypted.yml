@@ -11,9 +11,9 @@ appConfig:
     faviconApi: iconhorse
     auth:
         users:
-            - user: ENC[AES256_GCM,data:E2Mn,iv:wp3h+kGXSMzMWsNUbui23JEcb9aJzI3F7tFHOAwlRQU=,tag:tyoCl68qW2O7QgyAPadatQ==,type:str]
-              hash: ENC[AES256_GCM,data:4sBZgIIUbYS/My0uh87dMEqvSANjz5Hqc+VopohR60h4HS9ZgrY9rorlP2thH0cGLII0QzKCbfzgHcXiGNlBuQ==,iv:2nxIetuh+ykU8BRDYtgbJTWk5/M5DCcEL92VTcx0Jh4=,tag:JvvlUfO8euoFq7a9OBGuPQ==,type:str]
-              type: ENC[AES256_GCM,data:Jba3tHg=,iv:r4M4kp2grWgrQheD9NHv955nVJ2gQim7hYZDlY7qras=,tag:tgW7K7t/PELaYqs8b8HG7w==,type:str]
+            - user: ENC[AES256_GCM,data:ERP4,iv:iRdlnQN17zKry8E5Jx2cZeDPGfz+wnoy+i8LocArTkA=,tag:INpY/8vNfbTpwi/QfATtoA==,type:str]
+              hash: ENC[AES256_GCM,data:4Yc8p+AVcr3pnGHlbOWydtDgs2Rmz9VnEez44yXD9aqzJQc+Fxs+nM1L9eRe9RP+Vk4sdN2qMD2fXyhXSq2CyQ==,iv:y0toVKkIekLXlen4tZrRLyUUYJtmJ6aiDXNO8D5XAjY=,tag:RpjUv4+o74qcmjYu6yGYxA==,type:str]
+              type: ENC[AES256_GCM,data:GZesOHo=,iv:YG/TfVts94MiOK2q/3xIIb0KD4ju0IGdI8w+VLbnE1A=,tag:9mwZmTyx0i0SCJ1UysgtMQ==,type:str]
         enableGuestAccess: true
     iconSize: small
     theme: nord-custom
@@ -23,6 +23,7 @@ appConfig:
         hideSettings: true
     routingMode: history
     disableConfigurationForNonAdmin: true
+    layout: auto
 pages:
     - name: Hobbies
       path: hobbies.yml
@@ -33,7 +34,7 @@ pages:
 pageInfo:
     title: Corsaire Labs
     description: Dashboard
-    logo: /img/corsaire.png
+    logo: corsaire.png
     footerText: <a data-v-001d966c="" href="https://github.com/maxpoullain/homelab" target="_blank">Corsaire Labs source code</a>
 sections:
     - name: Today's sea
@@ -47,17 +48,20 @@ sections:
             format: fr-FR
             hideSeconds: true
             customCityName: Saint-Malo
+          id: 0_1012_clock
         - type: weather
           options:
-            apiKey: ENC[AES256_GCM,data:X89tjedXMcLkovfpAemZyV9AHoW+yOlUDDFjLqfwyUo=,iv:RD7Qq8kcWcCtTgH1fxSC1Yo990GcmaUN2rhy8hw0Swc=,tag:ru3VO79H9N2Lafwq99ddTw==,type:str]
+            apiKey: ENC[AES256_GCM,data:ySlLR3hN++Yo6LuH4NIfAoRfxDO2LOT3iTUpNfLm8KU=,iv:u2fgyWJT0klOXLrXOchlrvVklB1//enfpyKZ0kcKnzk=,tag:46YBTh0kcZ3XdbIo0KzfXA==,type:str]
             city: St-Malo
             units: metric
+          id: 1_1012_weather
         - type: weather-forecast
           options:
             city: St-Malo
             znumDays: 6
-            apiKey: ENC[AES256_GCM,data:tl4NLMP45+ULK5B3fSUHQi/ZaQBEH+GYDYyYGn8ZwWc=,iv:qNig1RHFRVni9aXHsKaoVEToAfojDmamVQsT1aXz/9k=,tag:w6EL3B3LN0xXSZL7I2OBdw==,type:str]
+            apiKey: ENC[AES256_GCM,data:OEH0urvidAhaF4RciuLK09A6rsTB1tGqIsq+Geim9vM=,iv:sURYi4Np0UwgFdL5U3cEdQMBICiDZIi8A6r187ZgM8o=,tag:HIvGOusD0Laet4FEaA3btg==,type:str]
             units: metric
+          id: 2_1012_weatherforecast
     - name: Shanties
       icon: fas fa-music
       displayData:
@@ -67,32 +71,39 @@ sections:
           icon: twitch.png
           description: Games streaming service
           url: https://www.twitch.tv/directory/following
+          id: 0_831_twitch
         - title: Youtube
           icon: youtube.png
           description: Enjoy the videos and music you love
           url: https://www.youtube.com/feed/subscriptions
+          id: 1_831_youtube
         - title: Jellyfin
           icon: jellyfin.png
           description: Free software media system
           url: https://tv.corsaire.duckdns.org/
           statusCheck: true
+          id: 2_831_jellyfin
         - title: Immich
           icon: immich.png
           description: High performance self-hosted photo and video management solution
           url: https://photos.corsaire.duckdns.org/
           statusCheck: true
+          id: 3_831_immich
         - title: Prime Video
           icon: primevideo.png
           description: Streaming video service
           url: https://www.primevideo.com/
+          id: 4_831_primevideo
         - title: Netflix
           icon: netflix.png
           description: Streaming video service
           url: https://www.netflix.com/
+          id: 5_831_netflix
         - title: F1 TV
           icon: f1tv.png
           description: Enter the world of Formula 1
           url: https://f1tv.formula1.com/
+          id: 6_831_ftv
     - name: Booty
       icon: fas fa-coins
       displayData:
@@ -102,28 +113,34 @@ sections:
           icon: finary.png
           description: The ultimate portfolio tracker
           url: https://app.finary.com/v2
+          id: 0_525_finary
         - title: BoursoBank
           icon: brs.png
           description: Banking service
           url: https://clients.boursorama.com/connexion/
+          id: 1_525_boursobank
         - title: CA
           icon: ca.png
           description: Banking service
           url: https://www.credit-agricole.fr/ca-normandie/particulier/acceder-a-mes-comptes.html
+          id: 2_525_ca
         - title: Degiro
           icon: degiro.png
           description: Stock broker
           url: https://www.degiro.fr/
+          id: 3_525_degiro
         - title: Wise
           icon: wise.png
           description: Send money abroad
           url: https://wise.com/
+          id: 4_525_wise
     - name: Your ship
       icon: fas fa-ship
       displayData:
         rows: 1
       widgets:
         - type: public-ip
+          id: 0_899_publicip
     - name: Docks
       icon: fas fa-anchor
       displayData:
@@ -133,30 +150,37 @@ sections:
           icon: notion.png
           description: Productivity and note-taking app
           url: https://www.notion.so/
+          id: 0_500_notion
         - title: Reddit
           icon: reddit.png
           description: Network of communities
           url: https://reddit.com/
+          id: 1_500_reddit
         - title: Github
           icon: github.png
           description: Code hosting platform
           url: https://github.com/
+          id: 2_500_github
         - title: Amazon
           icon: amazon.png
           description: E-commerce site
           url: https://www.amazon.fr/
+          id: 3_500_amazon
         - title: Meteo France
           icon: favicon
           description: French national meteorological service
           url: https://meteofrance.com/previsions-meteo-france/saint-malo/35400
+          id: 4_500_meteofrance
         - title: LinkedIn
           icon: linkedin.png
           description: Professional networking
           url: https://www.linkedin.com/
+          id: 5_500_linkedin
         - title: Facebook
           icon: facebook.png
           description: Connect with friends
           url: https://www.facebook.com/
+          id: 6_500_facebook
     - name: Captain's Quarters
       icon: fas fa-dharmachakra
       displayData:
@@ -167,66 +191,79 @@ sections:
           description: Open-source software for home automation
           url: https://home.corsaire.duckdns.org/
           statusCheck: true
+          id: 0_1745_ha
         - title: NAS
           icon: nas.png
           description: QNAP
           url: https://nas.corsaire.duckdns.org/cgi-bin/
           statusCheck: true
+          id: 1_1745_nas
         - title: Traefik
           icon: traefik.png
           description: Modern reverse proxy
           url: https://traefik.corsaire.duckdns.org/
           statusCheck: true
           statusCheckAcceptCodes: "401"
+          id: 2_1745_traefik
         - title: Glances
           icon: glances.png
           description: Cross-platform system monitoring tool written in Python
           url: https://health.corsaire.duckdns.org/
           statusCheck: true
           statusCheckAcceptCodes: "401"
+          id: 3_1745_glances
         - title: WAN
           icon: wan.png
           description: ISP router
           url: https://livebox.corsaire.duckdns.org/
           statusCheck: true
+          id: 4_1745_wan
         - title: Transmission
           icon: transmission.png
           description: BitTorrent client
           url: https://seedbox.corsaire.duckdns.org/
           statusCheck: true
           statusCheckAcceptCodes: "401"
+          id: 5_1745_transmission
         - title: Sonarr
           icon: sonarr.png
           description: TV show collection manager
           url: https://shows.corsaire.duckdns.org/
           statusCheck: true
+          id: 6_1745_sonarr
         - title: Radarr
           icon: radarr.png
           description: Movie collection manager
           url: https://movies.corsaire.duckdns.org/
           statusCheck: true
+          id: 7_1745_radarr
         - title: Readarr
           icon: readarr.png
           description: Books collection manager
           url: https://books.corsaire.duckdns.org/
           statusCheck: true
+          id: 8_1745_readarr
         - title: Prowlarr
           icon: prowlarr.png
           description: Arr indexer manager/proxy
           url: https://prowlarr.corsaire.duckdns.org/
           statusCheck: true
-        - title: AirVPN
+          id: 9_1745_prowlarr
+        - title: PIA
+          description: PIA VPN protects your digital identity by rerouting your internet traffic through private and secure servers.
           icon: favicon
-          description: OpenVPN and WireGuard based VPN operated by activists in defense of net neutrality, privacy and against censorship.
-          url: https://airvpn.org/
+          url: https://https://www.privateinternetaccess.com/account/client-control-panel#subscription-overview/
+          id: 10_1745_pia
         - title: Backblaze
           icon: favicon
           description: Robust, scalable low cost cloud backup and storage services
           url: https://backblaze.com/
+          id: 11_1745_backblaze
         - title: KeeWeb
           icon: keeweb.png
           description: Cross-platform password manager
           url: https://app.keeweb.info/
+          id: 12_1745_keeweb
     - name: The 7 seas
       icon: fas fa-skull-crossbones
       displayData:
@@ -237,12 +274,14 @@ sections:
             rssUrl: https://www.france24.com/fr/rss
             limit: 6
             orderDirection: asc
+          id: 0_836_rssfeed
         - type: public-holidays
           options:
             country: fr
             holidayType: all
             monthsToShow: 4
             lang: fr
+          id: 1_836_publicholidays
     - name: Catch of the day
       icon: fas fa-fish
       displayData:
@@ -251,6 +290,7 @@ sections:
         - type: joke
           options:
             safeMode: true
+          id: 0_1431_joke
 sops:
     kms: []
     gcp_kms: []
@@ -260,14 +300,14 @@ sops:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBjeGlEVzFzbEJjTnRQcnM4
-            bFl5NHJtVUFtVVVwSkhFY2Zpb25vOUxHZ1E4CkFTL3BYcWNzV3h3U0N4cDVsZ3hZ
-            RmhYdDQ1MzUyRVFVcEhwYyt0ejluQlEKLS0tIDN5OTcwWDFPdC9veGxkekEwR0ZH
-            WkQ3WTRBN0JvbzZiQ0t5VHRVMzNqRncKGXCQOEbjv2bUtBrLPGdLeskanwojsTdS
-            o5ngr2xZ2fRVsnk0aARcOdFFBNgyIaB112iKy3vtKqEPGNVkTvGFjw==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBnWXZpVWhqbkJjMGJCMXFw
+            N3hJWXZGSWRXYkM0bVRWNmtvdnQwRVI3emtBCmFsY0hnMGczWmhXdFVROS8weHBa
+            T3p1aW5UT0F5c0JJSUlUdEw2c0V3K0UKLS0tIDRsT3pSRTFvZnRTOUdaYys0SnRa
+            UE9UV0xsQk9nZmg2cFNqeG1EMDB4RUUKHc3tcnE7lxa4DNnqPZRO0/s9t8g67/iC
+            YUxT9LexWzRSeZ1ZvE628MtSUi8taJHiPLzMN90ia7mJcdby/XKOKA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-10-16T12:17:02Z"
-    mac: ENC[AES256_GCM,data:L9KiP9BJremim4Pk+SEoQJW1i5raCoL7w5PzVPSjXOYfa9/tSSCR+acI8o26tUIaNWJCJudFuZdMD1QGXXgf90JvIzmAK6sMemwAt/+6kb5S+bMpCZU2jYCcGqHT1HU5C7JuCEQaFt14QzQT5XAmUMUvOnl4KM3pdgAEFhV+gDo=,iv:7u2BNxXknp0GDTunSZ+ZnvSuJJ6SaBnDJx90sSwYnqQ=,tag:EW6uThjMSsshf6Xlmj0+8g==,type:str]
+    lastmodified: "2024-11-01T10:29:30Z"
+    mac: ENC[AES256_GCM,data:L6nc/Oizi0I/Hq23BDnA+RprrNWewd2FSxUhZx0CkEJLhCk6ajOI2o+Iieg64gib/cx0PgNKWgbCD+sd0RrgE5Kl1A6WYznsdK8qPll1Sf99qT6A5JGtmBJbxLbeGbAfAejRhcnz62KqfBT2j0YFP9E0UUuK9AhGvrOvuIJiREk=,iv:IX+VqnyRAr+8LURBy/B0muvmeaoecTU8TeoAp+0he1M=,tag:p8NR2oxb8Cx8GMvfiA+0Sw==,type:str]
     pgp: []
     encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*DB_PASSWORD.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*DNS.*|.*POST_UP.*|.*PRE_DOWN.*)$
     version: 3.9.1
