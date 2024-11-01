@@ -2,6 +2,7 @@
 **/.env
 dashy/config/conf.yml
 dashy/config/health.yml
+dashy/config/config-backups/*
 home/ha/*
 immich/storage/*
 immich/postgres/*
