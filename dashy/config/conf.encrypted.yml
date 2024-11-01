@@ -11,9 +11,9 @@ appConfig:
     faviconApi: iconhorse
     auth:
         users:
-            - user: ENC[AES256_GCM,data:ERP4,iv:iRdlnQN17zKry8E5Jx2cZeDPGfz+wnoy+i8LocArTkA=,tag:INpY/8vNfbTpwi/QfATtoA==,type:str]
-              hash: ENC[AES256_GCM,data:4Yc8p+AVcr3pnGHlbOWydtDgs2Rmz9VnEez44yXD9aqzJQc+Fxs+nM1L9eRe9RP+Vk4sdN2qMD2fXyhXSq2CyQ==,iv:y0toVKkIekLXlen4tZrRLyUUYJtmJ6aiDXNO8D5XAjY=,tag:RpjUv4+o74qcmjYu6yGYxA==,type:str]
-              type: ENC[AES256_GCM,data:GZesOHo=,iv:YG/TfVts94MiOK2q/3xIIb0KD4ju0IGdI8w+VLbnE1A=,tag:9mwZmTyx0i0SCJ1UysgtMQ==,type:str]
+            - user: ENC[AES256_GCM,data:h1Xt,iv:Ccal0xKveWNF967bAP4tRYSVe29ONcOs+L3MGMoPRqc=,tag:M/mJkD/MUWwIQ+b22CvXdg==,type:str]
+              hash: ENC[AES256_GCM,data:pAQU0X9jpeTh0BFPsSOYWKDf3UNCzWcRU49LrIVX71HSiP895S1KMWB94EMg6BSJHyWd/6pHhOeagJ346Qe0MA==,iv:5POnMfJNDXSJsyWg/kOwaXzvPUh9dwuR0vxRk7oKjeA=,tag:tEMljezVHIWp2ju07LwnVQ==,type:str]
+              type: ENC[AES256_GCM,data:mYT3Xa4=,iv:U4sXr8pHm07TP7t5+rVeR/7kC6TeLS64v36FEJbwLcY=,tag:aZVjsUf2q1S6ExsOLbptQQ==,type:str]
         enableGuestAccess: true
     iconSize: small
     theme: nord-custom
@@ -34,7 +34,7 @@ pages:
 pageInfo:
     title: Corsaire Labs
     description: Dashboard
-    logo: corsaire.png
+    logo: /img/corsaire.png
     footerText: <a data-v-001d966c="" href="https://github.com/maxpoullain/homelab" target="_blank">Corsaire Labs source code</a>
 sections:
     - name: Today's sea
@@ -51,7 +51,7 @@ sections:
           id: 0_1012_clock
         - type: weather
           options:
-            apiKey: ENC[AES256_GCM,data:ySlLR3hN++Yo6LuH4NIfAoRfxDO2LOT3iTUpNfLm8KU=,iv:u2fgyWJT0klOXLrXOchlrvVklB1//enfpyKZ0kcKnzk=,tag:46YBTh0kcZ3XdbIo0KzfXA==,type:str]
+            apiKey: ENC[AES256_GCM,data:FWdFr/7S7Q3Hql+PX7Eblf+KLbPUMiWXsS4pg6b6BT4=,iv:f44FF36XXhVExOGymS4ivpa7TotaU2nSoXo3Zx9UHr4=,tag:cy6dSa124BEW+SSr41AFtw==,type:str]
             city: St-Malo
             units: metric
           id: 1_1012_weather
@@ -59,7 +59,7 @@ sections:
           options:
             city: St-Malo
             znumDays: 6
-            apiKey: ENC[AES256_GCM,data:OEH0urvidAhaF4RciuLK09A6rsTB1tGqIsq+Geim9vM=,iv:sURYi4Np0UwgFdL5U3cEdQMBICiDZIi8A6r187ZgM8o=,tag:HIvGOusD0Laet4FEaA3btg==,type:str]
+            apiKey: ENC[AES256_GCM,data:SA3wRAku6DDPef8N6SZqhIAow/Mx11kdOdDJI7VACWo=,iv:w/CQHQVwkH26Eo6wd8ovM5rYyIjUrgv0eAzr2OQXgfI=,tag:2zLWqTyvuydryMqpCP8JXA==,type:str]
             units: metric
           id: 2_1012_weatherforecast
     - name: Shanties
@@ -251,11 +251,11 @@ sections:
           id: 9_1745_prowlarr
         - title: PIA
           description: PIA VPN protects your digital identity by rerouting your internet traffic through private and secure servers.
-          icon: favicon
+          icon: pia.png
           url: https://https://www.privateinternetaccess.com/account/client-control-panel#subscription-overview/
           id: 10_1745_pia
         - title: Backblaze
-          icon: favicon
+          icon: backblaze.png
           description: Robust, scalable low cost cloud backup and storage services
           url: https://backblaze.com/
           id: 11_1745_backblaze
@@ -300,14 +300,14 @@ sops:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBnWXZpVWhqbkJjMGJCMXFw
-            N3hJWXZGSWRXYkM0bVRWNmtvdnQwRVI3emtBCmFsY0hnMGczWmhXdFVROS8weHBa
-            T3p1aW5UT0F5c0JJSUlUdEw2c0V3K0UKLS0tIDRsT3pSRTFvZnRTOUdaYys0SnRa
-            UE9UV0xsQk9nZmg2cFNqeG1EMDB4RUUKHc3tcnE7lxa4DNnqPZRO0/s9t8g67/iC
-            YUxT9LexWzRSeZ1ZvE628MtSUi8taJHiPLzMN90ia7mJcdby/XKOKA==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAyVGlhQzFhYVNKVXU5SUZG
+            N0J3MWFaOXN1SCtpTmpkbkwwMG5iWFNuRFg0Clgxa1R1QWdwL0RzTU5RTVdIR1lK
+            RzV2Y0ZlVi9RQVRvaHpkSHBQb1NrdjgKLS0tIEVWTzY5WkM1VnlRU1RqVTZSN0pE
+            Ris1MFF1L2xvc1JvYmphOHFCeVNHLzAKxMB882Y0M52pGtQEw1lhn7ESgYukCSxT
+            q1sy+hXGwcn+qsEomiS3fSoad5JHYLKOvW1wSVk9mY/BJC7avpZWTQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-11-01T10:29:30Z"
-    mac: ENC[AES256_GCM,data:L6nc/Oizi0I/Hq23BDnA+RprrNWewd2FSxUhZx0CkEJLhCk6ajOI2o+Iieg64gib/cx0PgNKWgbCD+sd0RrgE5Kl1A6WYznsdK8qPll1Sf99qT6A5JGtmBJbxLbeGbAfAejRhcnz62KqfBT2j0YFP9E0UUuK9AhGvrOvuIJiREk=,iv:IX+VqnyRAr+8LURBy/B0muvmeaoecTU8TeoAp+0he1M=,tag:p8NR2oxb8Cx8GMvfiA+0Sw==,type:str]
+    lastmodified: "2024-11-01T15:48:52Z"
+    mac: ENC[AES256_GCM,data:LKbdtP+pu8UARIMkVRDdyM+ehpUjJhiuwy/MaOL6MswFmamRSNwSfD4lGWyNErIMMTdqw7lAFPUlVquUglOgoDeyipYwtq9F8mV1/z+IjS61yRUZtpta/ybRFDtrblL5Oky4SYVDrbnJbUPnpnW/Q7y/GHAPdbQ6xbS7NzpIJec=,iv:hh8lE1MlqwQ1o+CqXo7bOGE0Ke/60e9srNSNppeJ/OE=,tag:ef0EppClE6qLObRt5Vm4Mw==,type:str]
     pgp: []
     encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*DB_PASSWORD.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*DNS.*|.*POST_UP.*|.*PRE_DOWN.*)$
     version: 3.9.1
