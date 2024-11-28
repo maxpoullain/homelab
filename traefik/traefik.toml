@@ -9,6 +9,9 @@
 [accessLog]
  filePath = "/etc/traefik/logs/access.log"
 
+[serversTransport]
+  insecureSkipVerify = true
+
 [providers]
  [providers.docker]
    endpoint = "unix:///var/run/docker.sock"
