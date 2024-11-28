@@ -27,7 +27,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dashy.entrypoints=https"
-      - "traefik.http.routers.dashy.rule=Host(`dashy.corsaire.duckdns.org`, `www.corsaire.duckdns.org`, `corsaire.duckdns.org`)"
+      - "traefik.http.routers.dashy.rule=Host(`dashy.corsaire.duckdns.org`) || Host(`www.corsaire.duckdns.org`) || Host(`corsaire.duckdns.org`)"
       - "traefik.http.routers.dashy.middlewares=dashy"
       - "traefik.http.routers.dashy.tls=true"
       - "traefik.http.routers.dashy.tls.certresolver=acme"
