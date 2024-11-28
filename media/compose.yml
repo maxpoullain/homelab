@@ -53,8 +53,7 @@ services:
     container_name: transmission
     image: linuxserver/transmission:latest
     restart: unless-stopped
-    cpus: 2
-    mem_limit: 1024m
+    mem_limit: 2048m
     security_opt:
       - no-new-privileges:true
     network_mode: "service:wireguard"
