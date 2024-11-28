@@ -1,0 +1,14 @@
+#  to NAS
+
+[http.routers.webdav]
+  entryPoints = [ "https" ]
+  rule = "Host(`webdav.corsaire.duckdns.org`)"
+  service = "webdav"
+  #middlewares = "webdav"
+  priority = 1
+  [http.routers.webdav.tls]
+    certResolver = "acme"
+
+[http.services.webdav.loadBalancer]
+  [[http.services.webdav.loadBalancer.servers]]
+    url = "https://192.168.1.42:5001"

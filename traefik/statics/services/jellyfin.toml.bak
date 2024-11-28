@@ -1,5 +1,0 @@
-# to Jellyfin
-
-[http.services.jellyfin]
- [[http.services.jellyfin.loadBalancer.servers]]
-   url = "http://192.168.1.3:8096"
