@@ -1,0 +1,31 @@
+name: wiki
+
+services:
+  mkdocs:
+    image: squidfunk/mkdocs-material
+    container_name: mkdocs
+    cpus: 1
+    mem_limit: 2048m
+    restart: unless-stopped
+    volumes:
+      - /mnt/nas/max/wiki:/docs/docs:ro
+      - ./config/mkdocs.yml:/docs/mkdocs.yml:ro
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.wiki.entrypoints=https"
+      - "traefik.http.routers.wiki.rule=Host(`wiki.corsaire.duckdns.org`)"
+      - "traefik.http.routers.wiki.tls=true"
+      - "traefik.http.routers.wiki.tls.certresolver=acme"
+      - "traefik.http.routers.wiki.service=wiki"
+      - "traefik.http.services.wiki.loadbalancer.server.port=8000"
+
+networks:
+  traefik:
+    external: true
