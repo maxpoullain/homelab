@@ -68,7 +68,6 @@ services:
       - "/mnt/nas/media/Shows:/tv"
       - "/mnt/nas/media/Movies:/movies"
       - "/mnt/nas/media/Books/raw:/books"
-      - "/mnt/nas/max/seedbox:/seedbox"
     env_file:
       - secrets.env
     environment:
