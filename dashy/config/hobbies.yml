@@ -18,76 +18,94 @@ sections:
         url: https://www.corsaire.duckdns.org/login
         target: sametab
         id: 0_1707_login
-  - name: 3D
-    icon: fas fa-cubes
+  - name: Dofus
+    icon: fas fa-egg
     displayData:
       hideForGuests: true
     items:
-      - title: Printables
+      - title: Humility
+        description: ''
         icon: favicon
-        description: Discover, download and print thousands of 3D models
-        url: https://www.printables.com/
-        id: 0_119_printables
-      - title: Thingiverse
+        url: https://www.twitch.tv/humility/videos
+        target: newtab
+        id: 0_513_dofus
+      - title: Dofus.com
+        description: ''
+        icon: favicon-local
+        url: https://www.dofus.com/fr
+        target: newtab
+        id: 0_513_dofus
+      - title: Changelog
+        icon: favicon-local
+        url: https://www.dofus.com/fr/mmorpg/actualites/maj/1752977-dofus-3/correctifs
+        target: newtab
+        id: 13_513_ankatracker
+      - title: AnkaTracker
+        icon: favicon-local
+        url: https://www.dofus.com/fr/forum/les-sujets?tracker=ANKA
+        target: newtab
+        id: 13_513_ankatracker
+      - title: Dofus DB
+        description: ''
         icon: favicon
-        description: >-
-          Download files and build them with your 3D printer, laser cutter, or
-          CNC
-        url: https://www.thingiverse.com/
-        id: 1_119_thingiverse
-      - title: Tinkercad
+        url: https://dofusdb.fr/fr/tools/map
+        target: newtab
+        id: 1_513_dofusdb
+      - title: Dofus Book
+        description: ''
         icon: favicon
-        description: >-
-          KidSAFE-certified online platform that lets you create 3D digital
-          designs
-        url: https://www.tinkercad.com/
-        id: 2_119_tinkercad
-    filteredItems:
-      - title: Printables
+        url: https://www.dofusbook.net/fr/equipements
+        target: newtab
+      - title: Huzounet
         icon: favicon
-        description: Discover, download and print thousands of 3D models
-        url: https://www.printables.com/
-        id: 0_119_printables
-      - title: Thingiverse
+        url: https://huzounet.fr
+        target: newtab
+        id: 4_513_huzounet
+      - title: Guidactik
         icon: favicon
-        description: >-
-          Download files and build them with your 3D printer, laser cutter, or
-          CNC
-        url: https://www.thingiverse.com/
-        id: 1_119_thingiverse
-      - title: Tinkercad
+        url: https://guidactik.com/dofus/
+        target: newtab
+        id: 5_513_guidactik
+      - title: DofusPlanet
         icon: favicon
-        description: >-
-          KidSAFE-certified online platform that lets you create 3D digital
-          designs
-        url: https://www.tinkercad.com/
-        id: 2_119_tinkercad
-  - name: Gaming
-    icon: fas fa-gamepad
-    displayData:
-      hideForGuests: true
-    items:
-      - title: Lorem ipsum
+        url: https://dofusplanet.fr/guide-opti
+        target: newtab
+        id: 6_513_dofusplanet
+      - title: Guide Progression
+        icon: si-googledocs
+        url: >-
+          https://docs.google.com/spreadsheets/d/1qPqf7Z6yb7BxfwGB3k2jcYw3pHzGWXHpBt46AW_U3XY/edit?gid=1604818439#gid=1604818439
+        target: newtab
+        id: 7_513_guideprogression
+      - title: DoMath
         icon: favicon
-        description: Lorem ipsum
-        url: https://www.lipsum.com/
-        id: 0_595_loremipsum
-      - title: Lorem ipsum
-        icon: favicon
-        description: Lorem ipsum
-        url: https://www.lipsum.com/
-        id: 1_595_loremipsum
-    filteredItems:
-      - title: Lorem ipsum
-        icon: favicon
-        description: Lorem ipsum
-        url: https://www.lipsum.com/
-        id: 0_595_loremipsum
-      - title: Lorem ipsum
-        icon: favicon
-        description: Lorem ipsum
-        url: https://www.lipsum.com/
-        id: 1_595_loremipsum
+        url: >-
+          https://domath.fr/calcul-degats?s=*************************************00*0*10****
+        target: newtab
+        id: 9_513_domath
+      - title: Quêtes DDG
+        description: ''
+        icon: si-googledocs
+        url: >-
+          https://docs.google.com/spreadsheets/d/1EmaGxhNMa1ZZAgrvkXp9loQpKcl809SMbv8VS47wP7w/edit?gid=0#gid=0
+        id: 10_513_qutesddg
+      - title: Tougli - Opti Dofus
+        icon: si-googledocs
+        url: >-
+          https://docs.google.com/spreadsheets/d/1EmaGxhNMa1ZZAgrvkXp9loQpKcl809SMbv8VS47wP7w/edit?gid=0#gid=0
+        target: newtab
+        id: 11_513_touglioptidofus
+      - title: Tutoriel Steamer
+        icon: si-googledocs
+        url: >-
+          https://docs.google.com/document/d/1aJo3EuCh7d6tuhXW2mZmMeMZnRxPnN6xPsqMSVR2b0c/edit?tab=t.0
+        target: newtab
+        id: 2_513_tutorielsteamer
+    widgets:
+      - type: iframe
+        options:
+          url: https://www.dimtopia.com/widget-almanax/dpln-retro
+          frameHeight: 154
   - name: TCG
     icon: fas fa-dice
     displayData:
@@ -153,112 +171,56 @@ sections:
         icon: favicon
         description: Magasin de jeux de cartes de plateaux à Caen
         url: https://www.cartes-normandes.com/
+        id: 10_222_cartesnormandes
       - title: InvestCollect
         icon: favicon
         description: La Ligue du Jeu by Invest Collect
         url: https://investcollect.com/
-        id: 10_222_investcollect
+        id: 11_222_investcollect
       - title: Le Coin Des Barons
         icon: favicon
         description: Magasin spécialisé dans la vente de produits TCG
         url: https://lecoindesbarons.com/
-        id: 11_222_lecoindesbarons
+        id: 12_222_lecoindesbarons
       - title: Parkage
         icon: favicon
         description: Magasin de jeux de cartes de plateaux
         url: https://www.parkage.com/fr/one-piece-card-game
-        id: 12_222_parkage
+        id: 13_222_parkage
       - title: LudiWorld
         icon: icon
         description: Magasin de jeux de jeux de plateaux
         url: https://ludiworld.com/873-one-piece-card-game
-        id: 13_222_ludiworld
+        id: 14_222_ludiworld
       - title: Baron Collections
         description: Vente TCG
         url: >-
           https://baroncollections.fr/en/collections/voir-toute-la-collection-one-piece-anglais
-        id: 14_222_baroncollections
-    filteredItems:
-      - title: Collectr
+        id: 15_222_baroncollections
+  - name: 3D
+    icon: fas fa-cubes
+    displayData:
+      hideForGuests: true
+    items:
+      - title: Printables
         icon: favicon
-        description: Get ready for the next-generation of collectible portfolio management.
-        url: https://app.getcollectr.com/
-        id: 0_222_collectr
-      - title: Shiny Live
-        icon: favicon
-        description: Vente aux enchères en direct
-        url: https://web.shiny-app.live/
-        id: 1_222_shinylive
-      - title: OP TCG
-        icon: favicon
-        description: Official One Piece TCG site
-        url: https://en.onepiece-cardgame.com/
-        id: 2_222_optcg
-      - title: OP Limitless TCG
-        icon: favicon
-        description: Aiming to provide all the content and information about TCG needs
-        url: https://onepiece.limitlesstcg.com/
-        id: 3_222_oplimitlesstcg
-      - title: OPECards
+        description: Discover, download and print thousands of 3D models
+        url: https://www.printables.com/
+        id: 0_119_printables
+      - title: Thingiverse
         icon: favicon
         description: >-
-          Site communautaire référence du jeu de cartes à collectionner One
-          Piece Card Game
-        url: https://www.opecards.fr/
-        id: 4_222_opecards
-      - title: Cardmarket
-        icon: favicon
-        description: Ultimate online destination for buying and selling trading cards
-        url: https://www.cardmarket.com/
-        id: 5_222_cardmarket
-      - title: Maxi Rêves
-        icon: favicon
-        description: Card shop
-        url: https://maxireves.fr/
-        id: 6_222_maxirves
-      - title: Fantasy Sphere
+          Download files and build them with your 3D printer, laser cutter, or
+          CNC
+        url: https://www.thingiverse.com/
+        id: 1_119_thingiverse
+      - title: Tinkercad
         icon: favicon
         description: >-
-          La boutique specialisée dans les cartes à collectionner, Pokémon
-          Yu-Gi-Oh! Magic, Disney Locarna, One Piece, TCG et les jeux de
-          sociétés.
-        url: https://www.fantasysphere.net/
-        id: 7_222_fantasysphere
-      - title: Games Avenue
-        icon: favicon
-        description: Card shop
-        url: https://gamesavenue.fr/
-        id: 8_222_gamesavenue
-      - title: E-CardStore
-        icon: favicon
-        description: Vente TCG
-        url: https://ecardstore.fr/
-        id: 9_222_ecardstore
-      - title: InvestCollect
-        icon: favicon
-        description: La Ligue du Jeu by Invest Collect
-        url: https://investcollect.com/
-        id: 10_222_investcollect
-      - title: Le Coin Des Barons
-        icon: favicon
-        description: Magasin spécialisé dans la vente de produits TCG
-        url: https://lecoindesbarons.com/
-        id: 11_222_lecoindesbarons
-      - title: Parkage
-        icon: favicon
-        description: Magasin de jeux de cartes de plateaux
-        url: https://www.parkage.com/fr/one-piece-card-game
-        id: 12_222_parkage
-      - title: LudiWorld
-        icon: icon
-        description: Magasin de jeux de jeux de plateaux
-        url: https://ludiworld.com/873-one-piece-card-game
-        id: 13_222_ludiworld
-      - title: Baron Collections
-        description: Vente TCG
-        url: >-
-          https://baroncollections.fr/en/collections/voir-toute-la-collection-one-piece-anglais
-        id: 14_222_baroncollections
+          KidSAFE-certified online platform that lets you create 3D digital
+          designs
+        url: https://www.tinkercad.com/
+        id: 2_119_tinkercad
   - name: F1
     icon: fas fa-flag-checkered
     displayData:
@@ -284,17 +246,6 @@ sections:
           limit: 5
           hideImage: false
         id: 0_119_sportsscores
-    # filteredItems:
-    #   - title: F1 TV
-    #     icon: f1tv.png
-    #     description: Enter the world of Formula 1
-    #     url: https://f1tv.formula1.com/
-    #     id: 0_119_ftv
-    #   - title: F1 Calendar
-    #     icon: favicon
-    #     description: Races, Qualifying & Practice Sessions
-    #     url: https://f1calendar.com/
-    #     id: 1_119_fcalendar
   - name: Karting
     icon: fas fa-trophy
     displayData:
@@ -327,31 +278,10 @@ sections:
         description: French Federation of Automobile Sport
         url: https://licence.ffsa.org/
         id: 4_720_ffsa
-    filteredItems:
-      - title: ASK Laval
-        icon: favicon
-        description: Disponibilité Circuit Beausoleil
-        url: https://www.karting-laval.fr/disponibilite-circuit/
-        id: 0_720_asklaval
-      - title: EvoKart
-        icon: favicon
-        description: >-
-          Constructeur de karting de compétition et organisation de courses
-          sprint et endurance
-        url: http://www.evokart-france.com/
-        id: 1_720_evokart
-      - title: Karting KFS
-        icon: favicon
-        description: FB KFS
-        url: https://www.facebook.com/groups/1105901062824211/
-        id: 2_720_kartingkfs
-      - title: Mondokart
-        icon: favicon
-        description: Go-Kart online shop
-        url: https://www.mondokart.com/
-        id: 3_720_mondokart
-      - title: FFSA
-        icon: favicon
-        description: French Federation of Automobile Sport
-        url: https://licence.ffsa.org/
-        id: 4_720_ffsa
+pages:
+  - name: Hobbies
+    path: hobbies.yml
+  - name: Work
+    path: work.yml
+  - name: Health
+    path: health.yml
