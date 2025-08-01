@@ -20,4 +20,5 @@ traefik/acme/*
 traefik/logs/*
 traefik/statics/core/basicauth.yaml
 tv/jellyfin/*
-wiki/docs
+wiki/otter/settings.cfg
+wiki/otter/db.sqlite
