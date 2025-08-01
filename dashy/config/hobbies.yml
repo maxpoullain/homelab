@@ -51,6 +51,11 @@ sections:
         url: https://dofusdb.fr/fr/tools/map
         target: newtab
         id: 1_513_dofusdb
+      - title: Almanax
+        description: ''
+        icon: favicon
+        url: https://www.krosmoz.com/fr/almanax
+        target: newtab
       - title: Dofus Book
         description: ''
         icon: favicon
@@ -61,6 +66,10 @@ sections:
         url: https://huzounet.fr
         target: newtab
         id: 4_513_huzounet
+      - title: Skyzio stuffs
+        icon: favicon
+        url: https://www.dofusbook.net/fr/membre/5998-skyzio/equipements
+        target: newtab
       - title: Guidactik
         icon: favicon
         url: https://guidactik.com/dofus/
@@ -92,7 +101,7 @@ sections:
       - title: Tougli - Opti Dofus
         icon: si-googledocs
         url: >-
-          https://docs.google.com/spreadsheets/d/1EmaGxhNMa1ZZAgrvkXp9loQpKcl809SMbv8VS47wP7w/edit?gid=0#gid=0
+          https://docs.google.com/spreadsheets/d/15_oH7iRZtMxycvM8KH-Cj1GKDJG80kgPsgqEps_HU_Q/edit?gid=1567240526#gid=1567240526
         target: newtab
         id: 11_513_touglioptidofus
       - title: Tutoriel Steamer
@@ -238,6 +247,22 @@ sections:
         description: Races, Qualifying & Practice Sessions
         url: https://f1calendar.com/
         id: 1_119_fcalendar
+      - title: WatchF1Full
+        icon: favicon
+        description: Races, Qualifying & Practice Sessions
+        url: https:///watchf1full.com/
+      - title: FullRaces
+        icon: favicon
+        description: Races, Qualifying & Practice Sessions
+        url: https://fullraces.com/
+      - title: F1 Torrent 1
+        icon: favicon
+        description:
+        url: https://extranet.torrentbay.st/browse/?sort=age&order=desc&user_nick=showstopper&with_adult=1
+      - title: F1 Torrent 2
+        icon: favicon
+        description:
+        url: https://extranet.torrentbay.st/browse/?sort=age&order=desc&user_nick=egortech&with_adult=1
     widgets:
       - type: sports-scores
         options:

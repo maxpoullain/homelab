@@ -24,6 +24,7 @@ services:
       - traefik
     volumes:
       - ./pia:/pia
+      - ./secrets.env/:/secrets.env
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -40,6 +41,7 @@ services:
       - "traefik.http.routers.seedbox.rule=Host(`seedbox.corsaire.duckdns.org`)"
       - "traefik.http.routers.seedbox.tls=true"
       - "traefik.http.routers.seedbox.tls.certresolver=acme"
+      - "traefik.http.routers.seedbox.middlewares=traefik-auth@file"
       - "traefik.http.routers.seedbox.service=seedbox"
       - "traefik.http.services.seedbox.loadbalancer.server.port=9091"
       - "traefik.http.routers.prowlarr.entrypoints=https"
@@ -53,6 +55,7 @@ services:
     container_name: transmission
     image: linuxserver/transmission:latest
     restart: unless-stopped
+    cpus: 4
     mem_limit: 2048m
     security_opt:
       - no-new-privileges:true
@@ -65,6 +68,7 @@ services:
       - "./transmission:/config"
       - "./transmission/watch:/watch"
       - "./transmission/downloads:/downloads"
+      - "/mnt/nas/media/Downloads:/nas/downloads"
       - "/mnt/nas/media/Shows:/tv"
       - "/mnt/nas/media/Movies:/movies"
       - "/mnt/nas/media/Books/raw:/books"
