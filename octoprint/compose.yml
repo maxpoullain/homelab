@@ -3,10 +3,12 @@ services:
     container_name: octoprint
     image: octoprint/octoprint:latest
     restart: unless-stopped
-    security_opt:
-      - seccomp:unconfined
-      - apparmor:unconfined
-      - no-new-privileges:true
+    # security_opt:
+    #   - seccomp:unconfined
+    #   - apparmor:unconfined
+    #   - no-new-privileges:true
+    ports:
+      - 8888:80
     # devices:
     # use `python -m serial.tools.miniterm` to see what the name is of the printer, this requires pyserial
     #  - /dev/ttyACM0:/dev/ttyACM0
@@ -19,14 +21,6 @@ services:
     # you add a video device
     #environment:
     #  - ENABLE_MJPG_STREAMER=true
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.octoprint.entrypoints=https"
-      - "traefik.http.routers.octoprint.rule=Host(`octoprint.corsaire.duckdns.org`)"
-      - "traefik.http.routers.octoprint.tls=true"
-      - "traefik.http.routers.octoprint.tls.certresolver=acme"
-      - "traefik.http.routers.octoprint.service=octoprint"
-      - "traefik.http.services.octoprint.loadbalancer.server.port=80"
 
 ####
 # uncomment if you wish to edit the configuration files of octoprint
@@ -49,7 +43,3 @@ services:
 
 volumes:
   octoprint:
-
-networks:
-  traefik:
-    external: true

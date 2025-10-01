@@ -1,0 +1,13 @@
+#  to octoprint
+
+[http.routers.octoprint]
+  entryPoints = [ "https" ]
+  rule = "Host(`octoprint.corsaire.duckdns.org`)"
+  service = "octoprint"
+  priority = 1
+  [http.routers.octoprint.tls]
+    certResolver = "acme"
+
+[http.services.octoprint.loadBalancer]
+  [[http.services.octoprint.loadBalancer.servers]]
+    url = "http://192.168.1.3:8888"
