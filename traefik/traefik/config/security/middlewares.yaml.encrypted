@@ -1,0 +1,161 @@
+http:
+    middlewares:
+        # CrowdSec Plugin Middleware
+        crowdsec:
+            plugin:
+                bouncer:
+                    enabled: true
+                    logLevel: INFO
+                    updateIntervalSeconds: 60
+                    defaultDecisionSeconds: 60
+                    httpTimeoutSeconds: 10
+                    crowdsecMode: live
+                    crowdsecAppsecEnabled: false
+                    crowdsecAppsecHost: crowdsec:7422
+                    crowdsecLapiKey: ENC[AES256_GCM,data:MSf2uWZcxg1ONd6H6qMUZWdi9xn991erdpssJG+dcm0sJayJW90x7LvLsA==,iv:bjUdxdrd1orKmc4EOjd+C0RmmpegsdVG41Wd5LZuOaE=,tag:yDy7zMXvdMtFiRRtOKmisA==,type:str]
+                    crowdsecLapiHost: crowdsec:8080
+                    crowdsecLapiScheme: http
+                    forwardedHeadersCustomName: X-Custom-Header
+                    clientTrustedIPs:
+                        - 0.0.0.0/0
+        # Rate limiting
+        rate-limit:
+            rateLimit:
+                average: 100
+                period: 1m
+                burst: 50
+        # Rate limiting = Permissiove (for dashboards like Dashy, Home Assistant)
+        rate-limit-soft:
+            rateLimit:
+                average: 1000
+                period: 5m
+                burst: 500
+        # Geographic blocking - Blacklist Mode
+        # Blocks only high-risk countries known for attacks
+        geoblock:
+            plugin:
+                geoblock:
+                    silentStartUp: false
+                    allowLocalRequests: true
+                    logLocalRequests: false
+                    logAllowedRequests: false
+                    logApiRequests: false
+                    api: https://get.geojs.io/v1/ip/country/{ip}
+                    apiTimeoutMs: 500
+                    cacheSize: 15
+                    forceMonthlyUpdate: true
+                    # Allow countries we can't identify
+                    allowUnknownCountries: true
+                    unknownCountryApiResponse: nil
+                    # BLACKLIST MODE: Block specific countries known for attacks
+                    blackListMode: true
+                    # High-risk countries for cyber attacks
+                    countries:
+                        # China - High volume of brute force attacks
+                        - CN
+                        # Russia - Known botnet activity
+                        - RU
+                        # North Korea - Aggressive cyber warfare
+                        - KP
+                        # Iran - State-sponsored attacks
+                        - IR
+                        # Syria - Botnet activity
+                        - SY
+                        # Vietnam - High brute force/scanning activity
+                        - VN
+                        # Thailand - Compromised servers/botnets
+                        - TH
+                        # Indonesia - Malicious activity
+                        - ID
+                        # Turkey - SSH/credential attacks
+                        - TR
+                        # Brazil - Brute force attacks
+                        - BR
+                        # Mexico - Botnet activity
+                        - MX
+                        # Pakistan - Phishing/scanning
+                        - PK
+                        # Nigeria - Spam/phishing
+                        - NG
+                        # Ghana - Malicious activity
+                        - GH
+                        # South Africa - Some botnet activity
+                        - ZA
+                        # Ukraine - Mixed activity (may reconsider)
+                        - UA
+                        # Philippines - Account takeover attempts
+                        - PH
+                        # Bangladesh - Spam/phishing
+                        - BD
+                        # India - High volume low-level attacks
+                        - IN
+        # Security headers - Strict (for normal services)
+        security-headers:
+            headers:
+                frameDeny: true
+                browserXssFilter: true
+                contentTypeNosniff: true
+                forceSTSHeader: true
+                stsIncludeSubdomains: true
+                stsPreload: true
+                stsSeconds: 31536000
+                customFrameOptionsValue: SAMEORIGIN
+                customResponseHeaders:
+                    X-Robots-Tag: none,noarchive,nosnippet,notranslate,noimageindex
+                    server: ""
+                    X-Powered-By: ""
+        # Security headers - Permissive (for dashboards like Dashy, Home Assistant)
+        # Allows framing and embedding
+        security-headers-soft:
+            headers:
+                frameDeny: false
+                browserXssFilter: true
+                contentTypeNosniff: true
+                forceSTSHeader: true
+                stsIncludeSubdomains: true
+                stsPreload: true
+                stsSeconds: 31536000
+                customFrameOptionsValue: ALLOWALL
+                customResponseHeaders:
+                    X-Robots-Tag: none,noarchive,nosnippet,notranslate,noimageindex
+                    server: ""
+                    X-Powered-By: ""
+                    # Allow embedding/iframes
+                    X-Frame-Options: ALLOW-ALL
+                    Access-Control-Allow-Origin: '*'
+        # Compression
+        compression:
+            compress: {}
+        # Standard security chain
+        security:
+            chain:
+                middlewares:
+                    - crowdsec
+                    - rate-limit
+                    - geoblock
+                    - security-headers
+                    - compression
+        # Standard security chain
+        security-soft:
+            chain:
+                middlewares:
+                    - crowdsec
+                    - rate-limit-soft
+                    - geoblock
+                    - security-headers-soft
+                    - compression
+sops:
+    age:
+        - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBNMFRlL0pSd3pFSk4yTDNI
+            elF6U05Xd1VLOHFOVWFVNzBHRWZqZGNHYkZjCmlkdFlmN0sxaHQ2Nkc2KzBGMXlS
+            US9oRUZFLy9qRHJIQXB5a3VwaDBoeVkKLS0tIHIvNFNYdEEwNkxrUU4ySFF0SzFD
+            ek1ITVBtV3ZkbWJzWlhua01YU3Z1QlkK75t7TbHCpXKZmzzj8rSaasvMqdpRLSxP
+            CThWhe/oNHyIGa7jrbfr9LzeLJ9DKNwRb9oOCW8Pj+O5vPQKq8NpEQ==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-10-19T18:56:18Z"
+    mac: ENC[AES256_GCM,data:fhpZj8K0Xg/hf8KxLk1iz+VVyYH6bKeL775sFaM933dGBHJTlWyPXzclM8yVWEjQ3Vo1nCdP4LR2Ew9YwY6JvB4lyc7QUy2XjFnkn8KExznrDxK7xsIPgBw4EhR0B6Rd1kBqi3YERJ4yiAR1J7wJpF6TycrsUG0EJYR4beUhLw0=,iv:XBX78nAF6zcEYyRboPcvdu/Rjnr4obNIFYBH2rNxNbA=,tag:EzGKWMfIQD2AYd6HP3mnmw==,type:str]
+    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*DB_PASSWORD.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*DNS.*|.*POST_UP.*|.*PRE_DOWN.*|.*crowdsecLapiKey.*|.*TS_AUTHKEY.*)$
+    version: 3.11.0

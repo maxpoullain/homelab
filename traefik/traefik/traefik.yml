@@ -1,0 +1,94 @@
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+
+log:
+  level: "WARN"
+  filePath: "/etc/traefik/logs/traefik.log"
+
+accessLog:
+  filePath: "/etc/traefik/logs/access.log"
+  format: json  # JSON format for better CrowdSec parsing
+  filters:
+    statusCodes:
+      - "200"
+      - "300-302"
+      - "400-404"
+      - "429"
+      - "500-511"
+  fields:
+    headers:
+      names:
+        User-Agent: keep
+        X-Forwarded-For: keep
+        X-Real-Ip: keep
+
+serversTransport:
+  insecureSkipVerify: true
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    watch: true
+    exposedByDefault: false
+  
+  file:
+    directory: "/etc/traefik/config"
+    watch: true
+
+entryPoints:
+  http:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: https
+          scheme: https
+          permanent: true
+  https:
+    address: ":443"
+    http:
+      tls:
+        certResolver: acme
+
+api:
+  dashboard: true
+  insecure: false  # Secure the dashboard
+
+metrics:
+  prometheus:
+    buckets: [0.1, 0.3, 1.2, 5.0]
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+
+certificatesResolvers:
+  acme:
+    acme:
+      email: "macksize@gmail.com"
+      storage: "/etc/traefik/acme/acme.json"
+      dnsChallenge:
+        provider: ovh
+        resolvers:
+          - "1.1.1.1:53"
+          - "8.8.8.8:53"
+
+# # Define the wildcard certificate globally
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/traefik/certs/default.crt
+        keyFile: /etc/traefik/certs/default.key
+
+# Experimental plugins
+experimental:
+  plugins:
+    # CrowdSec Bouncer Plugin
+    bouncer:
+      moduleName: "github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin"
+      version: "v1.4.5"
+    # GeoBlock Plugin
+    geoblock:
+      moduleName: "github.com/PascalMinder/geoblock"
+      version: "v0.2.7"

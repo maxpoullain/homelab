@@ -1,7 +1,7 @@
 services:
   dashy:
     container_name: dashy
-    image: lissy93/dashy:3.x
+    image: lissy93/dashy:latest
     restart: unless-stopped
     cpus: 3
     mem_limit: 2048m
@@ -20,21 +20,20 @@ services:
       - "./web-icons:/app/public/web-icons"
       - "./styles/user-defined-themes.scss:/app/src/styles/user-defined-themes.scss"
     environment:
-      - GID=1000
-      - UID=1000
+      - GID=3002
+      - UID=3000
       - NODE_ENV=production
       - TZ=Europe/Paris
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dashy.entrypoints=https"
-      - "traefik.http.routers.dashy.rule=Host(`dashy.corsaire.duckdns.org`) || Host(`www.corsaire.duckdns.org`) || Host(`corsaire.duckdns.org`)"
+      - "traefik.http.routers.dashy.rule=Host(`dashy.corsair.tf`) || Host(`www.corsair.tf`) || Host(`corsair.tf`)"
       - "traefik.http.routers.dashy.middlewares=dashy"
-      - "traefik.http.routers.dashy.tls=true"
-      - "traefik.http.routers.dashy.tls.certresolver=acme"
+      - "traefik.http.routers.dashy.middlewares=security-soft@file"
       - "traefik.http.routers.dashy.service=dashy"
       - "traefik.http.services.dashy.loadbalancer.server.port=8080"
-      - "traefik.http.middlewares.dashy.redirectregex.regex=https://(dashy.)?corsaire.duckdns.org"
-      - "traefik.http.middlewares.dashy.redirectregex.replacement=https://www.corsaire.duckdns.org"
+      - "traefik.http.middlewares.dashy.redirectregex.regex=https://(dashy.)?corsair.tf"
+      - "traefik.http.middlewares.dashy.redirectregex.replacement=https://www.corsair.tf"
 
 networks:
   traefik:
