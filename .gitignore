@@ -16,9 +16,13 @@ media/prowlarr/*
 media/transmission/*
 tools/scripts/duckdns/duck.env
 tools/scripts/duckdns/duck.log
-traefik/acme/*
-traefik/logs/*
-traefik/statics/core/basicauth.yaml
+tailscale/tailscale-data/*
+traefik/crowdsec/*
+traefik/traefik/acme/*
+traefik/traefik/logs/*
+traefik/traefik/config/security/basicauth.yaml
+traefik/traefik/config/security/middlewares.yaml
 tv/jellyfin/*
+vault/vaultwarden/*
 wiki/otter/settings.cfg
 wiki/otter/db.sqlite

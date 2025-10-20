@@ -1,10 +1,10 @@
 pageInfo:
-  title: Corsaire Labs
+  title: Corsair Labs
   description: Hobbies
   logo: /img/corsaire.png
   footerText: >-
     <a data-v-001d966c="" href="https://github.com/maxpoullain/homelab"
-    target="_blank">Corsaire Labs source code</a>
+    target="_blank">Corsair Labs source code</a>
 sections:
   - name: Restricted access
     icon: fas fa-ban

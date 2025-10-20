@@ -1,0 +1,21 @@
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    hostname: corsair  # This will be your device name in Tailscale
+    environment:
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+      - TS_ACCEPT_DNS=true
+      # Optional: Enable subnet routing to access your entire network
+      # - TS_ROUTES=192.168.1.0/24
+    env_file:
+      - .env
+    volumes:
+      - ./tailscale-data:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    network_mode: host
+    restart: unless-stopped

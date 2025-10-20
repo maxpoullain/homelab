@@ -10,8 +10,8 @@ services:
     volumes:
       - ./otter:/app-data
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=3000
+      - PGID=3002
       - TZ=Europe/Paris
     networks:
       - traefik
@@ -19,9 +19,8 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
       - "traefik.http.routers.wiki.entrypoints=https"
-      - "traefik.http.routers.wiki.rule=Host(`wiki.corsaire.duckdns.org`)"
-      - "traefik.http.routers.wiki.tls=true"
-      - "traefik.http.routers.wiki.tls.certresolver=acme"
+      - "traefik.http.routers.wiki.rule=Host(`wiki.corsair.tf`)"
+      - "traefik.http.routers.wiki.middlewares=security@file"
       - "traefik.http.routers.wiki.service=wiki"
       - "traefik.http.services.wiki.loadbalancer.server.port=8080"
 

@@ -1,7 +1,7 @@
 services:
   traefik:
     container_name: traefik
-    image: traefik:v3.2.1
+    image: traefik:v3.5.3
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -10,18 +10,39 @@ services:
       - 443:443
     networks:
       - traefik
+    env_file:
+      - .env
     volumes:
-      - ./:/etc/traefik/
+      - ./traefik:/etc/traefik/
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.entrypoints=https
-      - traefik.http.routers.traefik.rule=Host(`traefik.corsaire.duckdns.org`)
-      - traefik.http.routers.traefik.tls
-      - traefik.http.routers.traefik.tls.certresolver=acme
+      - traefik.http.routers.traefik.rule=Host(`traefik.corsair.tf`)
+      - traefik.http.routers.traefik.tls.domains[0].main=corsair.tf
+      - traefik.http.routers.traefik.tls.domains[0].sans=*.corsair.tf
       - traefik.http.routers.traefik.middlewares=traefik-auth@file
       - traefik.http.routers.traefik.service=api@internal
       - traefik.http.services.traefik.loadbalancer.server.port=443
+
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - COLLECTIONS=crowdsecurity/traefik crowdsecurity/http-cve
+      - GID=3002
+      - CUSTOM_HOSTNAME=traefik-crowdsec
+    volumes:
+      - ./crowdsec/config:/etc/crowdsec
+      - ./crowdsec/data:/var/lib/crowdsec/data
+      - ./traefik/logs:/var/log/traefik:ro
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=false"
 
 networks:
   traefik:

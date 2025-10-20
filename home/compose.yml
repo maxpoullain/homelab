@@ -16,6 +16,6 @@ services:
       - /dev/serial/by-id/:/dev/serial/by-id
     environment:
       DISABLE_JEMALLOC: "true"
-      PUID: 1000
-      PGID: 1000
+      PUID: 3000
+      PGID: 3002
       TZ: "Europe/Paris"
