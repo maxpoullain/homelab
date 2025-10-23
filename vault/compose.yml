@@ -10,7 +10,7 @@ services:
       SIGNUPS_ALLOWED: "false"
       INVITATIONS_ALLOWED: "true"
     volumes:
-      - ./vaultwarden/:/data/
+      - /mnt/fast/dbs/homelab/vaultwarden:/data/
     networks:
       - traefik
     labels:

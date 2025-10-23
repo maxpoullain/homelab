@@ -8,7 +8,9 @@ services:
     mem_limit: 2048m
     restart: unless-stopped
     volumes:
-      - ./otter:/app-data
+      - ./otter/repository:/app-data/repository
+      - ./otter/settings.cfg:/app-data/settings.cfg
+      - /mnt/fast/dbs/homelab/wiki/db.sqlite:/app-data/db.sqlite
     environment:
       - PUID=3000
       - PGID=3002
