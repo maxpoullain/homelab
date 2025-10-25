@@ -14,9 +14,11 @@ media/readarr/*
 media/sonarr/*
 media/prowlarr/*
 media/transmission/*
-tools/scripts/duckdns/duck.env
-tools/scripts/duckdns/duck.log
 tailscale/tailscale-data/*
+tooling/data/backups/backup-services.log
+tooling/data/backups/backup-services.log.old
+tooling/dns/duckdns/duck.env
+tooling/dns/duckdns/duck.log
 traefik/crowdsec/*
 traefik/traefik/acme/*
 traefik/traefik/logs/*
@@ -26,3 +28,4 @@ tv/jellyfin/*
 vault/vaultwarden/*
 wiki/otter/settings.cfg
 wiki/otter/db.sqlite
+
