@@ -17,6 +17,8 @@ media/transmission/*
 tailscale/tailscale-data/*
 tooling/data/backups/backup-services.log
 tooling/data/backups/backup-services.log.old
+tooling/data/backups/backup-truenas.log
+tooling/data/backups/backup-truenas.log.old
 tooling/dns/duckdns/duck.env
 tooling/dns/duckdns/duck.log
 traefik/crowdsec/*
