@@ -132,9 +132,86 @@ else
 fi
 echo ""
 
+# ============================================
+# TrueNAS Configuration Backups
+# ============================================
+echo "TrueNAS configuration backups:"
+TRUENAS_BACKUP_DIR="/mnt/tank/backups/truenas"
+
+if [ -d "$TRUENAS_BACKUP_DIR" ]; then
+  # Count backup folders by type
+  DAILY_COUNT=$(find "$TRUENAS_BACKUP_DIR" -maxdepth 1 -type d -name "daily-*" 2>/dev/null | wc -l)
+  WEEKLY_COUNT=$(find "$TRUENAS_BACKUP_DIR" -maxdepth 1 -type d -name "weekly-*" 2>/dev/null | wc -l)
+  MONTHLY_COUNT=$(find "$TRUENAS_BACKUP_DIR" -maxdepth 1 -type d -name "monthly-*" 2>/dev/null | wc -l)
+  TOTAL_TN_COUNT=$((DAILY_COUNT + WEEKLY_COUNT + MONTHLY_COUNT))
+  
+  echo "  Backup folders: $DAILY_COUNT daily, $WEEKLY_COUNT weekly, $MONTHLY_COUNT monthly"
+  
+  # Check last backup time
+  LAST_TN_BACKUP=$(find "$TRUENAS_BACKUP_DIR" -maxdepth 1 -type d -name "*-*" -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -1 | cut -d' ' -f2-)
+  if [ -n "$LAST_TN_BACKUP" ]; then
+    LAST_TN_TIME=$(stat -c %y "$LAST_TN_BACKUP" 2>/dev/null | cut -d'.' -f1)
+    LAST_TN_AGE=$(($(date +%s) - $(stat -c %Y "$LAST_TN_BACKUP" 2>/dev/null)))
+    LAST_TN_HOURS=$((LAST_TN_AGE / 3600))
+    
+    if [ $LAST_TN_HOURS -lt 48 ]; then
+      echo "  ✓ Last backup: $LAST_TN_TIME ($LAST_TN_HOURS hours ago)"
+    else
+      echo "  ⚠ Last backup: $LAST_TN_TIME ($LAST_TN_HOURS hours ago) - May be stale"
+    fi
+  else
+    echo "  ✗ No TrueNAS config backups found"
+  fi
+  
+  # Validate backup folder completeness (should have 6 files per folder)
+  echo ""
+  echo "TrueNAS backup set validation:"
+  
+  INCOMPLETE_SETS=0
+  TOTAL_FOLDERS=0
+  
+  for folder in "$TRUENAS_BACKUP_DIR"/*-*/; do
+    if [ -d "$folder" ]; then
+      TOTAL_FOLDERS=$((TOTAL_FOLDERS + 1))
+      FILE_COUNT=$(find "$folder" -maxdepth 1 -type f | wc -l)
+      
+      # Each backup folder should have 6 files (SSL may be optional, so 5 is OK)
+      if [ $FILE_COUNT -lt 5 ]; then
+        INCOMPLETE_SETS=$((INCOMPLETE_SETS + 1))
+      fi
+    fi
+  done
+  
+  if [ $INCOMPLETE_SETS -eq 0 ] && [ $TOTAL_FOLDERS -gt 0 ]; then
+    echo "  ✓ All $TOTAL_FOLDERS backup sets complete (6 files per backup)"
+  elif [ $TOTAL_FOLDERS -eq 0 ]; then
+    echo "  ⚠ No backup folders found"
+  else
+    echo "  ⚠ WARNING: $INCOMPLETE_SETS incomplete backup sets detected!"
+    echo "    Each backup folder should have: truenas-config.tar.gz, ssh-keys.tar.gz,"
+    echo "    ssl-certs.tar.gz, zfs-config.txt, network.txt, cronjobs.json"
+  fi
+  
+  # Disk usage
+  TN_SIZE=$(du -sh "$TRUENAS_BACKUP_DIR" 2>/dev/null | cut -f1)
+  echo "  Total size: $TN_SIZE"
+else
+  echo "  ✗ TrueNAS backup directory not found: $TRUENAS_BACKUP_DIR"
+  echo "  → Run: /mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.sh"
+fi
+echo ""
+
 # Check backup sizes
 echo "Total backup sizes:"
 du -sh /mnt/tank/backups/homelab/immich /mnt/tank/backups/homelab/vaultwarden /mnt/tank/backups/homelab/wiki /mnt/tank/backups/homelab/homeassistant /mnt/tank/backups/homelab/jellyfin /mnt/tank/backups/homelab/tailscale /mnt/tank/backups/homelab/traefik 2>/dev/null
+if [ -d "$TRUENAS_BACKUP_DIR" ]; then
+  du -sh "$TRUENAS_BACKUP_DIR" 2>/dev/null | awk '{print $1 "\t" $2}'
+fi
 echo ""
-du -sh /mnt/tank/backups/homelab 2>/dev/null | awk '{print "Total: " $1}'
+du -sh /mnt/tank/backups/homelab 2>/dev/null | awk '{print "Services total: " $1}'
+if [ -d "$TRUENAS_BACKUP_DIR" ]; then
+  du -sh /mnt/tank/backups 2>/dev/null | awk '{print "Grand total:    " $1}'
+else
+  du -sh /mnt/tank/backups/homelab 2>/dev/null | awk '{print "Grand total:    " $1}'
+fi
 echo ""

@@ -1,13 +1,17 @@
 # Homelab Services Backup System
 
-Comprehensive backup solution for all homelab services, organized by service rather than backup method.
+Comprehensive backup solution for all homelab services and TrueNAS configuration.
 
 ## Quick Start
 
-### Run Backup Manually
+### Run Backups Manually
 
 ```bash
+# Backup all homelab services
 sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh
+
+# Backup TrueNAS configuration
+sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.sh
 ```
 
 ### Check Backup Status
@@ -16,17 +20,20 @@ sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh
 sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-check.sh
 ```
 
-### View Backup Log
+### View Backup Logs
 
 ```bash
 tail -f /mnt/fast/apps/homelab/tooling/data/backups/backup-services.log
+tail -f /mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.log
 ```
 
 ## Architecture
 
-### One Script, All Services
+### Two Main Scripts
 
-**`backup-services.sh`** - Main backup script that backs up all 7 services:
+#### 1. Services Backup (`backup-services.sh`)
+
+Backs up all 7 homelab services:
 
 1. **Immich** - PostgreSQL database + storage files (library/upload/profile)
 2. **Vaultwarden** - SQLite database + RSA keys + attachments  
@@ -36,34 +43,44 @@ tail -f /mnt/fast/apps/homelab/tooling/data/backups/backup-services.log
 6. **Tailscale** - State files
 7. **Traefik** - SSL/TLS certificates (ACME)
 
+#### 2. TrueNAS Config Backup (`backup-truenas.sh`)
+
+Backs up TrueNAS system configuration:
+
+1. **System config** - All TrueNAS settings, users, shares
+2. **SSH keys** - Host keys (machine identity)
+3. **SSL certificates** - Custom SSL certs (if any)
+4. **ZFS configuration** - Pool structure and properties
+5. **Network config** - IP addresses and netplan
+6. **Cron jobs** - All scheduled tasks
+
 ### Organized by Service
 
-Backup files are stored in `/mnt/tank/backups/homelab/[service]/`
-
-Restore documentation is tracked in git at `tooling/data/backups/services/`:
-
 ```
-Backup Files:
-/mnt/tank/backups/homelab/
-├── immich/
-│   ├── db-[type]-[date].sql.gz           # PostgreSQL database
-│   └── storage-[type]-[date].tar.gz      # Storage files
-├── vaultwarden/
-│   ├── db-[type]-[date].sqlite3          # Database
-│   ├── rsa_key-[type]-[date].pem         # RSA key
-│   └── attachments-[type]-[date].tar.gz  # Attachments
-├── wiki/
-│   └── db-[type]-[date].sqlite3
-├── homeassistant/
-│   ├── db-[type]-[date].sqlite3          # Main database
-│   ├── zigbee-[type]-[date].sqlite3      # Zigbee database
-│   └── config-[type]-[date].tar.gz       # YAML configs
-├── jellyfin/
-│   └── full-[type]-[date].tar.gz         # Full backup
-├── tailscale/
-│   └── state-[type]-[date].tar.gz
-└── traefik/
-    └── acme-[type]-[date].tar.gz         # SSL certificates
+/mnt/tank/backups/
+├── homelab/              # Service backups
+│   ├── immich/
+│   │   ├── db-[type]-[date].sql.gz
+│   │   └── storage-[type]-[date].tar.gz
+│   ├── vaultwarden/
+│   │   ├── db-[type]-[date].sqlite3
+│   │   ├── rsa_key-[type]-[date].pem
+│   │   └── attachments-[type]-[date].tar.gz
+│   ├── wiki/
+│   ├── homeassistant/
+│   ├── jellyfin/
+│   ├── tailscale/
+│   └── traefik/
+└── truenas/              # TrueNAS config backups
+    ├── daily-20251026-1800/
+    │   ├── truenas-config.tar.gz
+    │   ├── ssh-keys.tar.gz
+    │   ├── ssl-certs.tar.gz
+    │   ├── zfs-config.txt
+    │   ├── network.txt
+    │   └── cronjobs.json
+    ├── weekly-20251027-0100/
+    └── monthly-20251101-0100/
 
 Restore Documentation (in git):
 tooling/data/backups/services/
@@ -78,6 +95,7 @@ tooling/data/backups/services/
 
 ## Backup Types & Retention
 
+### Service Backups
 Backups are automatically categorized by time:
 
 | Type | When | Retention | Frequency |
@@ -87,11 +105,18 @@ Backups are automatically categorized by time:
 | **weekly** | Sunday midnight | 28 days | 4 backups |
 | **monthly** | 1st of month, midnight | 180 days | 6 backups |
 
+### TrueNAS Config Backups
+Stored in individual folders:
+
+| Type | When | Retention | Frequency |
+|------|------|-----------|-----------|
+| **daily** | 1 AM | 7 days | 7 backup folders |
+| **weekly** | Sunday 1 AM | 28 days | 4 backup folders |
+| **monthly** | 1st of month, 1 AM | 90 days | 3 backup folders |
+
 Example filenames:
-- `db-twice-daily-20251025-1900.sql.gz`
-- `db-daily-20251025-0000.sql.gz`
-- `db-weekly-20251027-0000.sql.gz`
-- `db-monthly-20251101-0000.sql.gz`
+- Service: `db-twice-daily-20251025-1900.sql.gz`
+- TrueNAS: `daily-20251026-0100/` (folder with 6 files inside)
 
 ## Backup Methods by Service
 
@@ -129,49 +154,151 @@ Example filenames:
 - **Contains**: All Let's Encrypt SSL certificates
 - **Method**: File backup
 
+## TrueNAS Configuration Backup
+
+Separate backup of TrueNAS OS configuration for disaster recovery:
+
+### Components Backed Up (6 files per backup folder)
+
+1. **truenas-config.tar.gz**: Complete system configuration
+   - All system settings, shares, users, groups
+   - From `/data/freenas-v1.db` and `/data/pwenc_secret`
+   
+2. **ssh-keys.tar.gz**: SSH host keys
+   - Preserves server identity across reinstalls
+   - From `/usr/local/etc/ssh/`
+
+3. **ssl-certs.tar.gz**: Web UI SSL certificates
+   - Custom certificates for TrueNAS web interface
+   - From `/etc/certificates/`
+
+4. **zfs-config.txt**: ZFS pool configuration
+   - Output of `zpool status` for all pools
+   - Reference for pool reconstruction
+
+5. **network.txt**: Network configuration
+   - Interfaces, VLANs, static routes, DNS
+   - From `midclt call` network queries
+
+6. **cronjobs.json**: Scheduled tasks
+   - All cron jobs configured in TrueNAS
+   - From `midclt call cronjob.query`
+
+### Backup Organization
+
+Each backup creates one folder containing all 6 files:
+```
+/mnt/tank/backups/truenas/
+├── daily-20251026-0100/
+│   ├── truenas-config.tar.gz
+│   ├── ssh-keys.tar.gz
+│   ├── ssl-certs.tar.gz
+│   ├── zfs-config.txt
+│   ├── network.txt
+│   └── cronjobs.json
+├── weekly-20251027-0100/
+└── monthly-20251101-0100/
+```
+
+### Retention Policy
+
+- **Daily**: 7 days (7 folders)
+- **Weekly**: 28 days (4 folders)
+- **Monthly**: 90 days (3 folders)
+
+Typical size: ~700KB per backup folder
+
+### Restoration Notes
+
+See `TRUENAS-CRON-SETUP.md` for disaster recovery procedures using these backups.
+
+---
+
 ## Setup
 
-### 1. Create Cron Job (TrueNAS GUI)
+### 1. Create Cron Jobs (TrueNAS GUI)
 
 **Via TrueNAS SCALE Web Interface:**
+
+#### Services Backup (7 AM & 7 PM)
 
 1. Go to: **System → Advanced → Cron Jobs**
 2. Click **Add**
 3. Configure:
-   - **Description**: Homelab Services Backup
+   - **Description**: Homelab Services Backup (Twice Daily)
    - **Command**: `/mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh`
    - **Run As User**: `root`
    - **Schedule**: 
      - **Minutes**: `0`
      - **Hours**: `7,19` (7 AM and 7 PM)
-     - **Days of Month**: `*`
-     - **Months**: `*`
-     - **Days of Week**: `*`
-   - **Hide Standard Output**: ✓ (checked)
-   - **Hide Standard Error**: ☐ (unchecked - to see errors)
+     - **Days**: `*` (all days)
+   - **Hide Standard Output**: ☐ (unchecked)
+   - **Hide Standard Error**: ☐ (unchecked)
 4. Click **Save**
 
-### 2. Test Backup
+#### TrueNAS Config Backup (1 AM daily)
+
+1. Click **Add** again
+2. Configure:
+   - **Description**: TrueNAS Configuration Backup (Daily)
+   - **Command**: `/mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.sh`
+   - **Run As User**: `root`
+   - **Schedule**: 
+     - **Minutes**: `0`
+     - **Hours**: `1` (1 AM)
+     - **Days**: `*` (all days)
+   - **Hide Standard Output**: ☐ (unchecked)
+   - **Hide Standard Error**: ☐ (unchecked)
+3. Click **Save**
+
+### 2. Test Backups
 
 ```bash
-# Run manually first
+# Test services backup
 sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh
+
+# Test TrueNAS config backup
+sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.sh
 
 # Check results
 sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-check.sh
 
-# View log
+# View logs
 tail -50 /mnt/fast/apps/homelab/tooling/data/backups/backup-services.log
+tail -50 /mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.log
 ```
 
-### 3. Verify Cron Job
+### 3. Setup Offsite Backup (B2 - Optional but Recommended)
+
+**For cloud backup to Backblaze B2 (weekly + monthly only):**
+
+1. **Tasks → Cloud Sync Tasks → Add**
+2. Configure:
+   - **Description**: Homelab Backups to B2 (Weekly/Monthly)
+   - **Direction**: Push
+   - **Transfer Mode**: Sync
+   - **Credential**: (Your B2 credentials)
+   - **Bucket**: Your B2 bucket name
+   - **Folder**: `/homelab-backups/`
+   - **Directory/Files**: `/mnt/tank/backups`
+3. **Exclude patterns** (add one line):
+   ```
+   daily-*
+   ```
+4. **Schedule**: Daily at 2 AM (after backups complete)
+   - **Minutes**: `0`
+   - **Hours**: `2`
+
+This will upload only weekly and monthly backups, saving costs (~$0.27/month).
+
+### 4. Verify Cron Jobs
 
 ```bash
 # Check if configured
 sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-check.sh
 
 # Or check directly
-midclt call cronjob.query | grep backup-services
+midclt call cronjob.query | grep backup
 ```
 
 ## Restore
@@ -193,23 +320,27 @@ Or view them in your editor/git repository.
 ### Check Status
 
 ```bash
-# Full status report
+# Full status report (services + TrueNAS config)
 sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-check.sh
 ```
 
 Shows:
-- Cron job configuration status
+- Cron job configuration status (both scripts)
 - Container running status (all 7 services)
 - Last backup times per service
 - Backup file counts
 - Backup set integrity validation
+- **TrueNAS config backup status and validation**
 - Total backup sizes
 
 ### View Logs
 
 ```bash
-# Last 50 lines
+# Services backup log - Last 50 lines
 tail -50 /mnt/fast/apps/homelab/tooling/data/backups/backup-services.log
+
+# TrueNAS config backup log - Last 50 lines
+tail -50 /mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.log
 
 # Follow live
 tail -f /mnt/fast/apps/homelab/tooling/data/backups/backup-services.log
@@ -246,7 +377,7 @@ Results: 6 successful, 0 failed (out of 7)
 
 ## Troubleshooting
 
-### Backup Failed for a Service
+### Service Backup Failed
 
 1. Check the log for details:
    ```bash
@@ -268,33 +399,68 @@ Results: 6 successful, 0 failed (out of 7)
    sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh
    ```
 
+### TrueNAS Config Backup Failed
+
+1. Check the TrueNAS backup log:
+   ```bash
+   tail -100 /mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.log
+   ```
+
+2. Verify backup folders exist:
+   ```bash
+   ls -lh /mnt/tank/backups/truenas/
+   ```
+
+3. Check if a folder is incomplete (should have 6 files):
+   ```bash
+   find /mnt/tank/backups/truenas/ -type d -name "*-*" -exec sh -c 'echo -n "$1: "; ls "$1" | wc -l' _ {} \;
+   ```
+
+4. Test backup manually:
+   ```bash
+   sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.sh
+   ```
+
 ### Disk Space Issues
 
 Check backup sizes:
 ```bash
+# Service backups
 du -sh /mnt/tank/backups/homelab/*
 du -sh /mnt/tank/backups/homelab/
+
+# TrueNAS config backups (usually minimal)
+du -sh /mnt/tank/backups/truenas/*
+du -sh /mnt/tank/backups/truenas/
+
+# Total
+du -sh /mnt/tank/backups/
 ```
 
 Largest consumers are typically:
 - Immich storage (photos/videos)
 - Home Assistant main database (history/states)
+- TrueNAS backups are minimal (<1MB per folder)
 
 ### Cron Job Not Running
 
-1. Check cron configuration:
+1. Check cron configuration (both jobs):
    ```bash
-   midclt call cronjob.query | grep backup-services
+   midclt call cronjob.query | grep backup
    ```
 
-2. Check cron service is running:
-   ```bash
-   systemctl status cron
-   ```
+2. You should see two jobs:
+   - backup-services.sh at 7 AM & 7 PM
+   - backup-truenas.sh at 1 AM
 
 3. Check for errors in syslog:
    ```bash
-   grep backup-services /var/log/syslog
+   grep backup /var/log/syslog
+   ```
+
+4. Verify scripts are executable:
+   ```bash
+   ls -l /mnt/fast/apps/homelab/tooling/data/backups/backup-*.sh
    ```
 
 ### Permission Issues
@@ -302,12 +468,13 @@ Largest consumers are typically:
 All backups run as root. If you see permission errors:
 
 ```bash
-# Fix backup script permissions
+# Fix service backup script permissions
 sudo chmod +x /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh
+sudo chmod +x /mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.sh
 
 # Fix backup directory permissions
-sudo chown -R root:root /mnt/tank/backups/homelab/
-sudo chmod -R 755 /mnt/tank/backups/homelab/
+sudo chown -R root:root /mnt/tank/backups/
+sudo chmod -R 755 /mnt/tank/backups/
 ```
 
 ## Advanced
@@ -370,11 +537,27 @@ Update cron:
 
 | Item | Path |
 |------|------|
-| Main backup script | `/mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh` |
-| Status check script | `/mnt/fast/apps/homelab/tooling/data/backups/backup-check.sh` |
-| Log file | `/mnt/fast/apps/homelab/tooling/data/backups/backup-services.log` |
-| Backup destination | `/mnt/tank/backups/homelab/` |
-| Service restore guides | `/mnt/fast/apps/homelab/tooling/data/backups/services/` |
+| **Services backup script** | `/mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh` |
+| **TrueNAS backup script** | `/mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.sh` |
+| **Status check script** | `/mnt/fast/apps/homelab/tooling/data/backups/backup-check.sh` |
+| **Services backup log** | `/mnt/fast/apps/homelab/tooling/data/backups/backup-services.log` |
+| **TrueNAS backup log** | `/mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.log` |
+| **Service backups** | `/mnt/tank/backups/homelab/` |
+| **TrueNAS config backups** | `/mnt/tank/backups/truenas/` |
+| **Service restore guides** | `/mnt/fast/apps/homelab/tooling/data/backups/services/` |
+
+## Storage Estimates
+
+At full retention capacity:
+
+- **Homelab services**: ~50GB (23 backups × ~2.0GB per run)
+- **TrueNAS config**: ~10MB (14 folders × ~700KB per folder)
+- **Total**: ~50GB
+
+**Offsite (B2) with weekly + monthly only:**
+- **Homelab services**: ~20GB (10 backups)
+- **TrueNAS config**: ~5MB (7 folders)
+- **Estimated cost**: ~$0.27/month or $3.24/year
 
 ## Support
 

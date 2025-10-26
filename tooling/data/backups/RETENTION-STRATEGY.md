@@ -1,6 +1,19 @@
 # Backup Retention Strategy
 
-## Tiered Retention (Grandfather-Father-Son)
+## Two Backup Systems
+
+This infrastructure includes **two separate backup systems**:
+
+1. **Homelab Services**: Docker container backups (databases, configs, data)
+2. **TrueNAS Configuration**: System-level OS configuration for disaster recovery
+
+Both use tiered retention strategies optimized for their purpose.
+
+---
+
+## Homelab Services Retention
+
+### Tiered Retention (Grandfather-Father-Son)
 
 This backup system uses a **tiered retention strategy** that balances recovery flexibility with storage efficiency.
 
@@ -76,24 +89,39 @@ With headroom for growth: ~50 GB
 
 ## Offsite Backup (B2) Strategy
 
-For cloud backup to Backblaze B2, **only backup weekly and monthly**:
+For cloud backup to Backblaze B2, **exclude daily backups** to reduce costs:
 
+### Services (homelab directory)
 ```
 Weekly:   4 backups × 2.0 GB =  8 GB
 Monthly:  6 backups × 2.0 GB = 12 GB
 ──────────────────────────────────────
 Total:   10 backups           = 20 GB
-
-Estimated B2 cost: ~$0.27/month or $3.24/year
 ```
 
-**TrueNAS Cloud Sync exclude patterns:**
+### TrueNAS Config (truenas directory)
 ```
-*twice-daily*
-*-daily-*
+Weekly:   4 folders × 700 KB = 2.8 MB
+Monthly:  3 folders × 700 KB = 2.1 MB
+──────────────────────────────────────
+Total:    7 folders           = 4.9 MB
 ```
 
-This keeps costs minimal while maintaining 4 weeks + 6 months of offsite backups.
+**Combined B2 Storage: ~20 GB**
+
+**TrueNAS Cloud Sync exclude pattern:**
+```
+daily-*
+```
+
+This single pattern excludes:
+- Service backups: `*-daily-*` files
+- Service backups: `*-twice-daily-*` files  
+- TrueNAS backups: `daily-YYYYMMDD-HHMM/` folders
+
+**Estimated B2 cost: ~$0.27/month or $3.24/year**
+
+This keeps costs minimal while maintaining 4 weeks + 6 months of offsite backups for both systems.
 
 ## Recovery Scenarios
 
@@ -181,20 +209,27 @@ All 7 homelab services backed up:
 
 ## Monitoring
 
-Check retention status:
+Check retention status for both systems:
 
 ```bash
-# Run the status check script
+# Full status report (both systems)
 /mnt/fast/apps/homelab/tooling/data/backups/backup-check.sh
 
-# Or manually count by type
+# Or manually count by type (services only)
 echo "Twice-daily: $(find /mnt/tank/backups/homelab -name '*twice-daily*' | wc -l)"
 echo "Daily:       $(find /mnt/tank/backups/homelab -name '*daily*' | wc -l)"
 echo "Weekly:      $(find /mnt/tank/backups/homelab -name '*weekly*' | wc -l)"
 echo "Monthly:     $(find /mnt/tank/backups/homelab -name '*monthly*' | wc -l)"
+
+# TrueNAS config backups
+echo "Daily:       $(find /mnt/tank/backups/truenas -type d -name 'daily-*' | wc -l)"
+echo "Weekly:      $(find /mnt/tank/backups/truenas -type d -name 'weekly-*' | wc -l)"
+echo "Monthly:     $(find /mnt/tank/backups/truenas -type d -name 'monthly-*' | wc -l)"
 ```
 
 ## Customization
+
+### Services Retention
 
 To adjust retention periods, edit `backup-services.sh`:
 
@@ -214,10 +249,79 @@ To adjust retention periods, edit `backup-services.sh`:
 -mtime +180 -delete
 ```
 
+### TrueNAS Config Retention
+
+To adjust TrueNAS backup retention, edit `backup-truenas.sh`:
+
+```bash
+# In the cleanup section around line 110, change these values:
+
+# Daily retention (currently 7 days)
+-mtime +7 -type d -print0
+
+# Weekly retention (currently 28 days / 4 weeks)
+-mtime +28 -type d -print0
+
+# Monthly retention (currently 90 days / 3 months)
+-mtime +90 -type d -print0
+```
+
+---
+
+## TrueNAS Configuration Retention
+
+### Backup Frequency
+
+```
+┌──────────┬──────────┬────────────┬──────────────┐
+│ Tier     │ Schedule │ Retention  │ Folders      │
+├──────────┼──────────┼────────────┼──────────────┤
+│ Daily    │ 1 AM     │ 7 days     │ 7 folders    │
+│ Weekly   │ Sun 1 AM │ 28 days    │ 4 folders    │
+│ Monthly  │ 1st 1 AM │ 90 days    │ 3 folders    │
+└──────────┴──────────┴────────────┴──────────────┘
+
+Total Recovery Points: ~14 folders
+Total Storage: ~10 MB
+```
+
+### Storage Estimate
+
+```
+Each backup folder: ~700 KB (6 files)
+  - truenas-config.tar.gz  (~500 KB)
+  - ssh-keys.tar.gz        (~50 KB)
+  - ssl-certs.tar.gz       (~100 KB)
+  - zfs-config.txt         (~20 KB)
+  - network.txt            (~10 KB)
+  - cronjobs.json          (~5 KB)
+
+Full retention: 14 folders × 700 KB = ~10 MB
+```
+
+### Cleanup Logic
+
+```bash
+# Delete entire folders (not individual files)
+Daily:   Delete folders > 7 days old
+Weekly:  Delete folders > 28 days old
+Monthly: Delete folders > 90 days old
+```
+
+### Why Shorter Retention?
+
+TrueNAS configs change infrequently compared to service data:
+- **90 days monthly** is sufficient for config rollback
+- Minimal storage impact (~10 MB total)
+- More focused on disaster recovery than point-in-time restore
+
+---
+
 ## Related Documentation
 
 - Main README: [README.md](README.md)
-- Main backup script: [backup-services.sh](backup-services.sh)
+- Services backup script: [backup-services.sh](backup-services.sh)
+- TrueNAS backup script: [backup-truenas.sh](backup-truenas.sh)
 - Status checker: [backup-check.sh](backup-check.sh)
 - TrueNAS setup: [TRUENAS-CRON-SETUP.md](TRUENAS-CRON-SETUP.md)
 - Service restore guides: [services/](services/)
