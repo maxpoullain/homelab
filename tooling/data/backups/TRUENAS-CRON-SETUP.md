@@ -153,6 +153,8 @@ Each TrueNAS backup creates a **folder** containing 6 files:
 - **Weekly**: Sunday at 1 AM (28 days retention)
 - **Monthly**: 1st of month at 1 AM (90 days retention)
 
+**Why 1 AM?** Runs before service backups (7 AM/7 PM) and captures system state separately.
+
 ---
 
 ## Combined Backup Schedule
@@ -224,15 +226,14 @@ Each TrueNAS backup creates a **folder** containing 6 files:
 | 01:00 | Sunday | - | **weekly** |
 | 01:00 | 1st of month | - | **monthly** |
 | 07:00 | All days | twice-daily | - |
-| 19:00 | All days | twice-daily | - |
-| 00:00 | Mon-Sat | daily | - |
-| 00:00 | Sunday | **weekly** | - |
-| 00:00 | 1st of month | **monthly** | - |
+| 19:00 | Mon-Sat | **daily** | - |
+| 19:00 | Sunday | **weekly** | - |
+| 19:00 | 1st of month | **monthly** | - |
 
 **Key Points**:
 - TrueNAS config backups run at **1 AM** (before services wake up)
-- Services backups run at **7 AM and 7 PM** (twice-daily)
-- Midnight services backups automatically become daily/weekly/monthly
+- Services twice-daily backups run at **7 AM**
+- Services daily/weekly/monthly backups run at **7 PM**
 - No conflicts - different times
 
 ## All Services and Systems Covered
@@ -612,8 +613,8 @@ For 9 AM and 9 PM:
 
 ### 1. Services Backup
 - **Schedule**: `0 7,19 * * *`
-- **Frequency**: Twice daily (7 AM and 7 PM)
-- **Plus**: Daily/weekly/monthly at midnight
+- **7 AM**: Twice-daily backups
+- **7 PM**: Daily/weekly/monthly backups (determined by date)
 - **Services**: All 7 homelab containers
 - **Retention**: 23 backups (~50 GB)
 
@@ -625,7 +626,7 @@ For 9 AM and 9 PM:
 - **Retention**: 14 folders (~10 MB)
 
 ### Offsite (B2):
-- **Pattern**: `daily-*` (excludes all daily backups)
+- **Pattern**: `*daily*` (excludes all daily/twice-daily backups)
 - **Storage**: ~20 GB (weekly + monthly only)
 - **Cost**: ~$0.27/month
 

@@ -100,10 +100,10 @@ Backups are automatically categorized by time:
 
 | Type | When | Retention | Frequency |
 |------|------|-----------|-----------|
-| **twice-daily** | 7 AM & 7 PM | 3 days | 6 backups total |
-| **daily** | Midnight | 7 days | 7 backups |
-| **weekly** | Sunday midnight | 28 days | 4 backups |
-| **monthly** | 1st of month, midnight | 180 days | 6 backups |
+| **twice-daily** | 7 AM | 3 days | 6 backups total |
+| **daily** | 7 PM | 7 days | 7 backups |
+| **weekly** | Sunday 7 PM | 28 days | 4 backups |
+| **monthly** | 1st of month, 7 PM | 180 days | 6 backups |
 
 ### TrueNAS Config Backups
 Stored in individual folders:
