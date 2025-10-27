@@ -23,13 +23,14 @@ if [ -f "$LOG_FILE" ] && [ $(stat -f%z "$LOG_FILE" 2>/dev/null || stat -c%s "$LO
 fi
 
 # Determine backup type based on time
-if [ "$DAY_OF_MONTH" = "01" ] && [ "$HOUR" = "00" ]; then
+# 7 PM (19:00) is used for daily/weekly/monthly, 7 AM is twice-daily
+if [ "$DAY_OF_MONTH" = "01" ] && [ "$HOUR" = "19" ]; then
   BACKUP_TYPE="monthly"
   RETENTION_DAYS=180  # 6 months
-elif [ "$DAY_OF_WEEK" = "7" ] && [ "$HOUR" = "00" ]; then
+elif [ "$DAY_OF_WEEK" = "7" ] && [ "$HOUR" = "19" ]; then
   BACKUP_TYPE="weekly"
   RETENTION_DAYS=28   # 4 weeks
-elif [ "$HOUR" = "00" ]; then
+elif [ "$HOUR" = "19" ]; then
   BACKUP_TYPE="daily"
   RETENTION_DAYS=7    # 7 days
 else

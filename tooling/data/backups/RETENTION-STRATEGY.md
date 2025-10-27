@@ -24,10 +24,10 @@ This backup system uses a **tiered retention strategy** that balances recovery f
 │ Tier        │ Frequency    │ Retention  │ Recovery     │
 │             │              │            │ Points       │
 ├─────────────┼──────────────┼────────────┼──────────────┤
-│ Twice-daily │ 7 AM & 7 PM  │ 3 days     │ 6 points     │
-│ Daily       │ Midnight     │ 7 days     │ 7 points     │
-│ Weekly      │ Sun midnight │ 4 weeks    │ 4 points     │
-│ Monthly     │ 1st midnight │ 6 months   │ 6 points     │
+│ Twice-daily │ 7 AM         │ 3 days     │ 6 points     │
+│ Daily       │ 7 PM         │ 7 days     │ 7 points     │
+│ Weekly      │ Sun 7 PM     │ 4 weeks    │ 4 points     │
+│ Monthly     │ 1st 7 PM     │ 6 months   │ 6 points     │
 └─────────────┴──────────────┴────────────┴──────────────┘
 
 Total Recovery Points: ~23 per service
@@ -41,23 +41,21 @@ Time     ┊ 2×daily │ Daily │ Weekly │ Monthly
 ─────────┼─────────┼───────┼────────┼─────────
 Now      ┊         │       │        │
 7 AM     ┊   ✓     │       │        │
-Yesterday┊         │       │        │
-7 PM     ┊   ✓     │       │        │
--2d 7AM  ┊   ✓     │       │        │
--2d 7PM  ┊   ✓     │       │        │
+-1d 7PM  ┊         │   ✓   │        │
+-2d 7PM  ┊         │   ✓   │        │
 -3d 7AM  ┊   ✓     │       │        │
--3d 7PM  ┊   ✓     │       │        │
--4d 00:00┊         │   ✓   │        │
--5d 00:00┊         │   ✓   │        │
+-3d 7PM  ┊         │   ✓   │        │
+-4d 7PM  ┊         │   ✓   │        │
+-5d 7PM  ┊         │   ✓   │        │
 ...      ┊         │  ...  │        │
--7d 00:00┊         │   ✓   │        │
--14d     ┊         │       │   ✓    │
--21d     ┊         │       │   ✓    │
--28d     ┊         │       │   ✓    │
--1mo     ┊         │       │        │   ✓
--2mo     ┊         │       │        │   ✓
+-7d 7PM  ┊         │   ✓   │        │
+-14d 7PM ┊         │       │   ✓    │
+-21d 7PM ┊         │       │   ✓    │
+-28d 7PM ┊         │       │   ✓    │
+-1mo 7PM ┊         │       │        │   ✓
+-2mo 7PM ┊         │       │        │   ✓
 ...      ┊         │       │        │  ...
--6mo     ┊         │       │        │   ✓
+-6mo 7PM ┊         │       │        │   ✓
 ```
 
 ## Storage Estimate
@@ -130,39 +128,39 @@ This keeps costs minimal while maintaining 4 weeks + 6 months of offsite backups
 - Recovery Point: 7 AM today
 - File: `db-twice-daily-YYYYMMDD-0700.sql.gz`
 
-### Scenario 2: "I need to restore from 3 days ago"
+### Scenario 2: "I need to restore from yesterday evening"
 ✅ **Daily backup available**
-- Recovery Point: Midnight 3 days ago
-- File: `db-daily-YYYYMMDD-0000.sql.gz`
+- Recovery Point: 7 PM yesterday
+- File: `db-daily-YYYYMMDD-1900.sql.gz`
 
 ### Scenario 3: "I need to restore from 2 weeks ago"
 ✅ **Weekly backup available**
-- Recovery Point: Sunday midnight 2 weeks ago
-- File: `db-weekly-YYYYMMDD-0000.sql.gz`
+- Recovery Point: Sunday 7 PM, 2 weeks ago
+- File: `db-weekly-YYYYMMDD-1900.sql.gz`
 
 ### Scenario 4: "I need to restore from 4 months ago"
 ✅ **Monthly backup available**
-- Recovery Point: 1st of month 4 months ago
-- File: `db-monthly-YYYYMMDD-0000.sql.gz`
+- Recovery Point: 1st of month, 7 PM, 4 months ago
+- File: `db-monthly-YYYYMMDD-1900.sql.gz`
 
 ### Scenario 5: "I need to restore from exactly 2 days ago at 3 PM"
 ⚠️ **Not available** - Nearest recovery points:
-- 2 days ago 7 PM (twice-daily) or
-- 3 days ago midnight (daily)
+- 2 days ago 7 PM (daily) or
+- Today 7 AM (twice-daily)
 
 ## Backup Type Selection Logic
 
 The script automatically determines backup type based on current time:
 
 ```bash
-if [ month_day == 1 ] && [ hour == 0 ]; then
+if [ month_day == 1 ] && [ hour == 19 ]; then
   → Create MONTHLY backup
-elif [ weekday == Sunday ] && [ hour == 0 ]; then
+elif [ weekday == Sunday ] && [ hour == 19 ]; then
   → Create WEEKLY backup
-elif [ hour == 0 ]; then
+elif [ hour == 19 ]; then
   → Create DAILY backup
 else
-  → Create TWICE-DAILY backup (runs at 7 AM and 7 PM)
+  → Create TWICE-DAILY backup (runs at 7 AM)
 fi
 ```
 
@@ -188,8 +186,8 @@ This ensures:
 
 ## Benefits
 
-✅ **Recent flexibility**: Twice-daily backups for last 3 days (7 AM and 7 PM)  
-✅ **Medium-term coverage**: Daily backups for last week  
+✅ **Recent flexibility**: Twice-daily backups (7 AM) for last 3 days  
+✅ **Daily coverage**: Daily backups (7 PM) for last week  
 ✅ **Long-term compliance**: Monthly backups for 6 months  
 ✅ **Storage efficient**: ~50GB total vs hundreds of GB with hourly backups
 ✅ **Automated**: No manual intervention needed  
