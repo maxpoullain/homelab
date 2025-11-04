@@ -8,11 +8,15 @@ immich/storage/*
 immich/postgres/*
 media/pia/*
 !media/pia/encrypted.env
-media/jackett/*
+!media/pia/port.sh
+media/prowlarr/*
+!media/prowlarr/Definitions/
+media/prowlarr/Definitions/*
+!media/prowlarr/Definitions/Custom/
+!media/prowlarr/Definitions/Custom/*
 media/radarr/*
 media/readarr/*
 media/sonarr/*
-media/prowlarr/*
 media/transmission/*
 tailscale/tailscale-data/*
 tooling/data/backups/backup-services.log
