@@ -3,6 +3,11 @@
 # Homelab Services Backup Script
 # Consolidates database and application backups for all services
 # Each service section handles its complete backup (databases + configs + files)
+#
+# Usage:
+#   ./backup-services.sh                    # Backup all services
+#   ./backup-services.sh immich vaultwarden # Backup only specified services
+#   ./backup-services.sh --list             # List available services
 
 set +e  # Don't exit on errors - we want to continue even if one service fails
 
@@ -15,6 +20,58 @@ DATE=$(date +%Y%m%d-%H%M)
 DAY_OF_WEEK=$(date +%u)  # 1-7 (Monday-Sunday)
 DAY_OF_MONTH=$(date +%d)
 HOUR=$(date +%H)
+
+# Available services
+AVAILABLE_SERVICES=(immich vaultwarden otterwiki homeassistant jellyfin tailscale traefik prowlarr sonarr radarr readarr)
+
+# Parse command line arguments
+SELECTED_SERVICES=()
+if [ $# -eq 0 ]; then
+  # No arguments - backup all services
+  SELECTED_SERVICES=("${AVAILABLE_SERVICES[@]}")
+elif [ "$1" = "--list" ] || [ "$1" = "-l" ]; then
+  echo "Available services:"
+  for service in "${AVAILABLE_SERVICES[@]}"; do
+    echo "  - $service"
+  done
+  exit 0
+elif [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+  echo "Usage: $0 [SERVICE...]"
+  echo ""
+  echo "Backup homelab services. If no services specified, all services are backed up."
+  echo ""
+  echo "Options:"
+  echo "  -l, --list    List available services"
+  echo "  -h, --help    Show this help message"
+  echo ""
+  echo "Available services:"
+  for service in "${AVAILABLE_SERVICES[@]}"; do
+    echo "  - $service"
+  done
+  echo ""
+  echo "Examples:"
+  echo "  $0                           # Backup all services"
+  echo "  $0 immich vaultwarden        # Backup only Immich and Vaultwarden"
+  echo "  $0 prowlarr sonarr radarr    # Backup only *arr services"
+  exit 0
+else
+  # Validate provided services
+  for arg in "$@"; do
+    found=false
+    for service in "${AVAILABLE_SERVICES[@]}"; do
+      if [ "$arg" = "$service" ]; then
+        SELECTED_SERVICES+=("$arg")
+        found=true
+        break
+      fi
+    done
+    if [ "$found" = false ]; then
+      echo "Error: Unknown service '$arg'"
+      echo "Run '$0 --list' to see available services"
+      exit 1
+    fi
+  done
+fi
 
 # Rotate log file if it's larger than 10MB
 if [ -f "$LOG_FILE" ] && [ $(stat -f%z "$LOG_FILE" 2>/dev/null || stat -c%s "$LOG_FILE" 2>/dev/null) -gt 10485760 ]; then
@@ -39,10 +96,21 @@ else
 fi
 
 # Track success/failure
-TOTAL_SERVICES=7
+TOTAL_SERVICES=${#SELECTED_SERVICES[@]}
 SUCCESSFUL_BACKUPS=0
 FAILED_BACKUPS=0
 BACKUP_STATUS=""
+
+# Helper function to check if service should be backed up
+should_backup() {
+  local service=$1
+  for selected in "${SELECTED_SERVICES[@]}"; do
+    if [ "$selected" = "$service" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
 
 # Logging function
 log() {
@@ -55,15 +123,21 @@ log "=== Homelab Services Backup Started ==="
 log "Date: $(date)"
 log "Backup type: $BACKUP_TYPE"
 log "Retention: $RETENTION_DAYS days"
+if [ ${#SELECTED_SERVICES[@]} -eq ${#AVAILABLE_SERVICES[@]} ]; then
+  log "Services: ALL (${#SELECTED_SERVICES[@]})"
+else
+  log "Services: ${SELECTED_SERVICES[*]} (${#SELECTED_SERVICES[@]})"
+fi
 log "=========================================="
 log ""
 
 # Create backup directories if they don't exist
-mkdir -p "$BACKUP_DIR"/{immich,vaultwarden,wiki,homeassistant,jellyfin,tailscale,traefik}
+mkdir -p "$BACKUP_DIR"/{immich,vaultwarden,wiki,homeassistant,jellyfin,tailscale,traefik,prowlarr,sonarr,radarr,readarr}
 
 # ============================================
 # IMMICH - PostgreSQL Database + Storage
 # ============================================
+if should_backup "immich"; then
 log "Backing up Immich (database + storage)..."
 IMMICH_SUCCESS=true
 
@@ -117,10 +191,12 @@ else
   BACKUP_STATUS="${BACKUP_STATUS}Immich: ✗ FAILED\n"
 fi
 log ""
+fi
 
 # ============================================
 # VAULTWARDEN - SQLite Database + RSA Keys + Attachments
 # ============================================
+if should_backup "vaultwarden"; then
 log "Backing up Vaultwarden (database + keys + attachments)..."
 VAULTWARDEN_SUCCESS=true
 
@@ -196,10 +272,12 @@ else
   BACKUP_STATUS="${BACKUP_STATUS}Vaultwarden: ✗ FAILED\n"
 fi
 log ""
+fi
 
 # ============================================
 # OTTERWIKI - SQLite Database
 # ============================================
+if should_backup "otterwiki"; then
 log "Backing up OtterWiki (database)..."
 WIKI_SUCCESS=true
 
@@ -232,10 +310,12 @@ else
   BACKUP_STATUS="${BACKUP_STATUS}OtterWiki: ✗ FAILED\n"
 fi
 log ""
+fi
 
 # ============================================
 # HOME ASSISTANT - SQLite Databases + YAML Configs
 # ============================================
+if should_backup "homeassistant"; then
 log "Backing up Home Assistant (databases + configs)..."
 HA_SUCCESS=true
 
@@ -314,10 +394,12 @@ else
   BACKUP_STATUS="${BACKUP_STATUS}Home Assistant: ✗ FAILED\n"
 fi
 log ""
+fi
 
 # ============================================
 # JELLYFIN - Full Backup (Databases + Configs + Metadata)
 # ============================================
+if should_backup "jellyfin"; then
 log "Backing up Jellyfin (full backup)..."
 JELLYFIN_SUCCESS=true
 
@@ -354,10 +436,12 @@ else
   BACKUP_STATUS="${BACKUP_STATUS}Jellyfin: ✗ FAILED\n"
 fi
 log ""
+fi
 
 # ============================================
 # TAILSCALE - State Files
 # ============================================
+if should_backup "tailscale"; then
 log "Backing up Tailscale (state files)..."
 TAILSCALE_SUCCESS=true
 
@@ -385,10 +469,12 @@ else
   BACKUP_STATUS="${BACKUP_STATUS}Tailscale: ✗ FAILED\n"
 fi
 log ""
+fi
 
 # ============================================
 # TRAEFIK - SSL Certificates
 # ============================================
+if should_backup "traefik"; then
 log "Backing up Traefik (SSL certificates)..."
 TRAEFIK_SUCCESS=true
 
@@ -413,6 +499,146 @@ else
   BACKUP_STATUS="${BACKUP_STATUS}Traefik: ⚠ SKIPPED\n"
 fi
 log ""
+fi
+
+# ============================================
+# PROWLARR - Full Backup
+# ============================================
+if should_backup "prowlarr"; then
+log "Backing up Prowlarr (full backup)..."
+PROWLARR_SUCCESS=true
+
+if [ -d "$APPS_BASE/media/prowlarr" ]; then
+  PROWLARR_FILE="$BACKUP_DIR/prowlarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
+  
+  tar -czf "$PROWLARR_FILE" \
+    --exclude="logs" \
+    --exclude="Backups" \
+    -C "$APPS_BASE/media" prowlarr 2>&1 | grep -v "Removing leading" || true
+  
+  if [ -f "$PROWLARR_FILE" ]; then
+    PROWLARR_SIZE=$(du -h "$PROWLARR_FILE" | cut -f1)
+    log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($PROWLARR_SIZE)"
+    log "    Includes: databases, config.xml, Definitions"
+    SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Prowlarr: ✓ SUCCESS\n"
+  else
+    log "  ✗ Backup failed"
+    FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Prowlarr: ✗ FAILED\n"
+  fi
+else
+  log "  ✗ prowlarr directory not found"
+  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+  BACKUP_STATUS="${BACKUP_STATUS}Prowlarr: ✗ FAILED\n"
+fi
+log ""
+fi
+
+# ============================================
+# SONARR - Full Backup
+# ============================================
+if should_backup "sonarr"; then
+log "Backing up Sonarr (full backup)..."
+SONARR_SUCCESS=true
+
+if [ -d "$APPS_BASE/media/sonarr" ]; then
+  SONARR_FILE="$BACKUP_DIR/sonarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
+  
+  tar -czf "$SONARR_FILE" \
+    --exclude="logs" \
+    --exclude="Backups" \
+    --exclude="MediaCover" \
+    -C "$APPS_BASE/media" sonarr 2>&1 | grep -v "Removing leading" || true
+  
+  if [ -f "$SONARR_FILE" ]; then
+    SONARR_SIZE=$(du -h "$SONARR_FILE" | cut -f1)
+    log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($SONARR_SIZE)"
+    log "    Includes: databases, config.xml"
+    SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Sonarr: ✓ SUCCESS\n"
+  else
+    log "  ✗ Backup failed"
+    FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Sonarr: ✗ FAILED\n"
+  fi
+else
+  log "  ✗ sonarr directory not found"
+  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+  BACKUP_STATUS="${BACKUP_STATUS}Sonarr: ✗ FAILED\n"
+fi
+log ""
+fi
+
+# ============================================
+# RADARR - Full Backup
+# ============================================
+if should_backup "radarr"; then
+log "Backing up Radarr (full backup)..."
+RADARR_SUCCESS=true
+
+if [ -d "$APPS_BASE/media/radarr" ]; then
+  RADARR_FILE="$BACKUP_DIR/radarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
+  
+  tar -czf "$RADARR_FILE" \
+    --exclude="logs" \
+    --exclude="Backups" \
+    --exclude="MediaCover" \
+    -C "$APPS_BASE/media" radarr 2>&1 | grep -v "Removing leading" || true
+  
+  if [ -f "$RADARR_FILE" ]; then
+    RADARR_SIZE=$(du -h "$RADARR_FILE" | cut -f1)
+    log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($RADARR_SIZE)"
+    log "    Includes: databases, config.xml"
+    SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Radarr: ✓ SUCCESS\n"
+  else
+    log "  ✗ Backup failed"
+    FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Radarr: ✗ FAILED\n"
+  fi
+else
+  log "  ✗ radarr directory not found"
+  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+  BACKUP_STATUS="${BACKUP_STATUS}Radarr: ✗ FAILED\n"
+fi
+log ""
+fi
+
+# ============================================
+# READARR - Full Backup
+# ============================================
+if should_backup "readarr"; then
+log "Backing up Readarr (full backup)..."
+READARR_SUCCESS=true
+
+if [ -d "$APPS_BASE/media/readarr" ]; then
+  READARR_FILE="$BACKUP_DIR/readarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
+  
+  tar -czf "$READARR_FILE" \
+    --exclude="logs" \
+    --exclude="Backups" \
+    --exclude="MediaCover" \
+    -C "$APPS_BASE/media" readarr 2>&1 | grep -v "Removing leading" || true
+  
+  if [ -f "$READARR_FILE" ]; then
+    READARR_SIZE=$(du -h "$READARR_FILE" | cut -f1)
+    log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($READARR_SIZE)"
+    log "    Includes: databases, config.xml"
+    SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Readarr: ✓ SUCCESS\n"
+  else
+    log "  ✗ Backup failed"
+    FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Readarr: ✗ FAILED\n"
+  fi
+else
+  log "  ✗ readarr directory not found"
+  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+  BACKUP_STATUS="${BACKUP_STATUS}Readarr: ✗ FAILED\n"
+fi
+log ""
+fi
 
 # ============================================
 # Cleanup Old Backups
@@ -422,30 +648,30 @@ log "Cleaning up old backups..."
 # Cleanup twice-daily backups (older than 3 days)
 # Only delete core backup files (databases, configs, storage) - NOT RSA keys or attachments
 log "  Twice-daily backups (>3 days)..."
-TWICE_DAILY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "zigbee-*twice-daily*.sqlite3" -o -name "*twice-daily*.tar.gz" \) | wc -l)
-find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "zigbee-*twice-daily*.sqlite3" -o -name "*twice-daily*.tar.gz" \) -mtime +3 -delete 2>&1
-TWICE_DAILY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "zigbee-*twice-daily*.sqlite3" -o -name "*twice-daily*.tar.gz" \) | wc -l)
+TWICE_DAILY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "logs-*twice-daily*.sqlite3" -o -name "zigbee-*twice-daily*.sqlite3" -o -name "*twice-daily*.tar.gz" \) | wc -l)
+find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "logs-*twice-daily*.sqlite3" -o -name "zigbee-*twice-daily*.sqlite3" -o -name "*twice-daily*.tar.gz" \) -mtime +3 -delete 2>&1
+TWICE_DAILY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "logs-*twice-daily*.sqlite3" -o -name "zigbee-*twice-daily*.sqlite3" -o -name "*twice-daily*.tar.gz" \) | wc -l)
 log "    Deleted $((TWICE_DAILY_BEFORE - TWICE_DAILY_AFTER)) twice-daily backups, $TWICE_DAILY_AFTER remaining"
 
 # Cleanup daily backups (older than 7 days)
 log "  Daily backups (>7 days)..."
-DAILY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "zigbee-*daily*.sqlite3" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" | wc -l)
-find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "zigbee-*daily*.sqlite3" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" -mtime +7 -delete 2>&1
-DAILY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "zigbee-*daily*.sqlite3" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" | wc -l)
+DAILY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "logs-*daily*.sqlite3" -o -name "zigbee-*daily*.sqlite3" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" | wc -l)
+find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "logs-*daily*.sqlite3" -o -name "zigbee-*daily*.sqlite3" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" -mtime +7 -delete 2>&1
+DAILY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "logs-*daily*.sqlite3" -o -name "zigbee-*daily*.sqlite3" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" | wc -l)
 log "    Deleted $((DAILY_BEFORE - DAILY_AFTER)) daily backups, $DAILY_AFTER remaining"
 
 # Cleanup weekly backups (older than 28 days / 4 weeks)
 log "  Weekly backups (>28 days)..."
-WEEKLY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "zigbee-*weekly*.sqlite3" -o -name "*weekly*.tar.gz" \) | wc -l)
-find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "zigbee-*weekly*.sqlite3" -o -name "*weekly*.tar.gz" \) -mtime +28 -delete 2>&1
-WEEKLY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "zigbee-*weekly*.sqlite3" -o -name "*weekly*.tar.gz" \) | wc -l)
+WEEKLY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "logs-*weekly*.sqlite3" -o -name "zigbee-*weekly*.sqlite3" -o -name "*weekly*.tar.gz" \) | wc -l)
+find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "logs-*weekly*.sqlite3" -o -name "zigbee-*weekly*.sqlite3" -o -name "*weekly*.tar.gz" \) -mtime +28 -delete 2>&1
+WEEKLY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "logs-*weekly*.sqlite3" -o -name "zigbee-*weekly*.sqlite3" -o -name "*weekly*.tar.gz" \) | wc -l)
 log "    Deleted $((WEEKLY_BEFORE - WEEKLY_AFTER)) weekly backups, $WEEKLY_AFTER remaining"
 
 # Cleanup monthly backups (older than 180 days / 6 months)
 log "  Monthly backups (>180 days)..."
-MONTHLY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "zigbee-*monthly*.sqlite3" -o -name "*monthly*.tar.gz" \) | wc -l)
-find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "zigbee-*monthly*.sqlite3" -o -name "*monthly*.tar.gz" \) -mtime +180 -delete 2>&1
-MONTHLY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "zigbee-*monthly*.sqlite3" -o -name "*monthly*.tar.gz" \) | wc -l)
+MONTHLY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "logs-*monthly*.sqlite3" -o -name "zigbee-*monthly*.sqlite3" -o -name "*monthly*.tar.gz" \) | wc -l)
+find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "logs-*monthly*.sqlite3" -o -name "zigbee-*monthly*.sqlite3" -o -name "*monthly*.tar.gz" \) -mtime +180 -delete 2>&1
+MONTHLY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "logs-*monthly*.sqlite3" -o -name "zigbee-*monthly*.sqlite3" -o -name "*monthly*.tar.gz" \) | wc -l)
 log "    Deleted $((MONTHLY_BEFORE - MONTHLY_AFTER)) monthly backups, $MONTHLY_AFTER remaining"
 
 # Cleanup orphaned Vaultwarden files (no matching database backup)

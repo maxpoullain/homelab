@@ -10,6 +10,15 @@ Comprehensive backup solution for all homelab services and TrueNAS configuration
 # Backup all homelab services
 sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh
 
+# Backup specific services only
+sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh prowlarr sonarr radarr
+
+# List available services
+sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh --list
+
+# Show help
+sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh --help
+
 # Backup TrueNAS configuration
 sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.sh
 ```
@@ -33,7 +42,7 @@ tail -f /mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.log
 
 #### 1. Services Backup (`backup-services.sh`)
 
-Backs up all 7 homelab services:
+Backs up all 11 homelab services:
 
 1. **Immich** - PostgreSQL database + storage files (library/upload/profile)
 2. **Vaultwarden** - SQLite database + RSA keys + attachments  
@@ -42,6 +51,10 @@ Backs up all 7 homelab services:
 5. **Jellyfin** - Full backup (databases + metadata + plugins + settings)
 6. **Tailscale** - State files
 7. **Traefik** - SSL/TLS certificates (ACME)
+8. **Prowlarr** - Full backup (databases + config files)
+9. **Sonarr** - Full backup (databases + config files)
+10. **Radarr** - Full backup (databases + config files)
+11. **Readarr** - Full backup (databases + config files)
 
 #### 2. TrueNAS Config Backup (`backup-truenas.sh`)
 
@@ -70,7 +83,15 @@ Backs up TrueNAS system configuration:
 │   ├── homeassistant/
 │   ├── jellyfin/
 │   ├── tailscale/
-│   └── traefik/
+│   ├── traefik/
+│   ├── prowlarr/
+│   │   └── full-[type]-[date].tar.gz
+│   ├── sonarr/
+│   │   └── full-[type]-[date].tar.gz
+│   ├── radarr/
+│   │   └── full-[type]-[date].tar.gz
+│   └── readarr/
+│       └── full-[type]-[date].tar.gz
 └── truenas/              # TrueNAS config backups
     ├── daily-20251026-1800/
     │   ├── truenas-config.tar.gz
@@ -90,7 +111,11 @@ tooling/data/backups/services/
 ├── homeassistant-restore.md
 ├── jellyfin-restore.md
 ├── tailscale-restore.md
-└── traefik-restore.md
+├── traefik-restore.md
+├── prowlarr-restore.md
+├── sonarr-restore.md
+├── radarr-restore.md
+└── readarr-restore.md
 ```
 
 ## Backup Types & Retention
@@ -153,6 +178,30 @@ Example filenames:
 - **Certificates**: Tar of acme directory
 - **Contains**: All Let's Encrypt SSL certificates
 - **Method**: File backup
+
+### Prowlarr
+- **Full backup**: Tar of entire config directory
+- **Includes**: Databases, config.xml, Definitions
+- **Excludes**: Logs, built-in Backups folder
+- **Method**: Direct file backup (same as Jellyfin)
+
+### Sonarr
+- **Full backup**: Tar of entire config directory
+- **Includes**: Databases, config.xml
+- **Excludes**: Logs, built-in Backups folder, MediaCover
+- **Method**: Direct file backup (same as Jellyfin)
+
+### Radarr
+- **Full backup**: Tar of entire config directory
+- **Includes**: Databases, config.xml
+- **Excludes**: Logs, built-in Backups folder, MediaCover
+- **Method**: Direct file backup (same as Jellyfin)
+
+### Readarr
+- **Full backup**: Tar of entire config directory
+- **Includes**: Databases, config.xml
+- **Excludes**: Logs, built-in Backups folder, MediaCover
+- **Method**: Direct file backup (same as Jellyfin)
 
 ## TrueNAS Configuration Backup
 
@@ -326,7 +375,7 @@ sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-check.sh
 
 Shows:
 - Cron job configuration status (both scripts)
-- Container running status (all 7 services)
+- Container running status (all 11 services)
 - Last backup times per service
 - Backup file counts
 - Backup set integrity validation
@@ -371,8 +420,12 @@ Home Assistant: ✓ SUCCESS
 Jellyfin: ✓ SUCCESS
 Tailscale: ✓ SUCCESS
 Traefik: ⚠ SKIPPED
+Prowlarr: ✓ SUCCESS
+Sonarr: ✓ SUCCESS
+Radarr: ✓ SUCCESS
+Readarr: ✓ SUCCESS
 
-Results: 6 successful, 0 failed (out of 7)
+Results: 10 successful, 0 failed (out of 11)
 ```
 
 ## Troubleshooting
@@ -479,14 +532,30 @@ sudo chmod -R 755 /mnt/tank/backups/
 
 ## Advanced
 
-### Manual Backup of Single Service
+### Manual Backup of Specific Services
 
-The script backs up all services, but you can extract just one section if needed. Example for Immich:
+The script supports selective backup of one or more services:
 
 ```bash
-# Run full script but only watch Immich section
-sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh 2>&1 | grep -A 20 "Backing up Immich"
+# Backup only Prowlarr
+sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh prowlarr
+
+# Backup multiple specific services
+sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh immich vaultwarden homeassistant
+
+# Backup all *arr services
+sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh prowlarr sonarr radarr readarr
+
+# List available services
+sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh --list
+
+# Show help with examples
+sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh --help
 ```
+
+Available services: `immich`, `vaultwarden`, `otterwiki`, `homeassistant`, `jellyfin`, `tailscale`, `traefik`, `prowlarr`, `sonarr`, `radarr`, `readarr`
+
+**Note**: If no services are specified, all services will be backed up (default behavior for cron jobs).
 
 ### Custom Retention
 

@@ -56,6 +56,14 @@ echo -n "  Tailscale: "
 docker ps --format "{{.Names}}" | grep -q tailscale && echo "✓ Running" || echo "✗ Not running"
 echo -n "  Traefik: "
 docker ps --format "{{.Names}}" | grep -q traefik && echo "✓ Running" || echo "✗ Not running"
+echo -n "  Prowlarr: "
+docker ps --format "{{.Names}}" | grep -q prowlarr && echo "✓ Running" || echo "✗ Not running"
+echo -n "  Sonarr: "
+docker ps --format "{{.Names}}" | grep -q sonarr && echo "✓ Running" || echo "✗ Not running"
+echo -n "  Radarr: "
+docker ps --format "{{.Names}}" | grep -q radarr && echo "✓ Running" || echo "✗ Not running"
+echo -n "  Readarr: "
+docker ps --format "{{.Names}}" | grep -q readarr && echo "✓ Running" || echo "✗ Not running"
 echo ""
 
 # Check last backup time
@@ -67,6 +75,10 @@ HA_LAST=$(ls -lt /mnt/tank/backups/homelab/homeassistant/db-*.sqlite3 2>/dev/nul
 JELLYFIN_LAST=$(ls -lt /mnt/tank/backups/homelab/jellyfin/full-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
 TAILSCALE_LAST=$(ls -lt /mnt/tank/backups/homelab/tailscale/state-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
 TRAEFIK_LAST=$(ls -lt /mnt/tank/backups/homelab/traefik/acme-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
+PROWLARR_LAST=$(ls -lt /mnt/tank/backups/homelab/prowlarr/full-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
+SONARR_LAST=$(ls -lt /mnt/tank/backups/homelab/sonarr/full-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
+RADARR_LAST=$(ls -lt /mnt/tank/backups/homelab/radarr/full-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
+READARR_LAST=$(ls -lt /mnt/tank/backups/homelab/readarr/full-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
 
 echo "  Immich:          ${IMMICH_LAST:-No backups found}"
 echo "  Vaultwarden:     ${VAULT_LAST:-No backups found}"
@@ -75,6 +87,10 @@ echo "  Home Assistant:  ${HA_LAST:-No backups found}"
 echo "  Jellyfin:        ${JELLYFIN_LAST:-No backups found}"
 echo "  Tailscale:       ${TAILSCALE_LAST:-No backups found}"
 echo "  Traefik:         ${TRAEFIK_LAST:-No backups found}"
+echo "  Prowlarr:        ${PROWLARR_LAST:-No backups found}"
+echo "  Sonarr:          ${SONARR_LAST:-No backups found}"
+echo "  Radarr:          ${RADARR_LAST:-No backups found}"
+echo "  Readarr:         ${READARR_LAST:-No backups found}"
 echo ""
 
 # Check backup counts
@@ -91,6 +107,11 @@ HA_CONFIG_COUNT=$(ls -1 /mnt/tank/backups/homelab/homeassistant/config-*.tar.gz 
 JELLYFIN_COUNT=$(ls -1 /mnt/tank/backups/homelab/jellyfin/full-*.tar.gz 2>/dev/null | wc -l)
 TAILSCALE_COUNT=$(ls -1 /mnt/tank/backups/homelab/tailscale/state-*.tar.gz 2>/dev/null | wc -l)
 TRAEFIK_COUNT=$(ls -1 /mnt/tank/backups/homelab/traefik/acme-*.tar.gz 2>/dev/null | wc -l)
+PROWLARR_COUNT=$(ls -1 /mnt/tank/backups/homelab/prowlarr/full-*.tar.gz 2>/dev/null | wc -l)
+SONARR_COUNT=$(ls -1 /mnt/tank/backups/homelab/sonarr/full-*.tar.gz 2>/dev/null | wc -l)
+RADARR_COUNT=$(ls -1 /mnt/tank/backups/homelab/radarr/full-*.tar.gz 2>/dev/null | wc -l)
+READARR_COUNT=$(ls -1 /mnt/tank/backups/homelab/readarr/full-*.tar.gz 2>/dev/null | wc -l)
+READARR_CONFIG_COUNT=$(ls -1 /mnt/tank/backups/homelab/readarr/config-*.tar.gz 2>/dev/null | wc -l)
 
 echo "  Immich:          $IMMICH_DB_COUNT databases, $IMMICH_STORAGE_COUNT storage backups"
 echo "  Vaultwarden:     $VAULT_DB_COUNT databases, $VAULT_RSA_COUNT RSA keys, $VAULT_ATT_COUNT attachments"
@@ -99,6 +120,10 @@ echo "  Home Assistant:  $HA_DB_COUNT databases, $HA_ZIGBEE_COUNT zigbee DBs, $H
 echo "  Jellyfin:        $JELLYFIN_COUNT full backups"
 echo "  Tailscale:       $TAILSCALE_COUNT state backups"
 echo "  Traefik:         $TRAEFIK_COUNT certificate backups"
+echo "  Prowlarr:        $PROWLARR_COUNT full backups"
+echo "  Sonarr:          $SONARR_COUNT full backups"
+echo "  Radarr:          $RADARR_COUNT full backups"
+echo "  Readarr:         $READARR_COUNT full backups"
 echo ""
 
 # Validate Vaultwarden backup set integrity
@@ -203,7 +228,7 @@ echo ""
 
 # Check backup sizes
 echo "Total backup sizes:"
-du -sh /mnt/tank/backups/homelab/immich /mnt/tank/backups/homelab/vaultwarden /mnt/tank/backups/homelab/wiki /mnt/tank/backups/homelab/homeassistant /mnt/tank/backups/homelab/jellyfin /mnt/tank/backups/homelab/tailscale /mnt/tank/backups/homelab/traefik 2>/dev/null
+du -sh /mnt/tank/backups/homelab/immich /mnt/tank/backups/homelab/vaultwarden /mnt/tank/backups/homelab/wiki /mnt/tank/backups/homelab/homeassistant /mnt/tank/backups/homelab/jellyfin /mnt/tank/backups/homelab/tailscale /mnt/tank/backups/homelab/traefik /mnt/tank/backups/homelab/prowlarr /mnt/tank/backups/homelab/sonarr /mnt/tank/backups/homelab/radarr /mnt/tank/backups/homelab/readarr 2>/dev/null
 if [ -d "$TRUENAS_BACKUP_DIR" ]; then
   du -sh "$TRUENAS_BACKUP_DIR" 2>/dev/null | awk '{print $1 "\t" $2}'
 fi
