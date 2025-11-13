@@ -38,8 +38,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
+      - "traefik.http.routers.seedbox.entrypoints=https"
       - "traefik.http.routers.seedbox.rule=Host(`seedbox.corsair.tf`)"
-      - "traefik.http.routers.seedbox.middlewares=traefik-auth@file,security@file"
+      - "traefik.http.routers.seedbox.middlewares=private@file,security@file"
       - "traefik.http.routers.seedbox.service=seedbox"
       - "traefik.http.services.seedbox.loadbalancer.server.port=9091"
 
@@ -118,7 +119,7 @@ services:
       - "traefik.docker.network=traefik"
       - "traefik.http.routers.prowlarr.entrypoints=https"
       - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.corsair.tf`)"
-      - "traefik.http.routers.prowlarr.middlewares=security@file"
+      - "traefik.http.routers.prowlarr.middlewares=private@file,security@file"
       - "traefik.http.routers.prowlarr.service=prowlarr"
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
 
@@ -145,8 +146,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
+      - "traefik.http.routers.shows.entrypoints=https"
       - "traefik.http.routers.shows.rule=Host(`shows.corsair.tf`)"
-      - "traefik.http.routers.shows.middlewares=security@file"
+      - "traefik.http.routers.shows.middlewares=private@file,security@file"
       - "traefik.http.routers.shows.service=shows"
       - "traefik.http.services.shows.loadbalancer.server.port=8989"
 
@@ -173,8 +175,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
+      - "traefik.http.routers.movies.entrypoints=https"
       - "traefik.http.routers.movies.rule=Host(`movies.corsair.tf`)"
-      - "traefik.http.routers.movies.middlewares=security@file"
+      - "traefik.http.routers.movies.middlewares=private@file,security@file"
       - "traefik.http.routers.movies.service=movies"
       - "traefik.http.services.movies.loadbalancer.server.port=7878"
 
@@ -201,8 +204,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
+      - "traefik.http.routers.readarr.entrypoints=https"
       - "traefik.http.routers.readarr.rule=Host(`readarr.corsair.tf`)"
-      - "traefik.http.routers.readarr.middlewares=security@file"
+      - "traefik.http.routers.readarr.middlewares=private@file,security@file"
       - "traefik.http.routers.readarr.service=readarr"
       - "traefik.http.services.readarr.loadbalancer.server.port=8787"
 

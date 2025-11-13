@@ -1,18 +1,17 @@
 http:
   routers:
-    livebox:
+    adguard:
       entryPoints:
         - https
-      rule: "Host(`livebox.corsair.tf`)"
-      service: livebox
+      rule: "Host(`adguard.corsair.tf`)"
+      service: adguard
       priority: 1
       middlewares:
         - private@file
         - security@file
-
+        
   services:
-    livebox:
+    adguard:
       loadBalancer:
-        passHostHeader: false
         servers:
-          - url: "http://192.168.1.1:80"
+          - url: "http://192.168.1.8:3000"
