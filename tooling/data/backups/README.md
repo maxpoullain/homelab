@@ -42,12 +42,12 @@ tail -f /mnt/fast/apps/homelab/tooling/data/backups/backup-truenas.log
 
 #### 1. Services Backup (`backup-services.sh`)
 
-Backs up all 11 homelab services:
+Backs up all 13 homelab services:
 
 1. **Immich** - PostgreSQL database + storage files (library/upload/profile)
 2. **Vaultwarden** - SQLite database + RSA keys + attachments  
 3. **OtterWiki** - SQLite database
-4. **Home Assistant** - SQLite databases (main + zigbee) + YAML configs
+4. **Home Assistant** - SQLite database + YAML configs
 5. **Jellyfin** - Full backup (databases + metadata + plugins + settings)
 6. **Tailscale** - State files
 7. **Traefik** - SSL/TLS certificates (ACME)
@@ -55,6 +55,8 @@ Backs up all 11 homelab services:
 9. **Sonarr** - Full backup (databases + config files)
 10. **Radarr** - Full backup (databases + config files)
 11. **Readarr** - Full backup (databases + config files)
+12. **Zigbee2mqtt** - Full backup (configuration + database + coordinator backup)
+13. **AdGuard Home** - Full backup (configuration + filters + statistics database)
 
 #### 2. TrueNAS Config Backup (`backup-truenas.sh`)
 
@@ -90,7 +92,11 @@ Backs up TrueNAS system configuration:
 │   │   └── full-[type]-[date].tar.gz
 │   ├── radarr/
 │   │   └── full-[type]-[date].tar.gz
-│   └── readarr/
+│   ├── readarr/
+│   │   └── full-[type]-[date].tar.gz
+│   ├── zigbee2mqtt/
+│   │   └── full-[type]-[date].tar.gz
+│   └── adguard/
 │       └── full-[type]-[date].tar.gz
 └── truenas/              # TrueNAS config backups
     ├── daily-20251026-1800/
@@ -115,7 +121,9 @@ tooling/data/backups/services/
 ├── prowlarr-restore.md
 ├── sonarr-restore.md
 ├── radarr-restore.md
-└── readarr-restore.md
+├── readarr-restore.md
+├── zigbee2mqtt-restore.md
+└── adguard-restore.md
 ```
 
 ## Backup Types & Retention
@@ -160,7 +168,7 @@ Example filenames:
 - **Method**: Safe while running, no locking
 
 ### Home Assistant
-- **Databases**: Python SQLite Online Backup API (main + zigbee)
+- **Database**: Python SQLite Online Backup API (main database only)
 - **Configs**: Tar of YAML files
 - **Method**: Safe while running
 
@@ -202,6 +210,21 @@ Example filenames:
 - **Includes**: Databases, config.xml
 - **Excludes**: Logs, built-in Backups folder, MediaCover
 - **Method**: Direct file backup (same as Jellyfin)
+
+### Zigbee2mqtt
+- **Full backup**: Tar of entire zigbee2mqtt directory
+- **Includes**: configuration.yaml (network keys, device mappings), database.db (device state and pairings), coordinator_backup.json (coordinator state), configuration backup files
+- **Excludes**: Log files only
+- **Critical**: Contains Zigbee network keys and device pairings - losing this means re-pairing all devices
+- **Method**: File backup
+- **Note**: Mosquitto (MQTT broker) is NOT backed up - it only stores ephemeral data. Mosquitto config is version-controlled in git.
+
+### AdGuard Home
+- **Full backup**: Tar of entire adguard directory
+- **Includes**: AdGuardHome.yaml (configuration), filters, statistics database, blocklists
+- **Excludes**: sessions.db (temporary sessions), large query log files (querylog.json)
+- **Method**: File backup
+- **Size**: Small (~1-10MB depending on statistics retention)
 
 ## TrueNAS Configuration Backup
 
@@ -553,7 +576,7 @@ sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh --list
 sudo /mnt/fast/apps/homelab/tooling/data/backups/backup-services.sh --help
 ```
 
-Available services: `immich`, `vaultwarden`, `otterwiki`, `homeassistant`, `jellyfin`, `tailscale`, `traefik`, `prowlarr`, `sonarr`, `radarr`, `readarr`
+Available services: `immich`, `vaultwarden`, `otterwiki`, `homeassistant`, `jellyfin`, `tailscale`, `traefik`, `prowlarr`, `sonarr`, `radarr`, `readarr`, `zigbee2mqtt`, `adguard`
 
 **Note**: If no services are specified, all services will be backed up (default behavior for cron jobs).
 

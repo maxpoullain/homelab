@@ -8,8 +8,6 @@ services:
       - apparmor:unconfined
       - no-new-privileges:true
     network_mode: "host"
-    devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
     volumes:
       - ./ha:/config
       - /etc/localtime:/etc/localtime:ro
@@ -19,3 +17,66 @@ services:
       PUID: 3000
       PGID: 3002
       TZ: "Europe/Paris"
+    depends_on:
+      - mosquitto
+
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto:latest
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+      - no-new-privileges:true
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    environment:
+      PUID: 3000
+      PGID: 3002
+      TZ: "Europe/Paris"
+    networks:
+      - home
+
+  z2m:
+    container_name: zigbee2mqtt
+    image: koenkk/zigbee2mqtt:latest
+    restart: unless-stopped
+    user: 3000:3002
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+      - no-new-privileges:true
+    group_add:
+        - dialout
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    volumes:
+      - ./zigbee2mqtt:/app/data
+      - /run/udev:/run/udev:ro
+    environment:
+      PUID: 3000
+      PGID: 3002
+      TZ: "Europe/Paris"
+    networks:
+      - traefik
+      - home
+    depends_on:
+      - mosquitto
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.z2m.entrypoints=https"
+      - "traefik.http.routers.z2m.rule=Host(`zigbee.corsair.tf`)"
+      - "traefik.http.routers.z2m.middlewares=private@file,security@file"
+      - "traefik.http.routers.z2m.service=z2m"
+      - "traefik.http.services.z2m.loadbalancer.server.port=8080"
+
+networks:
+  traefik:
+    external: true
+  home:
+    external: true

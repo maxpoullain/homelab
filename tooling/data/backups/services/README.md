@@ -11,6 +11,8 @@ Detailed restore documentation for each homelab service.
 - [Jellyfin](./jellyfin.md) - Full backup (databases + metadata + plugins)
 - [Tailscale](./tailscale.md) - State files
 - [Traefik](./traefik.md) - SSL/TLS certificates
+- [Zigbee2mqtt](./zigbee2mqtt-restore.md) - Configuration + database + coordinator backup
+- [AdGuard Home](./adguard-restore.md) - Configuration + filters + statistics database
 
 ## Backup Location
 
