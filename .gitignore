@@ -1,9 +1,15 @@
 **/secrets.env
 **/.env
+adguard/conf/*
+adguard/work/*
 dashy/config/conf.yml
 dashy/config/health.yml
 dashy/config/config-backups/*
 home/ha/*
+home/mosquitto/*
+!home/mosquitto/config/
+!home/mosquitto/config/*.conf
+home/zigbee2mqtt/*
 immich/storage/*
 immich/postgres/*
 media/pia/*

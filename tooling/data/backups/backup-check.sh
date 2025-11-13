@@ -64,6 +64,10 @@ echo -n "  Radarr: "
 docker ps --format "{{.Names}}" | grep -q radarr && echo "✓ Running" || echo "✗ Not running"
 echo -n "  Readarr: "
 docker ps --format "{{.Names}}" | grep -q readarr && echo "✓ Running" || echo "✗ Not running"
+echo -n "  Zigbee2mqtt: "
+docker ps --format "{{.Names}}" | grep -q zigbee2mqtt && echo "✓ Running" || echo "✗ Not running"
+echo -n "  AdGuard: "
+docker ps --format "{{.Names}}" | grep -q adguard && echo "✓ Running" || echo "✗ Not running"
 echo ""
 
 # Check last backup time
@@ -79,6 +83,8 @@ PROWLARR_LAST=$(ls -lt /mnt/tank/backups/homelab/prowlarr/full-*.tar.gz 2>/dev/n
 SONARR_LAST=$(ls -lt /mnt/tank/backups/homelab/sonarr/full-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
 RADARR_LAST=$(ls -lt /mnt/tank/backups/homelab/radarr/full-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
 READARR_LAST=$(ls -lt /mnt/tank/backups/homelab/readarr/full-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
+Z2M_LAST=$(ls -lt /mnt/tank/backups/homelab/zigbee2mqtt/full-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
+ADGUARD_LAST=$(ls -lt /mnt/tank/backups/homelab/adguard/full-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
 
 echo "  Immich:          ${IMMICH_LAST:-No backups found}"
 echo "  Vaultwarden:     ${VAULT_LAST:-No backups found}"
@@ -91,6 +97,8 @@ echo "  Prowlarr:        ${PROWLARR_LAST:-No backups found}"
 echo "  Sonarr:          ${SONARR_LAST:-No backups found}"
 echo "  Radarr:          ${RADARR_LAST:-No backups found}"
 echo "  Readarr:         ${READARR_LAST:-No backups found}"
+echo "  Zigbee2mqtt:     ${Z2M_LAST:-No backups found}"
+echo "  AdGuard:         ${ADGUARD_LAST:-No backups found}"
 echo ""
 
 # Check backup counts
@@ -102,7 +110,6 @@ VAULT_RSA_COUNT=$(ls -1 /mnt/tank/backups/homelab/vaultwarden/rsa_key-*.pem 2>/d
 VAULT_ATT_COUNT=$(ls -1 /mnt/tank/backups/homelab/vaultwarden/attachments-*.tar.gz 2>/dev/null | wc -l)
 WIKI_COUNT=$(ls -1 /mnt/tank/backups/homelab/wiki/db-*.sqlite3 2>/dev/null | wc -l)
 HA_DB_COUNT=$(ls -1 /mnt/tank/backups/homelab/homeassistant/db-*.sqlite3 2>/dev/null | wc -l)
-HA_ZIGBEE_COUNT=$(ls -1 /mnt/tank/backups/homelab/homeassistant/zigbee-*.sqlite3 2>/dev/null | wc -l)
 HA_CONFIG_COUNT=$(ls -1 /mnt/tank/backups/homelab/homeassistant/config-*.tar.gz 2>/dev/null | wc -l)
 JELLYFIN_COUNT=$(ls -1 /mnt/tank/backups/homelab/jellyfin/full-*.tar.gz 2>/dev/null | wc -l)
 TAILSCALE_COUNT=$(ls -1 /mnt/tank/backups/homelab/tailscale/state-*.tar.gz 2>/dev/null | wc -l)
@@ -112,11 +119,13 @@ SONARR_COUNT=$(ls -1 /mnt/tank/backups/homelab/sonarr/full-*.tar.gz 2>/dev/null 
 RADARR_COUNT=$(ls -1 /mnt/tank/backups/homelab/radarr/full-*.tar.gz 2>/dev/null | wc -l)
 READARR_COUNT=$(ls -1 /mnt/tank/backups/homelab/readarr/full-*.tar.gz 2>/dev/null | wc -l)
 READARR_CONFIG_COUNT=$(ls -1 /mnt/tank/backups/homelab/readarr/config-*.tar.gz 2>/dev/null | wc -l)
+Z2M_COUNT=$(ls -1 /mnt/tank/backups/homelab/zigbee2mqtt/full-*.tar.gz 2>/dev/null | wc -l)
+ADGUARD_COUNT=$(ls -1 /mnt/tank/backups/homelab/adguard/full-*.tar.gz 2>/dev/null | wc -l)
 
 echo "  Immich:          $IMMICH_DB_COUNT databases, $IMMICH_STORAGE_COUNT storage backups"
 echo "  Vaultwarden:     $VAULT_DB_COUNT databases, $VAULT_RSA_COUNT RSA keys, $VAULT_ATT_COUNT attachments"
 echo "  OtterWiki:       $WIKI_COUNT databases"
-echo "  Home Assistant:  $HA_DB_COUNT databases, $HA_ZIGBEE_COUNT zigbee DBs, $HA_CONFIG_COUNT configs"
+echo "  Home Assistant:  $HA_DB_COUNT databases, $HA_CONFIG_COUNT configs"
 echo "  Jellyfin:        $JELLYFIN_COUNT full backups"
 echo "  Tailscale:       $TAILSCALE_COUNT state backups"
 echo "  Traefik:         $TRAEFIK_COUNT certificate backups"
@@ -124,6 +133,8 @@ echo "  Prowlarr:        $PROWLARR_COUNT full backups"
 echo "  Sonarr:          $SONARR_COUNT full backups"
 echo "  Radarr:          $RADARR_COUNT full backups"
 echo "  Readarr:         $READARR_COUNT full backups"
+echo "  Zigbee2mqtt:     $Z2M_COUNT full backups"
+echo "  AdGuard:         $ADGUARD_COUNT full backups"
 echo ""
 
 # Validate Vaultwarden backup set integrity
@@ -136,24 +147,6 @@ else
   echo "    RSA keys:  $VAULT_RSA_COUNT"
   echo "    Attachments: $VAULT_ATT_COUNT"
   echo "    Each backup should have 1 database + 1 RSA key + 1 attachment archive"
-fi
-echo ""
-
-# Validate Home Assistant backup set integrity
-echo "Home Assistant backup set validation:"
-if [ $HA_DB_COUNT -gt 0 ]; then
-  echo "  ✓ Main database backups found: $HA_DB_COUNT"
-  if [ $HA_ZIGBEE_COUNT -eq $HA_DB_COUNT ]; then
-    echo "  ✓ Complete backup sets: All main databases have matching Zigbee databases"
-  elif [ $HA_ZIGBEE_COUNT -eq 0 ]; then
-    echo "  ℹ No Zigbee databases (may not be configured)"
-  else
-    echo "  ⚠ WARNING: Partial Zigbee backups detected!"
-    echo "    Main databases: $HA_DB_COUNT"
-    echo "    Zigbee databases: $HA_ZIGBEE_COUNT"
-  fi
-else
-  echo "  ✗ No Home Assistant backups found"
 fi
 echo ""
 
@@ -228,7 +221,7 @@ echo ""
 
 # Check backup sizes
 echo "Total backup sizes:"
-du -sh /mnt/tank/backups/homelab/immich /mnt/tank/backups/homelab/vaultwarden /mnt/tank/backups/homelab/wiki /mnt/tank/backups/homelab/homeassistant /mnt/tank/backups/homelab/jellyfin /mnt/tank/backups/homelab/tailscale /mnt/tank/backups/homelab/traefik /mnt/tank/backups/homelab/prowlarr /mnt/tank/backups/homelab/sonarr /mnt/tank/backups/homelab/radarr /mnt/tank/backups/homelab/readarr 2>/dev/null
+du -sh /mnt/tank/backups/homelab/immich /mnt/tank/backups/homelab/vaultwarden /mnt/tank/backups/homelab/wiki /mnt/tank/backups/homelab/homeassistant /mnt/tank/backups/homelab/jellyfin /mnt/tank/backups/homelab/tailscale /mnt/tank/backups/homelab/traefik /mnt/tank/backups/homelab/prowlarr /mnt/tank/backups/homelab/sonarr /mnt/tank/backups/homelab/radarr /mnt/tank/backups/homelab/readarr /mnt/tank/backups/homelab/zigbee2mqtt /mnt/tank/backups/homelab/adguard 2>/dev/null
 if [ -d "$TRUENAS_BACKUP_DIR" ]; then
   du -sh "$TRUENAS_BACKUP_DIR" 2>/dev/null | awk '{print $1 "\t" $2}'
 fi

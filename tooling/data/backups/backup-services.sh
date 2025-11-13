@@ -22,7 +22,7 @@ DAY_OF_MONTH=$(date +%d)
 HOUR=$(date +%H)
 
 # Available services
-AVAILABLE_SERVICES=(immich vaultwarden otterwiki homeassistant jellyfin tailscale traefik prowlarr sonarr radarr readarr)
+AVAILABLE_SERVICES=(immich vaultwarden otterwiki homeassistant jellyfin tailscale traefik prowlarr sonarr radarr readarr zigbee2mqtt adguard)
 
 # Parse command line arguments
 SELECTED_SERVICES=()
@@ -132,7 +132,7 @@ log "=========================================="
 log ""
 
 # Create backup directories if they don't exist
-mkdir -p "$BACKUP_DIR"/{immich,vaultwarden,wiki,homeassistant,jellyfin,tailscale,traefik,prowlarr,sonarr,radarr,readarr}
+mkdir -p "$BACKUP_DIR"/{immich,vaultwarden,wiki,homeassistant,jellyfin,tailscale,traefik,prowlarr,sonarr,radarr,readarr,zigbee2mqtt,adguard}
 
 # ============================================
 # IMMICH - PostgreSQL Database + Storage
@@ -336,34 +336,17 @@ if docker ps --format "{{.Names}}" | grep -q "^ha$"; then
     log "  ✗ Main database backup failed - Python backup command failed"
     HA_SUCCESS=false
   fi
-  
-  # 2. Backup Zigbee database (if exists)
-  HA_ZIGBEE_FILE="$BACKUP_DIR/homeassistant/zigbee-${BACKUP_TYPE}-$DATE.sqlite3"
-  
-  if docker exec ha python3 -c "import sqlite3; src=sqlite3.connect('/config/zigbee.db'); dst=sqlite3.connect('/tmp/zigbee-backup.db'); src.backup(dst); src.close(); dst.close()" 2>&1 | tee -a "$LOG_FILE"; then
-    if docker cp "ha:/tmp/zigbee-backup.db" "$HA_ZIGBEE_FILE" 2>&1; then
-      HA_ZIGBEE_SIZE=$(du -h "$HA_ZIGBEE_FILE" | cut -f1)
-      log "  ✓ Zigbee database backed up: zigbee-${BACKUP_TYPE}-$DATE.sqlite3 ($HA_ZIGBEE_SIZE)"
-      docker exec ha rm -f /tmp/zigbee-backup.db 2>/dev/null
-    else
-      log "  ✗ Zigbee database backup failed - could not copy backup file"
-      HA_SUCCESS=false
-    fi
-  else
-    log "  ℹ Zigbee database backup skipped (may not exist if no Zigbee devices)"
-  fi
 else
   log "  ✗ ha container not running"
   HA_SUCCESS=false
 fi
 
-# 3. Backup YAML configuration files
+# 2. Backup YAML configuration files
 if [ -d "$APPS_BASE/home/ha" ] && [ "$HA_SUCCESS" = true ]; then
   HA_CONFIG_FILE="$BACKUP_DIR/homeassistant/config-${BACKUP_TYPE}-$DATE.tar.gz"
   
   tar -czf "$HA_CONFIG_FILE" \
     --exclude="home-assistant_v2.db*" \
-    --exclude="zigbee.db*" \
     --exclude="*.log*" \
     --exclude=".storage" \
     --exclude="deps" \
@@ -641,6 +624,75 @@ log ""
 fi
 
 # ============================================
+# ZIGBEE2MQTT - Configuration + Database + Coordinator Backup
+# ============================================
+if should_backup "zigbee2mqtt"; then
+log "Backing up Zigbee2mqtt (config + database + coordinator)..."
+Z2M_SUCCESS=true
+
+if [ -d "$APPS_BASE/home/zigbee2mqtt" ]; then
+  Z2M_FILE="$BACKUP_DIR/zigbee2mqtt/full-${BACKUP_TYPE}-$DATE.tar.gz"
+  
+  tar -czf "$Z2M_FILE" \
+    --exclude="log" \
+    -C "$APPS_BASE/home" zigbee2mqtt 2>&1 | grep -v "Removing leading" || true
+  
+  if [ -f "$Z2M_FILE" ]; then
+    Z2M_SIZE=$(du -h "$Z2M_FILE" | cut -f1)
+    log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($Z2M_SIZE)"
+    log "    Includes: configuration.yaml, database.db, coordinator_backup.json"
+    log "    Critical: Network keys, device pairings, coordinator state"
+    SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Zigbee2mqtt: ✓ SUCCESS\n"
+  else
+    log "  ✗ Backup failed"
+    FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Zigbee2mqtt: ✗ FAILED\n"
+  fi
+else
+  log "  ✗ Zigbee2mqtt directory not found"
+  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+  BACKUP_STATUS="${BACKUP_STATUS}Zigbee2mqtt: ✗ FAILED\n"
+fi
+log ""
+fi
+
+# ============================================
+# ADGUARD - Configuration + Database
+# ============================================
+if should_backup "adguard"; then
+log "Backing up AdGuard Home (config + database)..."
+ADGUARD_SUCCESS=true
+
+if [ -d "$APPS_BASE/adguard" ]; then
+  ADGUARD_FILE="$BACKUP_DIR/adguard/full-${BACKUP_TYPE}-$DATE.tar.gz"
+  
+  tar -czf "$ADGUARD_FILE" \
+    --exclude="work/data/sessions.db" \
+    --exclude="work/data/querylog.json*" \
+    -C "$APPS_BASE" adguard 2>&1 | grep -v "Removing leading" || true
+  
+  if [ -f "$ADGUARD_FILE" ]; then
+    ADGUARD_SIZE=$(du -h "$ADGUARD_FILE" | cut -f1)
+    log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($ADGUARD_SIZE)"
+    log "    Includes: AdGuardHome.yaml (config), filters, stats database"
+    log "    Excludes: sessions.db, large query logs"
+    SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}AdGuard: ✓ SUCCESS\n"
+  else
+    log "  ✗ Backup failed"
+    FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}AdGuard: ✗ FAILED\n"
+  fi
+else
+  log "  ✗ AdGuard directory not found"
+  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+  BACKUP_STATUS="${BACKUP_STATUS}AdGuard: ✗ FAILED\n"
+fi
+log ""
+fi
+
+# ============================================
 # Cleanup Old Backups
 # ============================================
 log "Cleaning up old backups..."
@@ -648,30 +700,30 @@ log "Cleaning up old backups..."
 # Cleanup twice-daily backups (older than 3 days)
 # Only delete core backup files (databases, configs, storage) - NOT RSA keys or attachments
 log "  Twice-daily backups (>3 days)..."
-TWICE_DAILY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "logs-*twice-daily*.sqlite3" -o -name "zigbee-*twice-daily*.sqlite3" -o -name "*twice-daily*.tar.gz" \) | wc -l)
-find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "logs-*twice-daily*.sqlite3" -o -name "zigbee-*twice-daily*.sqlite3" -o -name "*twice-daily*.tar.gz" \) -mtime +3 -delete 2>&1
-TWICE_DAILY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "logs-*twice-daily*.sqlite3" -o -name "zigbee-*twice-daily*.sqlite3" -o -name "*twice-daily*.tar.gz" \) | wc -l)
+TWICE_DAILY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "full-*twice-daily*.tar.gz" -o -name "*twice-daily*.tar.gz" \) | wc -l)
+find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "full-*twice-daily*.tar.gz" -o -name "*twice-daily*.tar.gz" \) -mtime +3 -delete 2>&1
+TWICE_DAILY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "full-*twice-daily*.tar.gz" -o -name "*twice-daily*.tar.gz" \) | wc -l)
 log "    Deleted $((TWICE_DAILY_BEFORE - TWICE_DAILY_AFTER)) twice-daily backups, $TWICE_DAILY_AFTER remaining"
 
 # Cleanup daily backups (older than 7 days)
 log "  Daily backups (>7 days)..."
-DAILY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "logs-*daily*.sqlite3" -o -name "zigbee-*daily*.sqlite3" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" | wc -l)
-find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "logs-*daily*.sqlite3" -o -name "zigbee-*daily*.sqlite3" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" -mtime +7 -delete 2>&1
-DAILY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "logs-*daily*.sqlite3" -o -name "zigbee-*daily*.sqlite3" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" | wc -l)
+DAILY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "full-*daily*.tar.gz" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" | wc -l)
+find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "full-*daily*.tar.gz" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" -mtime +7 -delete 2>&1
+DAILY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "full-*daily*.tar.gz" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" | wc -l)
 log "    Deleted $((DAILY_BEFORE - DAILY_AFTER)) daily backups, $DAILY_AFTER remaining"
 
 # Cleanup weekly backups (older than 28 days / 4 weeks)
 log "  Weekly backups (>28 days)..."
-WEEKLY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "logs-*weekly*.sqlite3" -o -name "zigbee-*weekly*.sqlite3" -o -name "*weekly*.tar.gz" \) | wc -l)
-find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "logs-*weekly*.sqlite3" -o -name "zigbee-*weekly*.sqlite3" -o -name "*weekly*.tar.gz" \) -mtime +28 -delete 2>&1
-WEEKLY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "logs-*weekly*.sqlite3" -o -name "zigbee-*weekly*.sqlite3" -o -name "*weekly*.tar.gz" \) | wc -l)
+WEEKLY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "full-*weekly*.tar.gz" -o -name "*weekly*.tar.gz" \) | wc -l)
+find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "full-*weekly*.tar.gz" -o -name "*weekly*.tar.gz" \) -mtime +28 -delete 2>&1
+WEEKLY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "full-*weekly*.tar.gz" -o -name "*weekly*.tar.gz" \) | wc -l)
 log "    Deleted $((WEEKLY_BEFORE - WEEKLY_AFTER)) weekly backups, $WEEKLY_AFTER remaining"
 
 # Cleanup monthly backups (older than 180 days / 6 months)
 log "  Monthly backups (>180 days)..."
-MONTHLY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "logs-*monthly*.sqlite3" -o -name "zigbee-*monthly*.sqlite3" -o -name "*monthly*.tar.gz" \) | wc -l)
-find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "logs-*monthly*.sqlite3" -o -name "zigbee-*monthly*.sqlite3" -o -name "*monthly*.tar.gz" \) -mtime +180 -delete 2>&1
-MONTHLY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "logs-*monthly*.sqlite3" -o -name "zigbee-*monthly*.sqlite3" -o -name "*monthly*.tar.gz" \) | wc -l)
+MONTHLY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "full-*monthly*.tar.gz" -o -name "*monthly*.tar.gz" \) | wc -l)
+find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "full-*monthly*.tar.gz" -o -name "*monthly*.tar.gz" \) -mtime +180 -delete 2>&1
+MONTHLY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "full-*monthly*.tar.gz" -o -name "*monthly*.tar.gz" \) | wc -l)
 log "    Deleted $((MONTHLY_BEFORE - MONTHLY_AFTER)) monthly backups, $MONTHLY_AFTER remaining"
 
 # Cleanup orphaned Vaultwarden files (no matching database backup)
