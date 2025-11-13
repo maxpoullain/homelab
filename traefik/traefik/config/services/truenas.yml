@@ -1,17 +1,17 @@
 http:
   routers:
-    homeassistant:
+    truenas:
       entryPoints:
         - https
-      rule: "Host(`home.corsair.tf`)"
-      service: homeassistant
+      rule: "Host(`truenas.corsair.tf`)"
+      service: truenas
       priority: 1
       middlewares:
         - private@file
         - security-soft@file
         
   services:
-    homeassistant:
+    truenas:
       loadBalancer:
         servers:
-          - url: "http://192.168.1.8:8123"
+          - url: "http://192.168.1.8:8080"

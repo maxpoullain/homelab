@@ -12,7 +12,7 @@ http:
                     crowdsecMode: live
                     crowdsecAppsecEnabled: false
                     crowdsecAppsecHost: crowdsec:7422
-                    crowdsecLapiKey: ENC[AES256_GCM,data:MSf2uWZcxg1ONd6H6qMUZWdi9xn991erdpssJG+dcm0sJayJW90x7LvLsA==,iv:bjUdxdrd1orKmc4EOjd+C0RmmpegsdVG41Wd5LZuOaE=,tag:yDy7zMXvdMtFiRRtOKmisA==,type:str]
+                    crowdsecLapiKey: ENC[AES256_GCM,data:12V3vOx84avBQzYUdt6Jfm/gSkkn8pW4Pq56wbFfdBI5EOXgl0s5jkeO6w==,iv:bFiaRh2mmkuZwzWvbIz1EcGfFV3RfgHXDhyzqPw6aUc=,tag:WPWh8PdVciOGk6N1ukVtfA==,type:str]
                     crowdsecLapiHost: crowdsec:8080
                     crowdsecLapiScheme: http
                     forwardedHeadersCustomName: X-Custom-Header
@@ -126,6 +126,24 @@ http:
         # Compression
         compression:
             compress: {}
+        # Tailscale + Local network whitelist
+        private:
+            ipWhiteList:
+                sourceRange:
+                    # Tailscale CGNAT range
+                    - 100.64.0.0/10
+                    # Private networks (192.168.x.x)
+                    - 192.168.0.0/16
+                    # Private networks (10.x.x.x)
+                    - 10.0.0.0/8
+                    # Private networks (172.16-31.x.x)
+                    - 172.16.0.0/12
+                    # Localhost
+                    - 127.0.0.1/32
+                ipStrategy:
+                    # Use direct client IP, not X-Forwarded-For
+                    depth: 0
+                    excludedIPs: []
         # Standard security chain
         security:
             chain:
@@ -149,13 +167,13 @@ sops:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBNMFRlL0pSd3pFSk4yTDNI
-            elF6U05Xd1VLOHFOVWFVNzBHRWZqZGNHYkZjCmlkdFlmN0sxaHQ2Nkc2KzBGMXlS
-            US9oRUZFLy9qRHJIQXB5a3VwaDBoeVkKLS0tIHIvNFNYdEEwNkxrUU4ySFF0SzFD
-            ek1ITVBtV3ZkbWJzWlhua01YU3Z1QlkK75t7TbHCpXKZmzzj8rSaasvMqdpRLSxP
-            CThWhe/oNHyIGa7jrbfr9LzeLJ9DKNwRb9oOCW8Pj+O5vPQKq8NpEQ==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBBQTlRVXZpTHhCcGlPL3hh
+            TVRkM1dQTmdHZ2hDZHArWkxtbzBBQVpScDAwCjdVMWc5R0xHMk5QYW5sVi9mOHV0
+            U01NcW1YblNpc25RMys5VDZxem5DN1EKLS0tIFJwYlo4dXp6R2NmVE14Q3VxVklv
+            eDgzRnBWcDA1RStZZDhINXNqMVFtRFEK7vxsCZ695zKAoiPVSPT/5jperZEWOiVg
+            7/Z1rJavUK2zUkarBAwyWjAd68Us63+cfrCcl15pEh4oVu+UJVH0GQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-10-19T18:56:18Z"
-    mac: ENC[AES256_GCM,data:fhpZj8K0Xg/hf8KxLk1iz+VVyYH6bKeL775sFaM933dGBHJTlWyPXzclM8yVWEjQ3Vo1nCdP4LR2Ew9YwY6JvB4lyc7QUy2XjFnkn8KExznrDxK7xsIPgBw4EhR0B6Rd1kBqi3YERJ4yiAR1J7wJpF6TycrsUG0EJYR4beUhLw0=,iv:XBX78nAF6zcEYyRboPcvdu/Rjnr4obNIFYBH2rNxNbA=,tag:EzGKWMfIQD2AYd6HP3mnmw==,type:str]
-    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*DB_PASSWORD.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*DNS.*|.*POST_UP.*|.*PRE_DOWN.*|.*crowdsecLapiKey.*|.*TS_AUTHKEY.*)$
+    lastmodified: "2025-11-13T20:02:45Z"
+    mac: ENC[AES256_GCM,data:lENuX/doJvbUOL33K82LQzMR9NaOWHtj8lt+s8qHHQnrK15ifduc1jr1MDYVzJLqSDKHi7b1YLoktcVrI77UqKcAO5A4O82hCj/VPearMpGOu3VyEyHK5kucpcxbII4UoXCgVgiRxoTdeYsQuDjwucXvd17NBv56YMC/5qaS2rU=,iv:BY/siITcsDg5P5+UJeXGID9i4Po5ZG9YFbt4xDLIGiM=,tag:MX7gikocxeLy6/CmpZ3/vg==,type:str]
+    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*DB_PASSWORD.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*DNS.*|.*POST_UP.*|.*PRE_DOWN.*|.*crowdsecLapiKey.*|.*TS_AUTHKEY.*|.*OVH_APPLICATION_KEY.*|.*OVH_APPLICATION_SECRET.*|.*OVH_CONSUMER_KEY.*|.*SECRET_KEY.*)$
     version: 3.11.0

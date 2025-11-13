@@ -34,7 +34,7 @@ services:
       - "traefik.http.routers.jellyfin.entrypoints=https"
       - "traefik.http.routers.jellyfin.rule=Host(`tv.corsair.tf`)"
       - "traefik.http.routers.jellyfin.middlewares=jellyfin"
-      - "traefik.http.routers.jellyfin.middlewares=security-soft@file"
+      - "traefik.http.routers.jellyfin.middlewares=private@file,security-soft@file"
       - "traefik.http.middlewares.jellyfin.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
       - "traefik.http.middlewares.jellyfin.headers.SSLRedirect=true"
       - "traefik.http.middlewares.jellyfin.headers.SSLHost=tv.corsair.tf"
