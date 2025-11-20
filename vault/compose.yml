@@ -11,6 +11,7 @@ services:
       INVITATIONS_ALLOWED: "true"
     volumes:
       - /mnt/fast/dbs/homelab/vaultwarden:/data/
+    env_file: .env
     networks:
       - traefik
     labels:
