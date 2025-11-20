@@ -8,12 +8,11 @@ services:
     security_opt:
       - no-new-privileges:true
     group_add:
-      - "44"
-    # devices:
-    #   - /dev/vchiq:/dev/vchiq
-    #   - /dev/video10:/dev/video10
-    #   - /dev/video11:/dev/video11
-    #   - /dev/video12:/dev/video12
+      - "44"   # video group
+      - "107"  # render group
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      # - /dev/dri/card0:/dev/dri/card0
     networks:
       - traefik
     ports:
