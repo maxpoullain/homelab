@@ -24,6 +24,7 @@ media/radarr/*
 media/readarr/*
 media/sonarr/*
 media/transmission/*
+monitoring/beszel*
 tailscale/tailscale-data/*
 tooling/data/backups/backup-services.log
 tooling/data/backups/backup-services.log.old
