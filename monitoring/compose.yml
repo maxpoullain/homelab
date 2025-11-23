@@ -1,0 +1,54 @@
+services:
+  beszel:
+    image: henrygd/beszel:latest
+    container_name: beszel
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik
+    volumes:
+      - ./beszel_data:/beszel_data
+      - ./beszel_socket:/beszel_socket
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.beszel.entrypoints=https"
+      - "traefik.http.routers.beszel.rule=Host(`status.corsair.tf`)"
+      - "traefik.http.routers.beszel.middlewares=private@file,security@file"
+      - "traefik.http.routers.beszel.service=beszel"
+      - "traefik.http.services.beszel.loadbalancer.server.port=8090"
+
+  beszel-agent:
+    image: henrygd/beszel-agent-intel:latest
+    container_name: beszel-agent
+    restart: unless-stopped
+    network_mode: host
+    dns:
+      - 192.168.1.8
+    cap_add:
+      - SYS_RAWIO # required for S.M.A.R.T. data
+      - SYS_ADMIN # required for NVMe S.M.A.R.T. data
+      - CAP_PERFMON # required for Intel GPU
+    devices:
+      - /dev/sda:/dev/sda
+      - /dev/sdb:/dev/sdb
+      - /dev/sdc:/dev/sdc
+      - /dev/sdd:/dev/sdd
+      - /dev/nvme0:/dev/nvme0
+      - /dev/nvme1:/dev/nvme1
+      - /dev/dri/card0:/dev/dri/card0
+    volumes:
+      - ./beszel_agent_data:/var/lib/beszel-agent
+      - ./beszel_socket:/beszel_socket
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
+    env_file:
+      - .env
+    environment:
+      LISTEN: /beszel_socket/beszel.sock
+      HUB_URL: https://status.corsair.tf
+
+networks:
+  traefik:
+    external: true
