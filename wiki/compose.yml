@@ -7,6 +7,10 @@ services:
     cpus: 1
     mem_limit: 2048m
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik
     volumes:
       - ./otter/repository:/app-data/repository
       - ./otter/settings.cfg:/app-data/settings.cfg
@@ -15,8 +19,6 @@ services:
       - PUID=3000
       - PGID=3002
       - TZ=Europe/Paris
-    networks:
-      - traefik
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"

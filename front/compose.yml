@@ -21,7 +21,7 @@ services:
       - traefik.http.routers.traefik.rule=Host(`traefik.corsair.tf`)
       - traefik.http.routers.traefik.tls.domains[0].main=corsair.tf
       - traefik.http.routers.traefik.tls.domains[0].sans=*.corsair.tf
-      - traefik.http.routers.traefik.middlewares=private@file
+      - traefik.http.routers.traefik.middlewares=security@file,private@file,auth@docker
       - traefik.http.routers.traefik.service=api@internal
       - traefik.http.services.traefik.loadbalancer.server.port=443
 
@@ -32,17 +32,35 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      - COLLECTIONS=crowdsecurity/traefik crowdsecurity/http-cve
+      - COLLECTIONS=crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/linux Dominic-Wagner/vaultwarden
       - GID=3002
-      - CUSTOM_HOSTNAME=traefik-crowdsec
+      - UID=3000
+      - CUSTOM_HOSTNAME=crowdsec
     volumes:
       - ./crowdsec/config:/etc/crowdsec
       - ./crowdsec/data:/var/lib/crowdsec/data
       - ./traefik/logs:/var/log/traefik:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - traefik
+
+  tinyauth:
+    image: ghcr.io/steveiliop56/tinyauth:v4
+    container_name: tinyauth
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik
+    env_file:
+      - .env
     labels:
-      - "traefik.enable=false"
+      - traefik.enable=true
+      - traefik.http.routers.auth.entrypoints=https
+      - traefik.http.routers.auth.rule=Host(`auth.corsair.tf`)
+      - traefik.http.routers.auth.service=auth
+      - traefik.http.services.auth.loadbalancer.server.port=3000
+      - traefik.http.middlewares.auth.forwardauth.address=http://tinyauth:3000/api/auth/traefik
 
 networks:
   traefik:

@@ -10,12 +10,14 @@ services:
     volumes:
       - ./beszel_data:/beszel_data
       - ./beszel_socket:/beszel_socket
+    # environment:
+    #   - DISABLE_PASSWORD_AUTH=true
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
       - "traefik.http.routers.beszel.entrypoints=https"
       - "traefik.http.routers.beszel.rule=Host(`status.corsair.tf`)"
-      - "traefik.http.routers.beszel.middlewares=private@file,security@file"
+      - "traefik.http.routers.beszel.middlewares=security@file,private@file"
       - "traefik.http.routers.beszel.service=beszel"
       - "traefik.http.services.beszel.loadbalancer.server.port=8090"
 
@@ -23,9 +25,9 @@ services:
     image: henrygd/beszel-agent-intel:latest
     container_name: beszel-agent
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     network_mode: host
-    dns:
-      - 192.168.1.8
     cap_add:
       - SYS_RAWIO # required for S.M.A.R.T. data
       - SYS_ADMIN # required for NVMe S.M.A.R.T. data

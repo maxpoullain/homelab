@@ -1,0 +1,9 @@
+---
+source: docker
+use_container_labels: true
+
+---
+filenames:
+  - /var/log/traefik/access.log
+labels:
+  type: traefik

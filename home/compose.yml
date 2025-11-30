@@ -4,8 +4,6 @@ services:
     image: "ghcr.io/home-assistant/home-assistant:stable"
     restart: unless-stopped
     security_opt:
-      - seccomp:unconfined
-      - apparmor:unconfined
       - no-new-privileges:true
     network_mode: "host"
     volumes:
@@ -25,8 +23,6 @@ services:
     image: eclipse-mosquitto:latest
     restart: unless-stopped
     security_opt:
-      - seccomp:unconfined
-      - apparmor:unconfined
       - no-new-privileges:true
     ports:
       - "1883:1883"
@@ -47,8 +43,6 @@ services:
     restart: unless-stopped
     user: 3000:3002
     security_opt:
-      - seccomp:unconfined
-      - apparmor:unconfined
       - no-new-privileges:true
     group_add:
         - dialout
@@ -71,7 +65,7 @@ services:
       - "traefik.docker.network=traefik"
       - "traefik.http.routers.z2m.entrypoints=https"
       - "traefik.http.routers.z2m.rule=Host(`zigbee.corsair.tf`)"
-      - "traefik.http.routers.z2m.middlewares=private@file,security@file"
+      - "traefik.http.routers.z2m.middlewares=security@file,private@file,auth@docker"
       - "traefik.http.routers.z2m.service=z2m"
       - "traefik.http.services.z2m.loadbalancer.server.port=8080"
 

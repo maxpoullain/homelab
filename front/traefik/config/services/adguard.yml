@@ -3,15 +3,16 @@ http:
     adguard:
       entryPoints:
         - https
-      rule: "Host(`adguard.corsair.tf`)"
+      rule: "Host(`dns.corsair.tf`)"
       service: adguard
       priority: 1
       middlewares:
-        - private@file
         - security@file
+        - private@file
+        - auth@docker
         
   services:
     adguard:
       loadBalancer:
         servers:
-          - url: "http://192.168.1.8:3000"
+          - url: "http://172.17.0.1:3000"

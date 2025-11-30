@@ -310,13 +310,3 @@ For issues:
 3. Check AdGuard documentation: https://github.com/AdguardTeam/AdGuardHome/wiki
 4. Test DNS resolution: `dig @<server-ip> google.com`
 5. Verify port 53 is not blocked by firewall
-
-## Performance Considerations
-
-After restore, if you experience slow DNS:
-
-1. **Reduce statistics retention** - Settings → General settings
-2. **Clear old query logs** - Query log → Clear
-3. **Use faster upstream DNS** - Switch to Cloudflare 1.1.1.1
-4. **Reduce number of filter lists** - Disable unnecessary lists
-5. **Check system resources**: `docker stats adguard`

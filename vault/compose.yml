@@ -5,15 +5,17 @@ services:
     image: vaultwarden/server:latest
     container_name: vaultwarden
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik
+    volumes:
+      - /mnt/fast/dbs/homelab/vaultwarden:/data/
     environment:
       DOMAIN: "https://vault.corsair.tf"
       SIGNUPS_ALLOWED: "false"
       INVITATIONS_ALLOWED: "true"
-    volumes:
-      - /mnt/fast/dbs/homelab/vaultwarden:/data/
     env_file: .env
-    networks:
-      - traefik
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
@@ -22,6 +24,12 @@ services:
       - "traefik.http.routers.vault.middlewares=security@file"
       - "traefik.http.routers.vault.service=vault"
       - "traefik.http.services.vault.loadbalancer.server.port=80"
+      - "traefik.http.routers.vault-admin.entrypoints=https"
+      - "traefik.http.routers.vault-admin.rule=Host(`vault.corsair.tf`) && PathPrefix(`/admin`)"
+      - "traefik.http.routers.vault-admin.middlewares=security@file,auth@docker"
+      - "traefik.http.routers.vault-admin.service=vault"
+      - "crowdsec.enable=true"
+      - "crowdsec.labels.type=Vaultwarden"
 
 networks:
   traefik:
