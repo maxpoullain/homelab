@@ -1,0 +1,8 @@
+type: http
+name: homeassistant_webhook
+format: |
+  {"title": "CrowdSec Alert", "message": "{{$alert := index . 0}}{{$decision := index $alert.Decisions 0}}{{$flag := `🏴‍☠️`}}{{if eq $alert.Source.Cn `BR`}}{{$flag = `🇧🇷`}}{{else if eq $alert.Source.Cn `CN`}}{{$flag = `🇨🇳`}}{{else if eq $alert.Source.Cn `DE`}}{{$flag = `🇩🇪`}}{{else if eq $alert.Source.Cn `FR`}}{{$flag = `🇫🇷`}}{{else if eq $alert.Source.Cn `IN`}}{{$flag = `🇮🇳`}}{{else if eq $alert.Source.Cn `IR`}}{{$flag = `🇮🇷`}}{{else if eq $alert.Source.Cn `JP`}}{{$flag = `🇯🇵`}}{{else if eq $alert.Source.Cn `KR`}}{{$flag = `🇰🇷`}}{{else if eq $alert.Source.Cn `LV`}}{{$flag = `🇱🇻`}}{{else if eq $alert.Source.Cn `NG`}}{{$flag = `🇳🇬`}}{{else if eq $alert.Source.Cn `NL`}}{{$flag = `🇳🇱`}}{{else if eq $alert.Source.Cn `PK`}}{{$flag = `🇵🇰`}}{{else if eq $alert.Source.Cn `RU`}}{{$flag = `🇷🇺`}}{{else if eq $alert.Source.Cn `TR`}}{{$flag = `🇹🇷`}}{{else if eq $alert.Source.Cn `UA`}}{{$flag = `🇺🇦`}}{{else if eq $alert.Source.Cn `US`}}{{$flag = `🇺🇸`}}{{else if eq $alert.Source.Cn `VN`}}{{$flag = `🇻🇳`}}{{end}}{{if $alert.Source.Cn}}{{$flag}} {{$alert.Source.Cn}} [{{$alert.Source.IP}}](https://db-ip.com/{{$alert.Source.IP}}) banned for {{$decision.Duration}}.\nReason: **{{$alert.Scenario}}**{{else}}{{$flag}} Unknown country [{{$alert.Source.IP}}](https://db-ip.com/{{$alert.Source.IP}}) banned for {{$decision.Duration}}.\nReason: **{{$alert.Scenario}}**{{end}}"}
+url: https://home.corsair.tf/api/webhook/notifications-webhook-4FPLVfhymqyqWARwgYWqiEAo
+method: POST
+headers:
+  Content-Type: application/json

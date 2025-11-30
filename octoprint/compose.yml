@@ -3,10 +3,8 @@ services:
     container_name: octoprint
     image: octoprint/octoprint:latest
     restart: unless-stopped
-    # security_opt:
-    #   - seccomp:unconfined
-    #   - apparmor:unconfined
-    #   - no-new-privileges:true
+    security_opt:
+      - no-new-privileges:true
     ports:
       - 8888:80
     # devices:

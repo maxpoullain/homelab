@@ -4,6 +4,11 @@
 # Consolidates database and application backups for all services
 # Each service section handles its complete backup (databases + configs + files)
 #
+# NOTE: Service paths updated for 2025:
+#   - Tailscale:   $APPS_BASE/network/tailscale
+#   - Traefik:     $APPS_BASE/front/traefik
+#   - AdGuard:     $APPS_BASE/dns/adguard
+#
 # Usage:
 #   ./backup-services.sh                    # Backup all services
 #   ./backup-services.sh immich vaultwarden # Backup only specified services
@@ -428,13 +433,14 @@ if should_backup "tailscale"; then
 log "Backing up Tailscale (state files)..."
 TAILSCALE_SUCCESS=true
 
-if [ -d "$APPS_BASE/tailscale/tailscale-data" ]; then
+# Updated path: network/tailscale
+if [ -d "$APPS_BASE/network/tailscale" ]; then
   TAILSCALE_FILE="$BACKUP_DIR/tailscale/state-${BACKUP_TYPE}-$DATE.tar.gz"
   
   tar -czf "$TAILSCALE_FILE" \
     --exclude="*.log*" \
     --exclude="*.txt" \
-    -C "$APPS_BASE/tailscale" tailscale-data 2>&1 | grep -v "Removing leading" || true
+    -C "$APPS_BASE/network" tailscale 2>&1 | grep -v "Removing leading" || true
   
   if [ -f "$TAILSCALE_FILE" ]; then
     TAILSCALE_SIZE=$(du -h "$TAILSCALE_FILE" | cut -f1)
@@ -461,11 +467,12 @@ if should_backup "traefik"; then
 log "Backing up Traefik (SSL certificates)..."
 TRAEFIK_SUCCESS=true
 
-if [ -d "$APPS_BASE/traefik/traefik/acme" ]; then
+# Updated path: front/traefik/acme
+if [ -d "$APPS_BASE/front/traefik/acme" ]; then
   TRAEFIK_FILE="$BACKUP_DIR/traefik/acme-${BACKUP_TYPE}-$DATE.tar.gz"
   
   tar -czf "$TRAEFIK_FILE" \
-    -C "$APPS_BASE/traefik/traefik" acme 2>&1 | grep -v "Removing leading" || true
+    -C "$APPS_BASE/front/traefik" acme 2>&1 | grep -v "Removing leading" || true
   
   if [ -f "$TRAEFIK_FILE" ]; then
     TRAEFIK_SIZE=$(du -h "$TRAEFIK_FILE" | cut -f1)
@@ -664,13 +671,14 @@ if should_backup "adguard"; then
 log "Backing up AdGuard Home (config + database)..."
 ADGUARD_SUCCESS=true
 
-if [ -d "$APPS_BASE/adguard" ]; then
+# Updated path: dns/adguard
+if [ -d "$APPS_BASE/dns/adguard" ]; then
   ADGUARD_FILE="$BACKUP_DIR/adguard/full-${BACKUP_TYPE}-$DATE.tar.gz"
   
   tar -czf "$ADGUARD_FILE" \
     --exclude="work/data/sessions.db" \
     --exclude="work/data/querylog.json*" \
-    -C "$APPS_BASE" adguard 2>&1 | grep -v "Removing leading" || true
+    -C "$APPS_BASE/dns" adguard 2>&1 | grep -v "Removing leading" || true
   
   if [ -f "$ADGUARD_FILE" ]; then
     ADGUARD_SIZE=$(du -h "$ADGUARD_FILE" | cut -f1)
@@ -768,6 +776,9 @@ log ""
 log "Completed at: $(date)"
 log "=========================================="
 log ""
+
+# Ensure backup files are owned by max:homelab
+chown -R max:homelab "$BACKUP_DIR" 2>/dev/null || true
 
 # Exit with error code if any backups failed
 if [ $FAILED_BACKUPS -gt 0 ]; then

@@ -3,6 +3,16 @@ services:
     image: tailscale/tailscale:latest
     container_name: tailscale
     hostname: corsair  # This will be your device name in Tailscale
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    volumes:
+      - ./tailscale:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
     environment:
       - TS_STATE_DIR=/var/lib/tailscale
       - TS_USERSPACE=false
@@ -12,11 +22,4 @@ services:
       # - TS_ROUTES=192.168.1.0/24
     env_file:
       - .env
-    volumes:
-      - ./tailscale-data:/var/lib/tailscale
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    network_mode: host
-    restart: unless-stopped
+

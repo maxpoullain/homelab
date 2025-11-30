@@ -12,7 +12,7 @@ http:
                     crowdsecMode: live
                     crowdsecAppsecEnabled: false
                     crowdsecAppsecHost: crowdsec:7422
-                    crowdsecLapiKey: ENC[AES256_GCM,data:12V3vOx84avBQzYUdt6Jfm/gSkkn8pW4Pq56wbFfdBI5EOXgl0s5jkeO6w==,iv:bFiaRh2mmkuZwzWvbIz1EcGfFV3RfgHXDhyzqPw6aUc=,tag:WPWh8PdVciOGk6N1ukVtfA==,type:str]
+                    crowdsecLapiKey: ENC[AES256_GCM,data:xjdDPhndOqYjfyHTRaUBb5Y+D3n03cfMCUJ87xSWBX9DZSgjoNBCjuXXTA==,iv:RtYObZzOFCzK3pDabim91k05gHk/x9PkKJBpVSlBzzo=,tag:SAAbt3EIF8jA8wDFlYh5pw==,type:str]
                     crowdsecLapiHost: crowdsec:8080
                     crowdsecLapiScheme: http
                     forwardedHeadersCustomName: X-Custom-Header
@@ -148,18 +148,18 @@ http:
         security:
             chain:
                 middlewares:
+                    - geoblock
                     - crowdsec
                     - rate-limit
-                    - geoblock
                     - security-headers
                     - compression
         # Standard security chain
         security-soft:
             chain:
                 middlewares:
+                    - geoblock
                     - crowdsec
                     - rate-limit-soft
-                    - geoblock
                     - security-headers-soft
                     - compression
 sops:
@@ -167,13 +167,13 @@ sops:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBBQTlRVXZpTHhCcGlPL3hh
-            TVRkM1dQTmdHZ2hDZHArWkxtbzBBQVpScDAwCjdVMWc5R0xHMk5QYW5sVi9mOHV0
-            U01NcW1YblNpc25RMys5VDZxem5DN1EKLS0tIFJwYlo4dXp6R2NmVE14Q3VxVklv
-            eDgzRnBWcDA1RStZZDhINXNqMVFtRFEK7vxsCZ695zKAoiPVSPT/5jperZEWOiVg
-            7/Z1rJavUK2zUkarBAwyWjAd68Us63+cfrCcl15pEh4oVu+UJVH0GQ==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBtK3BjREtsL2tzaUJjSGJQ
+            dEV4c2pRZ2NkMTlGa0UzNGsyRER0aExRT0JjCngvbG5NQVRwRXN6NnRUTkdPbTRN
+            WU9RQkYyUFE3NUc3K0xsSlIzTERUSmcKLS0tIDVRVlNRMWpNcnA5WTFWUXlNUUtw
+            L0UvcDBWMlIwM3RNQWlnL1NEMDBJcFEKlsBq/2TiMlkUd0TTB/CfZOwQWeGXUUyA
+            mqB5bG4HQmt4ac4jsOUheV7DXZplNYxNowOEAOiDdOnD5CuvG+Ct5A==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-11-13T20:02:45Z"
-    mac: ENC[AES256_GCM,data:lENuX/doJvbUOL33K82LQzMR9NaOWHtj8lt+s8qHHQnrK15ifduc1jr1MDYVzJLqSDKHi7b1YLoktcVrI77UqKcAO5A4O82hCj/VPearMpGOu3VyEyHK5kucpcxbII4UoXCgVgiRxoTdeYsQuDjwucXvd17NBv56YMC/5qaS2rU=,iv:BY/siITcsDg5P5+UJeXGID9i4Po5ZG9YFbt4xDLIGiM=,tag:MX7gikocxeLy6/CmpZ3/vg==,type:str]
-    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*DB_PASSWORD.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*DNS.*|.*POST_UP.*|.*PRE_DOWN.*|.*crowdsecLapiKey.*|.*TS_AUTHKEY.*|.*OVH_APPLICATION_KEY.*|.*OVH_APPLICATION_SECRET.*|.*OVH_CONSUMER_KEY.*|.*SECRET_KEY.*)$
+    lastmodified: "2025-11-24T20:26:44Z"
+    mac: ENC[AES256_GCM,data:k3EUM4FDzIEZy8EnYWK8Es2wjsixrYF80htSCM3sze3i73lHoctEjCZOb5ZVP5PIa/vF+kO9rNzVHSvqMb2b3J8+tLWkxCgamYqt479n5OFaCb+e2BVgfW9teSMyOjnOAO+Qscyo5hdc7TPRuZEzvmxzx1zEqvwwbhDGzJhhfqo=,iv:kmDh/LAIl0au3hjrX4rUIAAwtVU0cMJYGiDG+W56O/I=,tag:IRgXBuTLY9oG0Z5psxeDCA==,type:str]
+    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*DB_PASSWORD.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*KEY.*|.*DNS.*|.*POST_UP.*|.*PRE_DOWN.*|.*crowdsecLapiKey.*|.*TS_AUTHKEY.*|.*OVH_APPLICATION_KEY.*|.*OVH_APPLICATION_SECRET.*|.*OVH_CONSUMER_KEY.*|.*SECRET_KEY.*|.*ADMIN_TOKEN.*)$
     version: 3.11.0
