@@ -1,5 +1,7 @@
 **/secrets.env
 **/.env
+affine/config/*
+affine/storage/*
 dns/adguard/*
 dashy/config/conf.yml
 dashy/config/health.yml
@@ -34,7 +36,7 @@ media/radarr/*
 media/readarr/*
 media/sonarr/*
 media/transmission/*
-monitoring/beszel*
+monitor/beszel*
 network/tailscale/*
 tooling/data/backups/backup-services.log
 tooling/data/backups/backup-services.log.old
