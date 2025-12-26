@@ -45,11 +45,19 @@ services:
       - ./beszel_socket:/beszel_socket
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
+      # - /mnt/fast:/extra-filesystems/fast__fast:ro
+      # - /mnt/tank:/extra-filesystems/tank__tank:ro
+      # give the device a custom name with double underscores
+      # - /mnt/media/.beszel:/extra-filesystems/sdc1__Media:ro
     env_file:
       - .env
     environment:
+      SYSTEM_NAME: Corsair
       LISTEN: /beszel_socket/beszel.sock
       HUB_URL: https://status.corsair.tf
+      FILESYSTEM: sdb
+      PRIMARY_SENSOR: coretemp_package_id_0
+      # EXTRA_FILESYSTEMS: "fast__fast:nvme0n1,tank__tank:sdc"
 
 networks:
   traefik:
