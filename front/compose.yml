@@ -1,7 +1,7 @@
 services:
   traefik:
     container_name: traefik
-    image: traefik:v3.5.3
+    image: traefik:v3.6.5
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -18,12 +18,17 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.entrypoints=https
-      - traefik.http.routers.traefik.rule=Host(`traefik.corsair.tf`)
+      - traefik.http.routers.traefik.rule=(Host(`traefik.corsair.tf`) && !Path(`/metrics`))
       - traefik.http.routers.traefik.tls.domains[0].main=corsair.tf
       - traefik.http.routers.traefik.tls.domains[0].sans=*.corsair.tf
-      - traefik.http.routers.traefik.middlewares=security@file,private@file,auth@docker
+      - traefik.http.routers.traefik.middlewares=private@file,security@file,auth@docker
       - traefik.http.routers.traefik.service=api@internal
       - traefik.http.services.traefik.loadbalancer.server.port=443
+      - traefik.http.routers.traefik-metrics.entrypoints=https
+      - traefik.http.routers.traefik-metrics.rule=(Host(`traefik.corsair.tf`) && Path(`/metrics`))
+      - traefik.http.routers.traefik-metrics.middlewares=private@file,security@file,auth@docker
+      - traefik.http.routers.traefik-metrics.service=prometheus@internal
+
 
   crowdsec:
     image: crowdsecurity/crowdsec:latest
@@ -57,8 +62,9 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.auth.entrypoints=https
-      - traefik.http.routers.auth.rule=Host(`auth.corsair.tf`)
+      - traefik.http.routers.auth.rule=Host(`login.corsair.tf`)
       - traefik.http.routers.auth.service=auth
+      - traefik.http.routers.auth.middlewares=security@file
       - traefik.http.services.auth.loadbalancer.server.port=3000
       - traefik.http.middlewares.auth.forwardauth.address=http://tinyauth:3000/api/auth/traefik
 

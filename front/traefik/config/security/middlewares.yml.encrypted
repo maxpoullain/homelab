@@ -3,7 +3,7 @@ http:
         # CrowdSec Plugin Middleware
         crowdsec:
             plugin:
-                bouncer:
+                crowdsec-bouncer:
                     enabled: true
                     logLevel: INFO
                     updateIntervalSeconds: 60
@@ -12,19 +12,21 @@ http:
                     crowdsecMode: live
                     crowdsecAppsecEnabled: false
                     crowdsecAppsecHost: crowdsec:7422
-                    crowdsecLapiKey: ENC[AES256_GCM,data:xjdDPhndOqYjfyHTRaUBb5Y+D3n03cfMCUJ87xSWBX9DZSgjoNBCjuXXTA==,iv:RtYObZzOFCzK3pDabim91k05gHk/x9PkKJBpVSlBzzo=,tag:SAAbt3EIF8jA8wDFlYh5pw==,type:str]
+                    crowdsecLapiKey: ENC[AES256_GCM,data:x4vU6Ll11HYPrcOxr3mzdP66TQUPHxerHPgbHA+rZ9pUey5fxj0C2/M1Wg==,iv:FLJdFuG/T3arL7xMpZlAh3X5tgqyKdMpAvakE/ttnnI=,tag:U+bkDjzAJ5ryF8MiqOJFgA==,type:str]
                     crowdsecLapiHost: crowdsec:8080
-                    crowdsecLapiScheme: http
-                    forwardedHeadersCustomName: X-Custom-Header
-                    clientTrustedIPs:
-                        - 0.0.0.0/0
+                    # clientTrustedIPs:
+                    # - "100.64.0.0/10"     # Tailscale CGNAT range
+                    # - "192.168.0.0/16"    # Private networks (192.168.x.x)
+                    # - "10.0.0.0/8"        # Private networks (10.x.x.x)
+                    # - "172.16.0.0/12"     # Private networks (172.16-31.x.x)
+                    # - "127.0.0.1/32"      # Localhost
         # Rate limiting
         rate-limit:
             rateLimit:
                 average: 100
                 period: 1m
                 burst: 50
-        # Rate limiting = Permissiove (for dashboards like Dashy, Home Assistant)
+        # Rate limiting = Permissive (for dashboards like Dashy, Home Assistant)
         rate-limit-soft:
             rateLimit:
                 average: 1000
@@ -44,51 +46,15 @@ http:
                     apiTimeoutMs: 500
                     cacheSize: 15
                     forceMonthlyUpdate: true
-                    # Allow countries we can't identify
-                    allowUnknownCountries: true
+                    allowUnknownCountries: false
                     unknownCountryApiResponse: nil
-                    # BLACKLIST MODE: Block specific countries known for attacks
-                    blackListMode: true
-                    # High-risk countries for cyber attacks
+                    blackListMode: false
+                    allowedIPAddresses:
+                        # Tailscale CGNAT range  
+                        - 100.64.0.0/10
                     countries:
-                        # China - High volume of brute force attacks
-                        - CN
-                        # Russia - Known botnet activity
-                        - RU
-                        # North Korea - Aggressive cyber warfare
-                        - KP
-                        # Iran - State-sponsored attacks
-                        - IR
-                        # Syria - Botnet activity
-                        - SY
-                        # Vietnam - High brute force/scanning activity
-                        - VN
-                        # Thailand - Compromised servers/botnets
-                        - TH
-                        # Indonesia - Malicious activity
-                        - ID
-                        # Turkey - SSH/credential attacks
-                        - TR
-                        # Brazil - Brute force attacks
-                        - BR
-                        # Mexico - Botnet activity
-                        - MX
-                        # Pakistan - Phishing/scanning
-                        - PK
-                        # Nigeria - Spam/phishing
-                        - NG
-                        # Ghana - Malicious activity
-                        - GH
-                        # South Africa - Some botnet activity
-                        - ZA
-                        # Ukraine - Mixed activity (may reconsider)
-                        - UA
-                        # Philippines - Account takeover attempts
-                        - PH
-                        # Bangladesh - Spam/phishing
-                        - BD
-                        # India - High volume low-level attacks
-                        - IN
+                        # FRANCE
+                        - FR
         # Security headers - Strict (for normal services)
         security-headers:
             headers:
@@ -128,7 +94,7 @@ http:
             compress: {}
         # Tailscale + Local network whitelist
         private:
-            ipWhiteList:
+            IPAllowList:
                 sourceRange:
                     # Tailscale CGNAT range
                     - 100.64.0.0/10
@@ -149,31 +115,31 @@ http:
             chain:
                 middlewares:
                     - geoblock
-                    - crowdsec
                     - rate-limit
                     - security-headers
                     - compression
+                    - crowdsec
         # Standard security chain
         security-soft:
             chain:
                 middlewares:
                     - geoblock
-                    - crowdsec
                     - rate-limit-soft
                     - security-headers-soft
                     - compression
+                    - crowdsec
 sops:
     age:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBtK3BjREtsL2tzaUJjSGJQ
-            dEV4c2pRZ2NkMTlGa0UzNGsyRER0aExRT0JjCngvbG5NQVRwRXN6NnRUTkdPbTRN
-            WU9RQkYyUFE3NUc3K0xsSlIzTERUSmcKLS0tIDVRVlNRMWpNcnA5WTFWUXlNUUtw
-            L0UvcDBWMlIwM3RNQWlnL1NEMDBJcFEKlsBq/2TiMlkUd0TTB/CfZOwQWeGXUUyA
-            mqB5bG4HQmt4ac4jsOUheV7DXZplNYxNowOEAOiDdOnD5CuvG+Ct5A==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBIRTRLckJRTFJRTEJ6d0wv
+            UGM5WjZNdzNKN3M3T2pvNUVNSFlFSGtkRHlzCnM5aSszL1FVTVlJRkd6N0FKSEVQ
+            cWJLV2ZDZFRHVjBEOFlGM2FENkpFb0EKLS0tIDdEZURxNzdsV05HUE5ucnNjM1Mr
+            UjdZSEpod1dWTi9EK1RPN1VZSHlaTnMKYaTIUI6H/QgbDzW8cNmnsAvOcYyQYYro
+            8gc8zLhNUSPjx/5D1A/NURXYv7d8xBpIGdXnB0E/q1mhFdyP717NIQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-11-24T20:26:44Z"
-    mac: ENC[AES256_GCM,data:k3EUM4FDzIEZy8EnYWK8Es2wjsixrYF80htSCM3sze3i73lHoctEjCZOb5ZVP5PIa/vF+kO9rNzVHSvqMb2b3J8+tLWkxCgamYqt479n5OFaCb+e2BVgfW9teSMyOjnOAO+Qscyo5hdc7TPRuZEzvmxzx1zEqvwwbhDGzJhhfqo=,iv:kmDh/LAIl0au3hjrX4rUIAAwtVU0cMJYGiDG+W56O/I=,tag:IRgXBuTLY9oG0Z5psxeDCA==,type:str]
+    lastmodified: "2025-12-22T22:41:28Z"
+    mac: ENC[AES256_GCM,data:FgdC4gwxYduAAQPhKEtQEX+7NN1psbzvd1iHU9Al/RzCrzMG0MxCzFbgHunMDrClPOBQupICpbaj0IXwE3DeozOSzdapeQuQQNi/pq8R0H0F7g/e1SHk0s5aYJrdC8h6/7Hs6pNAw5l3LKKmW5aZsSzbO2v5AnKaLkQMjVkDaic=,iv:gppxhnGpAsvekQlcU1d34Czsah5bjI12u3Q5P5A+Ue8=,tag:RTqWNvgVcy1DEItwVI3dyg==,type:str]
     encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*DB_PASSWORD.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*KEY.*|.*DNS.*|.*POST_UP.*|.*PRE_DOWN.*|.*crowdsecLapiKey.*|.*TS_AUTHKEY.*|.*OVH_APPLICATION_KEY.*|.*OVH_APPLICATION_SECRET.*|.*OVH_CONSUMER_KEY.*|.*SECRET_KEY.*|.*ADMIN_TOKEN.*)$
     version: 3.11.0

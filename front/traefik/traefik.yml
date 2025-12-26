@@ -73,6 +73,7 @@ metrics:
     addEntryPointsLabels: true
     addRoutersLabels: true
     addServicesLabels: true
+    manualRouting: true
 
 certificatesResolvers:
   acme:
