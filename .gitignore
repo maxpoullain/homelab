@@ -1,7 +1,7 @@
 **/secrets.env
 **/.env
-affine/config/*
-affine/storage/*
+docs/affine/config/*
+docs/affine/storage/*
 dns/adguard/*
 dashy/config/conf.yml
 dashy/config/health.yml
