@@ -1,4 +1,4 @@
-# Immich
+# Docs
 
 ```
 docker network create --driver bridge affine

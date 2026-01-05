@@ -1,4 +1,4 @@
-# Tailscale
+# Network
 
 ```
 sops -d encrypted.env > .env
