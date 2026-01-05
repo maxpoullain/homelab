@@ -1,4 +1,4 @@
-name: affine
+name: docs
 services:
   affine:
     container_name: affine_server

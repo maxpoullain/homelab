@@ -1,4 +1,48 @@
 services:
+  dockpeek:
+    image: dockpeek/dockpeek:latest
+    container_name: dockpeek
+    depends_on:
+      - socket-proxy
+    restart: unless-stopped
+    env_file:
+      - .env
+    networks:
+      - traefik
+      - admin
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dockpeek.entrypoints=https"
+      - "traefik.http.routers.dockpeek.rule=Host(`admin.corsair.tf`)"
+      - "traefik.http.routers.dockpeek.middlewares=private@file,security@file,auth@docker"
+      - "traefik.http.routers.dockpeek.service=dockpeek"
+      - "traefik.http.services.dockpeek.loadbalancer.server.port=8000"
+      - "traefik.docker.network=traefik"
+
+  socket-proxy:
+    image: lscr.io/linuxserver/socket-proxy:latest 
+    container_name: dockpeek_socket-proxy
+    environment:
+      - CONTAINERS=1
+      - IMAGES=1
+      - PING=1
+      - VERSION=1
+      - INFO=1
+      - POST=1
+      # Required for container updates
+      - ALLOW_START=1
+      - ALLOW_STOP=1
+      - ALLOW_RESTARTS=1
+      - NETWORKS=1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - admin
+    read_only: true
+    tmpfs:
+      - /run
+    restart: unless-stopped
+
   beszel:
     image: henrygd/beszel:latest
     container_name: beszel
@@ -8,16 +52,14 @@ services:
     networks:
       - traefik
     volumes:
-      - ./beszel_data:/beszel_data
-      - ./beszel_socket:/beszel_socket
-    # environment:
-    #   - DISABLE_PASSWORD_AUTH=true
+      - ./beszel/beszel_data:/beszel_data
+      - ./beszel/beszel_socket:/beszel_socket
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
       - "traefik.http.routers.beszel.entrypoints=https"
       - "traefik.http.routers.beszel.rule=Host(`status.corsair.tf`)"
-      - "traefik.http.routers.beszel.middlewares=security@file,private@file"
+      - "traefik.http.routers.beszel.middlewares=security@file,private@file,auth@docker"
       - "traefik.http.routers.beszel.service=beszel"
       - "traefik.http.services.beszel.loadbalancer.server.port=8090"
 
@@ -41,8 +83,8 @@ services:
       - /dev/nvme1:/dev/nvme1
       - /dev/dri/card0:/dev/dri/card0
     volumes:
-      - ./beszel_agent_data:/var/lib/beszel-agent
-      - ./beszel_socket:/beszel_socket
+      - ./beszel/beszel_agent_data:/var/lib/beszel-agent
+      - ./beszel/beszel_socket:/beszel_socket
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
       # - /mnt/fast:/extra-filesystems/fast__fast:ro
@@ -61,4 +103,6 @@ services:
 
 networks:
   traefik:
+    external: true
+  admin:
     external: true

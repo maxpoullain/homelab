@@ -1,7 +1,7 @@
 services:
   traefik:
     container_name: traefik
-    image: traefik:v3.6.5
+    image: traefik:v3
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -28,7 +28,6 @@ services:
       - traefik.http.routers.traefik-metrics.rule=(Host(`traefik.corsair.tf`) && Path(`/metrics`))
       - traefik.http.routers.traefik-metrics.middlewares=private@file,security@file,auth@docker
       - traefik.http.routers.traefik-metrics.service=prometheus@internal
-
 
   crowdsec:
     image: crowdsecurity/crowdsec:latest

@@ -1,217 +1,148 @@
 name: media
 
 services:
-  wireguard:
-    container_name: wireguard
-    image: thrnz/docker-wireguard-pia:latest
+  jellyfin:
+    container_name: jellyfin
+    image: linuxserver/jellyfin:latest
     restart: unless-stopped
-    cpus: 0.5
-    mem_limit: 512m
-    healthcheck:
-      test: ping -c 1 www.google.com || exit 1
-      start_period: 12s
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    mem_limit: 3072m
     security_opt:
       - no-new-privileges:true
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.default.disable_ipv6=1
-      - net.ipv6.conf.all.disable_ipv6=1
-      - net.ipv6.conf.lo.disable_ipv6=1
+    group_add:
+      - "44"   # video group
+      - "107"  # render group
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+      # - /dev/dri/card0:/dev/dri/card0
     networks:
       - traefik
-      - media
+    ports:
+      - 8096:8096
+      - 8920:8920 #optional
+      - 7359:7359/udp #optional
+      - 1900:1900/udp #optional
     volumes:
-      - ./pia:/pia
-      - ./secrets.env/:/secrets.env
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    env_file:
-      - ./pia/.env
+      - ./jellyfin/config:/config
+      - /mnt/tank/media/tv:/shows
+      - /mnt/tank/media/movies:/movies
     environment:
       - PUID=3000
-      - PGID=3002
+      - PGID=3001
       - TZ=Europe/Paris
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=traefik"
-      - "traefik.http.routers.seedbox.entrypoints=https"
-      - "traefik.http.routers.seedbox.rule=Host(`seedbox.corsair.tf`)"
-      - "traefik.http.routers.seedbox.middlewares=security@file,private@file,auth@docker"
-      - "traefik.http.routers.seedbox.service=seedbox"
-      - "traefik.http.services.seedbox.loadbalancer.server.port=9091"
+      - "traefik.http.routers.jellyfin.entrypoints=https"
+      - "traefik.http.routers.jellyfin.rule=Host(`tv.corsair.tf`)"
+      - "traefik.http.routers.jellyfin.middlewares=jellyfin"
+      - "traefik.http.routers.jellyfin.middlewares=private@file,security-soft@file"
+      - "traefik.http.middlewares.jellyfin.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
+      - "traefik.http.middlewares.jellyfin.headers.SSLRedirect=true"
+      - "traefik.http.middlewares.jellyfin.headers.SSLHost=tv.corsair.tf"
+      - "traefik.http.middlewares.jellyfin.headers.SSLForceHost=true"
+      - "traefik.http.middlewares.jellyfin.headers.STSSeconds=315360000"
+      - "traefik.http.middlewares.jellyfin.headers.STSIncludeSubdomains=true"
+      - "traefik.http.middlewares.jellyfin.headers.STSPreload=true"
+      - "traefik.http.middlewares.jellyfin.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.jellyfin.headers.frameDeny=true"
+      - "traefik.http.middlewares.jellyfin.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.jellyfin.headers.browserXSSFilter=true"
+      - "traefik.http.middlewares.jellyfin.headers.customFrameOptionsValue='allow-from https://corsair.tf'"
+      - "traefik.http.routers.jellyfin.service=jellyfin"
+      - "traefik.http.services.jellyfin.loadBalancer.server.port=8096"
+      - "traefik.http.services.jellyfin.loadBalancer.passHostHeader=true"
 
-  transmission:
-    container_name: transmission
-    image: linuxserver/transmission:latest
+  immich-server:
+    container_name: immich_server
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
     restart: unless-stopped
-    cpus: 4
+    stop_grace_period: 10s
+    cpus: 3
     mem_limit: 2048m
     security_opt:
       - no-new-privileges:true
-    network_mode: "service:wireguard"
     depends_on:
-      wireguard:
-        condition: service_healthy
-        restart: true
+      - redis
+      - database
+    networks:
+      - immich
+      - traefik
     volumes:
-      - "./transmission:/config"
-      - "./transmission/watch:/watch"
-      - "/mnt/fast/downloads/seedbox:/downloads"
-      - "/mnt/tank/media/downloads:/tank/downloads"
-      - "/mnt/tank/media/tv/:/tank/tv"
-      - "/mnt/tank/media/movies/:/tank/movies"
-      - "/mnt/tank/media/books/raw:/tank/books"
+      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - /mnt/tank/media/photos:/usr/src/app/upload/library
+      - /mnt/tank/media/photos/Max:/library/Max:ro
+      - /mnt/tank/media/photos/Sixtine:/library/Sixtine:ro
+      - /mnt/tank/media/photos/JD:/library/JD:ro
+      - /mnt/tank/media/photos/Stephanie:/library/Stephanie:ro
+      - /etc/localtime:/etc/localtime:ro
     env_file:
-      - secrets.env
-    environment:
-      - PUID=3000
-      - PGID=3002
-      - TZ=Europe/Paris
-      - TRANSMISSION_WEB_UI=flood-for-transmission
-
-  flaresolverr:
-    container_name: flaresolverr
-    image: ghcr.io/flaresolverr/flaresolverr:latest #21hsmw/flaresolverr:nodriver #ghcr.io/flaresolverr/flaresolverr:pr-1282
-    restart: unless-stopped
-    cpus: 4
-    mem_limit: 1024m
-    security_opt:
-      - no-new-privileges:true
-    sysctls:
-      - net.ipv6.conf.all.disable_ipv6=1
-    networks:
-      - media
-    environment:
-      - PGID=3002
-      - PUID=3000
-      - TZ=Europe/Paris
-      - LOG_LEVEL=info
-      - LANG=fr_FR
-      - BROWSER_TIMEOUT=240
-      - NO_SANDBOX=True
-
-  prowlarr:
-    container_name: prowlarr
-    image: lscr.io/linuxserver/prowlarr:latest
-    restart: unless-stopped
-    cpus: 0.5
-    mem_limit: 512m
-    security_opt:
-      - no-new-privileges:true
-    networks:
-      - traefik
-      - media
-    depends_on:
-      flaresolverr:
-        condition: service_started
-    volumes:
-      - "./prowlarr:/config"
-    environment:
-      - PUID=3000
-      - PGID=3002
-      - TZ=Europe/Paris
+      - .env
+    healthcheck:
+      disable: false
     labels:
       - "traefik.enable=true"
+      - "traefik.http.routers.photos.entrypoints=https"
+      - "traefik.http.routers.photos.rule=Host(`photos.corsair.tf`)"
+      - "traefik.http.routers.photos.middlewares=security@file"
       - "traefik.docker.network=traefik"
-      - "traefik.http.routers.prowlarr.entrypoints=https"
-      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.corsair.tf`)"
-      - "traefik.http.routers.prowlarr.middlewares=security@file,private@file,auth@docker"
-      - "traefik.http.routers.prowlarr.service=prowlarr"
-      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
 
-  sonarr:
-    container_name: sonarr
-    image: linuxserver/sonarr:latest
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+    volumes:
+      - model-cache:/cache
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - .env
     restart: unless-stopped
+    healthcheck:
+      disable: false
+    stop_grace_period: 5s
+    cpus: 2
+    mem_limit: 4096m
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - immich
+
+  redis:
+    container_name: immich_redis
+    image: docker.io/valkey/valkey:8-bookworm@sha256:fea8b3e67b15729d4bb70589eb03367bab9ad1ee89c876f54327fc7c6e618571
+    healthcheck:
+      test: redis-cli ping || exit 1
+    restart: unless-stopped
+    stop_grace_period: 5s
     cpus: 1
     mem_limit: 1024m
     security_opt:
       - no-new-privileges:true
     networks:
-      - traefik
-    depends_on:
-      - prowlarr
-    volumes:
-      - "./sonarr:/config"
-      - "/mnt/tank/media/tv/:/tv"
-      - "/mnt/fast/downloads/seedbox:/downloads"
-    environment:
-      - PUID=3000
-      - PGID=3002
-      - TZ=Europe/Paris
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=traefik"
-      - "traefik.http.routers.shows.entrypoints=https"
-      - "traefik.http.routers.shows.rule=Host(`shows.corsair.tf`)"
-      - "traefik.http.routers.shows.middlewares=security@file,private@file,auth@docker"
-      - "traefik.http.routers.shows.service=shows"
-      - "traefik.http.services.shows.loadbalancer.server.port=8989"
+      - immich
 
-  radarr:
-    container_name: radarr
-    image: linuxserver/radarr:latest
+  database:
+    container_name: immich_postgres
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_DATABASE_NAME}
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    volumes:
+      - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
+    shm_size: 128mb
     restart: unless-stopped
-    cpus: 1
-    mem_limit: 1024m
+    stop_grace_period: 5s
+    cpus: 2
+    mem_limit: 2048m
     security_opt:
       - no-new-privileges:true
     networks:
-      - traefik
-    depends_on:
-      - prowlarr
-    volumes:
-      - "./radarr:/config"
-      - "/mnt/tank/media/movies/:/movies"
-      - "/mnt/fast/downloads/seedbox:/downloads"
-    environment:
-      - PUID=3000
-      - PGID=3002
-      - TZ=Europe/Paris
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=traefik"
-      - "traefik.http.routers.movies.entrypoints=https"
-      - "traefik.http.routers.movies.rule=Host(`movies.corsair.tf`)"
-      - "traefik.http.routers.movies.middlewares=security@file,private@file,auth@docker"
-      - "traefik.http.routers.movies.service=movies"
-      - "traefik.http.services.movies.loadbalancer.server.port=7878"
+      - immich
 
-  readarr:
-    container_name: readarr
-    image: lscr.io/linuxserver/readarr:0.4.18-develop
-    restart: unless-stopped
-    cpus: 0.5
-    mem_limit: 512m
-    security_opt:
-      - no-new-privileges:true
-    networks:
-      - traefik
-    depends_on:
-      - prowlarr
-    volumes:
-      - "./readarr:/config"
-      - "/mnt/tank/media/books/raw:/books"
-      - "/mnt/fast/downloads/seedbox:/downloads"
-    environment:
-      - PUID=3000
-      - PGID=3002
-      - TZ=Europe/Paris
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=traefik"
-      - "traefik.http.routers.readarr.entrypoints=https"
-      - "traefik.http.routers.readarr.rule=Host(`books.corsair.tf`)"
-      - "traefik.http.routers.readarr.middlewares=security@file,private@file,auth@docker"
-      - "traefik.http.routers.readarr.service=readarr"
-      - "traefik.http.services.readarr.loadbalancer.server.port=8787"
+volumes:
+  model-cache:
 
 networks:
   traefik:
     external: true
-  media:
+  immich:
     external: true

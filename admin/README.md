@@ -1,7 +1,7 @@
-# Immich
+# Admin
 
 ```
-docker network create --driver bridge immich
+docker network create --driver bridge admin
 ```
 
 ```
