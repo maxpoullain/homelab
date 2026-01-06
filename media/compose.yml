@@ -13,7 +13,6 @@ services:
       - "107"  # render group
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
-      # - /dev/dri/card0:/dev/dri/card0
     networks:
       - traefik
     ports:
@@ -88,6 +87,9 @@ services:
   immich-machine-learning:
     container_name: immich_machine_learning
     image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+    extends:
+      file: hwaccel.ml.yml
+      service: quicksync
     volumes:
       - model-cache:/cache
       - /etc/localtime:/etc/localtime:ro
@@ -106,7 +108,7 @@ services:
 
   redis:
     container_name: immich_redis
-    image: docker.io/valkey/valkey:8-bookworm@sha256:fea8b3e67b15729d4bb70589eb03367bab9ad1ee89c876f54327fc7c6e618571
+    image: docker.io/valkey/valkey:9@sha256:fb8d272e529ea567b9bf1302245796f21a2672b8368ca3fcb938ac334e613c8f
     healthcheck:
       test: redis-cli ping || exit 1
     restart: unless-stopped
