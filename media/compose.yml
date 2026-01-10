@@ -62,6 +62,9 @@ services:
     depends_on:
       - redis
       - database
+    extends:
+      file: hwaccel.transcoding.yml
+      service: quicksync
     networks:
       - immich
       - traefik
@@ -87,9 +90,6 @@ services:
   immich-machine-learning:
     container_name: immich_machine_learning
     image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
-    extends:
-      file: hwaccel.ml.yml
-      service: quicksync
     volumes:
       - model-cache:/cache
       - /etc/localtime:/etc/localtime:ro
