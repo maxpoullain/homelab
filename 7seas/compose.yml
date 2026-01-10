@@ -22,10 +22,10 @@ services:
       - net.ipv6.conf.lo.disable_ipv6=1
     networks:
       - traefik
-      - media
+      - 7seas
     volumes:
       - ./pia:/pia
-      - ./secrets.env/:/secrets.env
+      - .env/:/secrets.env
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -66,7 +66,7 @@ services:
       - "/mnt/tank/media/movies/:/tank/movies"
       - "/mnt/tank/media/books/raw:/tank/books"
     env_file:
-      - secrets.env
+      - .env
     environment:
       - PUID=3000
       - PGID=3002
@@ -84,7 +84,7 @@ services:
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1
     networks:
-      - media
+      - 7seas
     environment:
       - PGID=3002
       - PUID=3000
@@ -104,7 +104,7 @@ services:
       - no-new-privileges:true
     networks:
       - traefik
-      - media
+      - 7seas
     depends_on:
       flaresolverr:
         condition: service_started
@@ -122,6 +122,21 @@ services:
       - "traefik.http.routers.prowlarr.middlewares=security@file,private@file,auth@docker"
       - "traefik.http.routers.prowlarr.service=prowlarr"
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
+
+  ygege:
+    image: uwucode/ygege:latest
+    container_name: ygege
+    restart: unless-stopped
+    networks:
+      - 7seas
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8715/health || exit 1"]
+      interval: 1m30s
+      timeout: 20s
+      retries: 3
+      start_period: 10s
 
   sonarr:
     container_name: sonarr
@@ -213,5 +228,5 @@ services:
 networks:
   traefik:
     external: true
-  media:
+  7seas:
     external: true
