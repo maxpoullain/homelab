@@ -12,7 +12,8 @@
 7seas/readarr/*
 7seas/sonarr/*
 7seas/transmission/*
-admin/beszel*
+admin/beszel/*
+admin/dockhand/*
 docs/affine/config/*
 docs/affine/storage/*
 dashy/config/conf.yml

@@ -1,39 +1,53 @@
 services:
-  dockpeek:
-    image: dockpeek/dockpeek:latest
-    container_name: dockpeek
+  dockhand:
+    image: fnsys/dockhand:latest
+    container_name: dockhand
     depends_on:
       - socket-proxy
     restart: unless-stopped
-    env_file:
-      - .env
+    security_opt:
+      - no-new-privileges:true
+    group_add:
+      - "999"  # Replace with your host's Docker GID
+    environment:
+      - PUID=3000
+      - PGID=3002
+    volumes:
+      - ./dockhand:/app/data
     networks:
       - traefik
       - admin
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dockpeek.entrypoints=https"
-      - "traefik.http.routers.dockpeek.rule=Host(`admin.corsair.tf`)"
-      - "traefik.http.routers.dockpeek.middlewares=private@file,security@file,auth@docker"
-      - "traefik.http.routers.dockpeek.service=dockpeek"
-      - "traefik.http.services.dockpeek.loadbalancer.server.port=8000"
+      - "traefik.http.routers.dockhand.entrypoints=https"
+      - "traefik.http.routers.dockhand.rule=Host(`admin.corsair.tf`)"
+      - "traefik.http.routers.dockhand.middlewares=private@file,security@file,auth@docker"
+      - "traefik.http.routers.dockhand.service=dockhand"
+      - "traefik.http.services.dockhand.loadbalancer.server.port=3000"
       - "traefik.docker.network=traefik"
 
   socket-proxy:
-    image: lscr.io/linuxserver/socket-proxy:latest 
-    container_name: dockpeek_socket-proxy
+    image: lscr.io/linuxserver/socket-proxy:latest
+    container_name: socket-proxy
     environment:
       - CONTAINERS=1
       - IMAGES=1
       - PING=1
       - VERSION=1
-      - INFO=1
+      - NETWORKS=1
+      - VOLUMES=1
+      - EVENTS=1
       - POST=1
-      # Required for container updates
+      - DELETE=1
+      # Required for dashboard host info and disk usage
+      - INFO=1
+      - SYSTEM=1
+      # Required for container updates / vulnerability scanning
       - ALLOW_START=1
       - ALLOW_STOP=1
       - ALLOW_RESTARTS=1
-      - NETWORKS=1
+      # Optional: enable for terminal access
+      - EXEC=1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
@@ -54,13 +68,23 @@ services:
     volumes:
       - ./beszel/beszel_data:/beszel_data
       - ./beszel/beszel_socket:/beszel_socket
+    env_file:
+      - .env
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
+      # Main router for / (with auth)
       - "traefik.http.routers.beszel.entrypoints=https"
       - "traefik.http.routers.beszel.rule=Host(`status.corsair.tf`)"
       - "traefik.http.routers.beszel.middlewares=security@file,private@file,auth@docker"
       - "traefik.http.routers.beszel.service=beszel"
+      # API router for /api (without auth)
+      - "traefik.http.routers.beszel-api.entrypoints=https"
+      - "traefik.http.routers.beszel-api.rule=Host(`status.corsair.tf`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.beszel-api.middlewares=security@file,private@file"
+      - "traefik.http.routers.beszel-api.service=beszel"
+      - "traefik.http.routers.beszel-api.priority=100"
+      # Service definition
       - "traefik.http.services.beszel.loadbalancer.server.port=8090"
 
   beszel-agent:
@@ -87,8 +111,7 @@ services:
       - ./beszel/beszel_socket:/beszel_socket
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
-      # - /mnt/fast:/extra-filesystems/fast__fast:ro
-      # - /mnt/tank:/extra-filesystems/tank__tank:ro
+      - /:/extra-filesystems/sdb3__Boot:ro
       # give the device a custom name with double underscores
       # - /mnt/media/.beszel:/extra-filesystems/sdc1__Media:ro
     env_file:
@@ -96,10 +119,10 @@ services:
     environment:
       SYSTEM_NAME: Corsair
       LISTEN: /beszel_socket/beszel.sock
-      HUB_URL: https://status.corsair.tf
-      FILESYSTEM: sdb
+      FILESYSTEM: "/extra-filesystems/sdb3__Boot"
+      EXTRA_FILESYSTEMS: "sdb3__Boot:sdb3"
       PRIMARY_SENSOR: coretemp_package_id_0
-      # EXTRA_FILESYSTEMS: "fast__fast:nvme0n1,tank__tank:sdc"
+      #LOG_LEVEL: debug
 
 networks:
   traefik:
