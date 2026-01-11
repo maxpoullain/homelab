@@ -84,7 +84,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.photos.entrypoints=https"
       - "traefik.http.routers.photos.rule=Host(`photos.corsair.tf`)"
-      - "traefik.http.routers.photos.middlewares=security@file"
+      - "traefik.http.routers.photos.middlewares=security-soft@file"
       - "traefik.docker.network=traefik"
 
   immich-machine-learning:
