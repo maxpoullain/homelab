@@ -83,7 +83,7 @@
                   show-thumbnails: true
                   show-flairs: true
                   extra-sort-by: engagement
-                  collapse-after: 8
+                  collapse-after: 7
                 - type: rss
                   title: Homelab News
                   style: vertical-list

@@ -25,4 +25,3 @@ pages:
   - $include: home.yml
   - $include: lab.yml
   - $include: media.yml
-  - $include: test.yml
