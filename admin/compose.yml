@@ -9,9 +9,6 @@ services:
       - no-new-privileges:true
     group_add:
       - "999"  # Replace with your host's Docker GID
-    environment:
-      - PUID=3000
-      - PGID=3002
     volumes:
       - ./dockhand:/app/data
     networks:
