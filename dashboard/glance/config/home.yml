@@ -1,0 +1,427 @@
+- name: Home
+  hide-desktop-navigation: false
+  columns:
+    - size: small
+      widgets:
+
+        - type: calendar
+          first-day-of-week: monday        
+
+        - type: custom-api
+          title: Astronomy Picture of the Day
+          cache: 1d
+          url: https://apod.nasa.gov/apod?api_key=${NASA_API_KEY}
+          headers:
+            Accept: application/json
+          template: |
+            {{- if eq (.JSON.String "media_type") "image" -}}
+              <div style="display:flex; flex-direction:column; align-items:center; width:100%; padding:8px; box-sizing:border-box;">
+                <!-- Clickable title -->
+                <p class="color-primary" style="margin:0 0 8px; text-align:center;">
+                  <a 
+                    href="https://apod.nasa.gov/apod/astropix.html" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style="color: inherit; text-decoration: none;"
+                  >
+                    {{ .JSON.String "title" }}
+                  </a>
+                </p>
+
+                <!-- Image -->
+                <img
+                  src="{{ .JSON.String "url" }}"
+                  alt="{{ .JSON.String "title" }}"
+                  style="max-width:100%; height:auto; display:block; border-radius:4px;"
+                />
+
+                <!-- Explanation dropdown -->
+                <details style="width:100%; margin-top:12px;">
+                  <summary class="color-highlight size-h5" style="cursor:pointer;">
+                    Show Explanation
+                  </summary>
+                  <p class="color-highlight size-h5" style="margin-top:8px; text-align:left; line-height:1.4;">
+                    {{ .JSON.String "explanation" }}
+                  </p>
+                </details>
+              </div>
+            {{- else -}}
+              <p class="color-negative" style="text-align:center;">
+                No image available today.
+              </p>
+            {{- end }}
+
+        - type: custom-api
+          title: Nearby Aircraft (25km)
+          cache: 1m
+          url: https://opensky-network.org/api/states/all?lamin=48.425&lomin=-2.225&lamax=48.875&lomax=-1.775  # Saint-Malo area (25km radius)
+          template: |
+            <div class="opensky-aircraft-stats">
+              {{ $states := .JSON.Array "states" }}
+              {{ $statesCount := len $states }}
+              <div class="margin-block-2">
+                <div class="size-h6">AIRCRAFT NEARBY: {{ $statesCount }}</div>
+              </div>
+              {{ if gt $statesCount 0 }}
+                {{ range $index, $plane := $states }}
+                  {{ $callsign := $plane.String "1" }}
+                  {{ $icao24 := $plane.String "0" }}
+                  {{ $origin := $plane.String "2" }}
+                  {{ $onGround := $plane.Bool "8" }}
+                  {{ $airlineName := "" }}
+                  {{ $airlineIata := "" }}
+                  {{ $logoUrl := "" }}
+                  {{ if and (ne $callsign "") (ge (len $callsign) 3) }}
+                    {{ $prefix := (slice $callsign 0 3) }}
+                    {{ if eq $prefix "RYR" }}
+                      {{ $airlineName = "Ryanair" }}
+                      {{ $airlineIata = "FR" }}
+                      {{ $logoUrl = "https://cdn.simpleicons.org/ryanair/073590" }}
+                    {{ else if eq $prefix "EZY" }}
+                      {{ $airlineName = "EasyJet" }}
+                      {{ $airlineIata = "U2" }}
+                      {{ $logoUrl = "https://cdn.simpleicons.org/easyjet/FF6600" }}
+                    {{ else if eq $prefix "TAP" }}
+                      {{ $airlineName = "TAP Air Portugal" }}
+                      {{ $airlineIata = "TP" }}
+                      {{ $logoUrl = "https://cdn.simpleicons.org/tapairportugal/008878" }}
+                    {{ else if eq $prefix "VLG" }}
+                      {{ $airlineName = "Vueling" }}
+                      {{ $airlineIata = "VY" }}
+                      {{ $logoUrl = "https://cdn.simpleicons.org/vueling/FFC600" }}
+                    {{ else if eq $prefix "BAW" }}
+                      {{ $airlineName = "British Airways" }}
+                      {{ $airlineIata = "BA" }}
+                      {{ $logoUrl = "https://cdn.simpleicons.org/britishairways/003366" }}
+                    {{ else if eq $prefix "EFW" }}
+                      {{ $airlineName = "Everts Air Freight" }}
+                      {{ $airlineIata = "EF" }}
+                      {{ $logoUrl = "https://cdn.simpleicons.org/eveysairfreight/E4002B" }}
+                    {{ end }}
+                  {{ end }}
+                  <div class="aircraft-item margin-block-2" style="border-top: {{ if eq $index 0 }}none{{ else }}1px solid #ccc{{ end }}; padding-top: {{ if eq $index 0 }}0{{ else }}10px{{ end }};">
+                    {{ if ne $airlineName "" }}
+                      <div class="margin-block-1" style="display: flex; align-items: center; gap: 10px;">
+                        {{ if ne $logoUrl "" }}
+                          <img src="{{ $logoUrl }}" alt="{{ $airlineName }} Logo" style="width: 80px; height: 40px; object-fit: contain;">
+                        {{ end }}
+                        <div class="size-h5 color-highlight">{{ $airlineName }}</div>
+                      </div>
+                    {{ else }}
+                      <div class="margin-block-1">
+                        <div class="size-h5 color-highlight">{{ if ne $origin "" }}{{ $origin }} (Unknown Airline){{ else }}Unknown Airline{{ end }}</div>
+                      </div>
+                    {{ end }}
+                    <div class="margin-block-2">
+                      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                          <div class="color-highlight size-h3">{{ if ne $callsign "" }}{{ $callsign }}{{ else }}{{ $icao24 }}{{ end }}</div>
+                          <div class="size-h6">CALLSIGN</div>
+                        </div>
+                        <div>
+                          <div class="color-highlight size-h3 text-truncate" style="max-width: 100%;">{{ if ne $origin "" }}{{ $origin }}{{ else }}-{{ end }}</div>
+                          <div class="size-h6">ORIGIN</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="margin-block-2">
+                      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                          {{ $altitude := $plane.Float "7" }}
+                          <div class="color-highlight size-h3">{{ if and (not $onGround) ($altitude | ne 0.0) }}{{ $altitude | printf "%.0f" }}m{{ else }}-{{ end }}</div>
+                          <div class="size-h6">ALTITUDE</div>
+                        </div>
+                        <div>
+                          {{ $speed := $plane.Float "9" }}
+                          {{ $speedKmh := mul $speed 3.6 }}
+                          <div class="color-highlight size-h3">{{ if and (not $onGround) ($speed | ne 0.0) }}{{ $speedKmh | printf "%.0f" }}km/h{{ else }}-{{ end }}</div>
+                          <div class="size-h6">SPEED</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {{ end }}
+              {{ end }}
+            </div>
+
+    - size: full
+      widgets:
+
+        - type: split-column
+          widgets:
+
+          - type: split-column
+            widgets:
+            - type: group
+              widgets:
+                - type: weather
+                  location: Saint-Malo, France
+                  units: metric
+                  hour-format: 24h
+
+                - type: custom-api
+                  title: Weekly
+                  body-type: string
+                  cache: 1h
+                  options:
+                    location: Saint-Malo, France 
+                    weekend_color: "#34363D"
+                    color_clear: "#FFA500"
+                    color_partly: "#EBE387"
+                    color_cloud: "#A9A9A9"
+                    color_smog: "#D3D3D3"
+                    color_drizzle: "#5F9EA0"
+                    color_rain: "#4682B4"
+                    color_freezing_rain: "#B0E0E6"
+                    color_snow: "#FFFFFF"
+                    color_thunderstorm: "#696969"
+                    color_other: "#FFFFFF"
+                    color_red: "#F08C46"
+                    color_yellow: "#F0F046"
+                    color_blue: "#46F0F0"
+                    color_white: "#FFFFFF"
+                  template: | 
+                    {{/* Weather widget – fully customizable via options */}}
+                    {{ $temp_unit := .Options.StringOr "temp_unit" "celsius" }}
+                    {{ $weekend_color := .Options.StringOr "weekend_color" "var(--color-separator)" }}
+                    {{ $overlay_color := .Options.StringOr "overlay_color" "hsl(var(--bghs), var(--bgl), 50%)" }}
+                    {{ $color_clear := .Options.StringOr "color_clear" "var(--color-text-highlight)" }}
+                    {{ $color_partly := .Options.StringOr "color_partly" "var(--color-text-highlight)"}}
+                    {{ $color_cloud := .Options.StringOr "color_cloud" "var(--color-text-highlight)"}}
+                    {{ $color_smog := .Options.StringOr "color_smog" "var(--color-text-highlight)"}}
+                    {{ $color_drizzle := .Options.StringOr "color_drizzle" "var(--color-text-highlight)"}}
+                    {{ $color_rain := .Options.StringOr "color_rain" "var(--color-text-highlight)"}}
+                    {{ $color_freezing_rain := .Options.StringOr "color_freezing_rain" "var(--color-text-highlight)"}}
+                    {{ $color_snow := .Options.StringOr "color_snow" "var(--color-text-highlight)F"}}
+                    {{ $color_thunderstorm := .Options.StringOr "color_thunderstorm" "var(--color-text-highlight)"}}
+                    {{ $color_other := .Options.StringOr "color_other" "var(--color-text-highlight)"}}
+                    {{ $color_red := .Options.StringOr "color_red" "var(--color-negative)" }}  
+                    {{ $color_yellow := .Options.StringOr "color_yellow" "var(--color-text-subdue)" }}
+                    {{ $color_blue := .Options.StringOr "color_blue" "var(--color-positive)" }}
+                    {{ $color_white := .Options.StringOr "color_white" "var(--color-text-highlight)" }}
+                    {{ $temp_red := .Options.FloatOr "temp_red" 27 }}
+                    {{ $temp_yellow := .Options.FloatOr "temp_yellow" 20 }}
+                    {{ $temp_blue := .Options.FloatOr "temp_blue" 10.0 }}
+                    {{ $temp_white := .Options.FloatOr "temp_white" 0 }}
+                    {{ if eq $temp_unit "fahrenheit" }}
+                      {{ $temp_red = .Options.FloatOr "temp_red" 80.0 }}
+                      {{ $temp_yellow = .Options.FloatOr "temp_yellow" 70.0 }}
+                      {{ $temp_blue = .Options.FloatOr "temp_blue" 50.0 }}
+                      {{ $temp_white = .Options.FloatOr "temp_white" 30.0 }}
+                    {{end}}
+
+                    {{ $location_string := replaceAll " " "%20" (.Options.StringOr "location" "") }}
+                    {{ $url1 := printf "https://geocoding-api.open-meteo.com/v1/search?name=%s&count=20&language=en&format=json" $location_string }}
+                    {{ $req1 := newRequest $url1 | getResponse }}
+                    {{ $latitude := $req1.JSON.String "results.0.latitude" }}
+                    {{ $longitude := $req1.JSON.String "results.0.longitude" }}
+
+                    {{ $url2 := printf "https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s&temperature_unit=%s&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Europe/Prague" $latitude $longitude $temp_unit}}    
+                    {{ $req2 := newRequest $url2 | getResponse }}
+
+                    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+                      {{ $dates := $req2.JSON.Array "daily.time" }}
+                      <div style="position: relative; width: 100%; height: 25px;">  
+                        {{ range $index, $date := $dates }}
+                          {{ $dateString := .String "" }}
+                          {{ $parsedDate := $dateString | parseTime "DateOnly" }}
+                          {{ $dayOfWeek := $parsedDate.Format "Monday" | trimSuffix "day" | trimSuffix "on" | trimSuffix "es" | trimSuffix "edn" | trimSuffix "urs" | trimSuffix "ri" | trimSuffix "tur" | trimSuffix "n" }}  
+                          {{ $day_color := "" }}
+                          {{ if eq $dayOfWeek "Sa" "Su" }}
+                            {{ $day_color = $weekend_color }}
+                          {{ end }}
+                          <div style="text-align: center; width: 10%; height: 25px; line-height: 25px; margin: 0 10% 0 3%; left: {{ mul $index 14 }}%; position: absolute; background-color: {{ $day_color | safeCSS }} ">
+                            <p class="size-h4 color-paragraph">{{ $dayOfWeek }}</p> 
+                          </div>
+                        {{ end }}
+                      </div>
+
+                      <div style="position: relative; width: 100%; height: 25px;">     
+                        {{ range $index, $date := $dates }}
+                          {{ $dateString := .String "" }}
+                          {{ $trimmedDate := replaceMatches "[0-9]+-[0-9]+-" "" $dateString }}
+                          <div style="text-align: center; width: 10%; height: 25px; line-height: 25px; margin: 0 10% 0 3%; left: {{ mul $index 14 }}%; position: absolute;">
+                            <p class="size-h4 color-paragraph">{{ $trimmedDate }}</p> 
+                          </div>
+                        {{ end }}
+                      </div>
+
+                      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+                      {{ $codes := $req2.JSON.Array "daily.weathercode" }}
+                      <div style="position: relative; width: 100%; height: 30px;">     
+                        {{ range $index, $thiscode := $codes }}
+                          {{ $code := .Int "" }}
+                          <div style="text-align: center; width: 10%; height: 25px; line-height: 25px; margin: 0 10% 0 3%; left: {{ mul $index 14 }}% ; position: absolute;">
+                          {{ $wtype := "" }} 
+                          {{ $wicon := "" }} 
+                          {{ $wcolor := "" }} 
+                          {{ if eq $code 0 }}
+                            {{ $wtype = "Clear" }}
+                            {{ $wicon = "fas fa-sun" }}
+                            {{ $wcolor = $color_clear }}
+                          {{ else if or (eq $code 1) (eq $code 2) }}
+                            {{ $wtype = "Part Clear" }}
+                            {{ $wicon = "fas fa-cloud-sun" }}
+                            {{ $wcolor = $color_partly }} 
+                          {{ else if eq $code 3 }}
+                            {{ $wtype = "Cloudy" }}
+                            {{ $wicon = "fas fa-cloud" }}
+                            {{ $wcolor = $color_cloud }}
+                          {{ else if or (eq $code 45) (eq $code 48) }}
+                            {{ $wtype = "Fog" }}
+                            {{ $wicon = "fas fa-smog" }}
+                            {{ $wcolor = $color_smog }}
+                          {{ else if or (eq $code 51) (eq $code 53) (eq $code 55) (eq $code 56) (eq $code 57) }}
+                            {{ $wtype = "Drizzle" }}
+                            {{ $wicon = "fas fa-cloud-rain" }}
+                            {{ $wcolor = $color_drizzle }}
+                          {{ else if or (eq $code 61) (eq $code 63) (eq $code 65) (eq $code 80) (eq $code 81) (eq $code 82) }}
+                            {{ $wtype = "Rain" }}
+                            {{ $wicon = "fas fa-cloud-showers-heavy" }}
+                            {{ $wcolor = $color_rain }}
+                          {{ else if or (eq $code 66) (eq $code 67) }}
+                            {{ $wtype = "Freezing Rain" }}
+                            {{ $wicon = "fas fa-snowflake" }}
+                            {{ $wcolor = $color_freezing_rain }}
+                          {{ else if or (eq $code 71) (eq $code 73) (eq $code 75) (eq $code 77) (eq $code 85) (eq $code 86) }}
+                            {{ $wtype = "Snow" }}
+                            {{ $wicon = "fas fa-snowman" }}
+                            {{ $wcolor = $color_snow }}
+                          {{ else if or (eq $code 95) (eq $code 96) (eq $code 99) }}
+                            {{ $wtype = "Thunderstorm" }}
+                            {{ $wicon = "fas fa-bolt" }}
+                            {{ $wcolor = $color_thunderstorm }}
+                          {{ else }}
+                            {{ $wtype = "Other" }}
+                            {{ $wicon = "fa-solid fa-question" }}
+                            {{ $wcolor = $color_other }}
+                          {{ end }}
+                          <i class={{ $wicon }} style="font-size: 20px; color: {{ $wcolor | safeCSS }};" title={{ $wtype }}></i>
+                          </div>
+                        {{ end }}
+                      </div>
+                    </div>
+
+                    {{ $maxTemps := $req2.JSON.Array "daily.temperature_2m_max" }}
+                    {{ $minTemps := $req2.JSON.Array "daily.temperature_2m_min" }} 
+
+                    <div style="display: flex; justify-content: flex-start; align-items: center;">
+                      {{ $max_max := 0 }}
+                      {{ range $maxTemps }}
+                          {{ if gt (.Int "") $max_max }}
+                            {{ $max_max = (.Int "") }}
+                          {{ end }}
+                      {{ end }}
+                      {{ $min_min := 999 }}
+                      {{ range $minTemps }}
+                          {{ if lt (.Int "") $min_min }}
+                            {{ $min_min = (.Int "") }}
+                          {{ end }}
+                      {{ end }}
+                      {{ $max_max = add $max_max 1 }}
+                      {{ $min_min = sub $min_min 1 }}
+
+                      <div style="position: relative; width: 100%; height: 75px;">
+                        {{ $temp_range := sub $max_max $min_min }}
+                        {{ range $index, $thisHigh := $maxTemps }}
+                            {{ $thisLow := index $minTemps $index }}
+                            {{ $thisHigh = $thisHigh.Float "" }}
+                            {{ $thisLow = $thisLow.Float "" }}
+                            {{ $thisHighPct := sub 1 (div (sub $max_max $thisHigh) $temp_range) }}
+                            {{ $thisLowPct := div (sub $thisLow $min_min) $temp_range }}
+                            {{ $thisTempRange := sub $thisHigh $thisLow }}
+                            {{ $red_pos := mul 100 (div (sub $thisHigh $temp_red) $thisTempRange) | toInt }}
+                            {{ $yel_pos := mul 100 (div (sub $thisHigh $temp_yellow) $thisTempRange) | toInt }}
+                            {{ $blu_pos := mul 100 (div (sub $thisHigh $temp_blue) $thisTempRange) | toInt }}
+                            {{ $whi_pos := mul 100 (div (sub $thisHigh $temp_white) $thisTempRange) | toInt }}
+                            {{ $gradient_string := printf "%s %d%%, %s %d%%, %s %d%%, %s %d%%" $color_red $red_pos $color_yellow $yel_pos $color_blue $blu_pos $color_white $whi_pos }}
+
+                            <div style="left: {{ mul $index 14 | add 3 }}%; bottom: {{ mul $thisLowPct 100 | toInt }}%; 
+                              height: {{ mul (sub $thisHighPct $thisLowPct) 100 | toInt }}%; position: absolute;
+                              background:linear-gradient({{ $gradient_string | safeCSS }}); width: 10%; text-align: center; border-radius: 10px;">
+                              {{ $top_pos := -2 }}
+                              {{ $bot_pos := -2 }}
+                              {{ $pos_thresh := 0.20 }}
+                              {{ if lt (div $thisTempRange $temp_range) $pos_thresh }} 
+                                {{ $top_pos = -17 }}
+                                {{ $bot_pos = -19 }}
+                              {{ else if and (lt (div $thisTempRange $temp_range) (mul $pos_thresh 2)) (lt (sub 1 $thisHighPct) $thisLowPct) }}
+                                {{ $bot_pos = -19 }}
+                              {{ else if and (lt (div $thisTempRange $temp_range) (mul $pos_thresh 2)) (gt (sub 1 $thisHighPct) $thisLowPct) }}
+                                {{ $top_pos = -17 }}
+                              {{ end }}
+                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: {{ $overlay_color | safeCSS }}; z-index: 1;  border-radius: 10px;">
+                                  <p style='color: #F0F0F0; position: absolute; top: {{ $top_pos }}px; left: 0px; right: 0px'>{{ $thisHigh | toInt }}</p>
+                                  <p style='color: #F0F0F0; position: absolute; bottom: {{ $bot_pos }}px; left: 0px; right:0px'>{{ $thisLow | toInt }}</p>
+                                </div>
+                              </div>
+                        {{ end }}
+                      </div>
+                    </div>    
+
+            - type: bookmarks
+              groups:
+                - links:
+                    - title: Docs
+                      url: https://docs.corsair.tf/
+                      icon: di:affine
+                    - title: TinyAuth
+                      url: https://login.corsair.tf/
+                      icon: di:tinyauth
+                    - title: VaultWarden
+                      url: https://vault.corsair.tf/
+                      icon: di:vaultwarden
+                    - title: Amazon
+                      url: https://www.amazon.fr/
+                      icon: di:amazon
+                    - title: Météo France
+                      url: https://meteofrance.com/previsions-meteo-france/saint-malo/35400
+                      icon: mdi:weather-partly-cloudy
+                    - title: LinkedIn
+                      url: https://www.linkedin.com/
+                      icon: di:linkedin
+                    - title: Crédit Agricole
+                      url: https://www.credit-agricole.fr/ca-normandie/particulier/acceder-a-mes-comptes.html
+                      icon: mdi:bank
+                    - title: Boursorama
+                      url: https://clients.boursorama.com/connexion/
+                      icon: mdi:bank
+
+        - type: rss
+          title: France24
+          style: horizontal-cards
+          limit: 8
+          cache: 1h
+          feeds:
+            - url: https://www.france24.com/fr/rss
+              title: France24
+
+        - type: group
+          widgets:
+            - type: reddit
+              style: horizontal-cards
+              subreddit: technology
+              show-thumbnails: true
+
+    - size: small
+      widgets:
+
+        - type: clock
+          title: " "
+          hour-format: 24h
+
+        - type: custom-api
+          height: 200px
+          title: Random Dog
+          cache: 2m
+          url: https://dog.ceo/api/breeds/image/random
+          template: |
+            <img src="{{ .JSON.String "message" }}" style="max-width:100%; height:auto; border-radius:6px;" />
+
+        - type: custom-api
+          height: 200px
+          title: Random Cat
+          cache: 2m
+          url: https://cataas.com/cat?json=true
+          template: |
+            <img src="{{ .JSON.String "url" }}" style="max-width:100%; height:auto; border-radius:6px;" />

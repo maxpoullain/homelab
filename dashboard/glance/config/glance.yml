@@ -1,0 +1,28 @@
+server:
+  assets-path: /app/assets
+
+branding:
+  custom-footer: |
+    <div style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+      <a href="https://github.com/maxpoullain/homelab" target="_blank" rel="noreferrer">
+        <img class="bookmarks-icon flat-icon cached finished-transition" src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/github.svg" alt="" loading="lazy">
+      </a>
+      <a href="https://github.com/maxpoullain/homelab" class="bookmarks-link color-highlight size-h4" target="_blank" rel="noreferrer">Corsair Labs</a>
+    </div>
+  logo-url: /assets/corsair.png
+  favicon-url: /assets/corsair.png
+  app-name: "Corsair Labs"
+
+theme:
+  custom-css-file: /assets/custom.css
+  background-color: 232 23 18
+  contrast-multiplier: 1.2
+  primary-color: 220 83 75
+  positive-color: 105 48 72
+  negative-color: 351 74 73
+
+pages:
+  - $include: home.yml
+  - $include: lab.yml
+  - $include: media.yml
+  - $include: test.yml
