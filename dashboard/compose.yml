@@ -1,0 +1,36 @@
+services:
+  glance:
+    container_name: glance
+    image: glanceapp/glance
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./glance/config:/app/config
+      - ./glance/assets:/app/assets
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - GID=3002
+      - UID=3000
+      - TZ=Europe/Paris
+    env_file:
+      - .env
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.glance.entrypoints=https"
+      - "traefik.http.routers.glance.rule=(Host(`glance.corsair.tf`) || Host(`www.corsair.tf`) || Host(`corsair.tf`)) && PathRegexp(`^/(static/.*|assets/.*|api/pages/home/content/|[^/]*(/)?)$`)"
+      - "traefik.http.routers.glance.middlewares=glance@docker,security-soft@file"
+      - "traefik.http.routers.glance.service=glance"
+      - "traefik.http.routers.glance-protected.rule=(Host(`glance.corsair.tf`) || Host(`www.corsair.tf`) || Host(`corsair.tf`)) && !PathRegexp(`^/(static/.*|assets/.*|api/pages/home/content/|[^/]*(/)?)$`)"
+      - "traefik.http.routers.glance-protected.entrypoints=https"
+      - "traefik.http.routers.glance-protected.middlewares=glance@docker,security-soft@file,auth@docker"
+      - "traefik.http.routers.glance-protected.service=glance"
+      - "traefik.http.middlewares.glance.redirectregex.regex=https://(glance.)?corsair.tf"
+      - "traefik.http.middlewares.glance.redirectregex.replacement=https://www.corsair.tf"
+      - "traefik.http.services.glance.loadbalancer.server.port=8080"
+
+networks:
+  traefik:
+    external: true

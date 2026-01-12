@@ -1,0 +1,173 @@
+- name: Media
+  columns:
+    - size: small
+      widgets:
+        - type: monitor
+          title: Media Services
+          cache: 1m
+          sites:
+            - title: Jellyfin
+              url: https://tv.corsair.tf/
+              check-url: https://tv.corsair.tf/
+              timeout: 5s
+              alt-status-codes: [401,403]
+              icon: di:jellyfin
+            - title: Immich
+              url: https://photos.corsair.tf/
+              check-url: https://photos.corsair.tf/
+              timeout: 5s
+              alt-status-codes: [401,403]
+              icon: di:immich
+
+        - type: monitor
+          title: 7Seas
+          cache: 1m
+          sites:
+            - title: Sonarr
+              url: https://shows.corsair.tf/
+              check-url: https://shows.corsair.tf/
+              timeout: 5s
+              alt-status-codes: [401,403]
+              icon: di:sonarr
+            - title: Radarr
+              url: https://movies.corsair.tf/
+              check-url: https://movies.corsair.tf/
+              timeout: 5s
+              alt-status-codes: [401,403]
+              icon: di:radarr
+            - title: Readarr
+              url: https://books.corsair.tf/
+              check-url: https://books.corsair.tf/
+              timeout: 5s
+              alt-status-codes: [401,403]
+              icon: di:readarr
+            - title: Prowlarr
+              url: https://prowlarr.corsair.tf/
+              check-url: https://prowlarr.corsair.tf/
+              timeout: 5s
+              alt-status-codes: [401,403]
+              icon: di:prowlarr
+            - title: Transmission
+              url: https://seedbox.corsair.tf/
+              check-url: https://seedbox.corsair.tf/
+              timeout: 5s
+              alt-status-codes: [401,403]
+              icon: di:transmission
+
+    - size: full
+      widgets:
+        - type: rss
+          title: Movies & TV
+          style: horizontal-cards
+          limit: 12
+          collapse-after: 6
+          feeds:
+            - url: https://www.reddit.com/r/movies/.rss
+              title: r/movies
+            - url: https://www.reddit.com/r/television/.rss
+              title: r/television
+
+        - type: split-column
+          widgets:
+            - type: videos
+              title: YouTube
+              channels:
+                - UCXuqSBlHAE6Xw-yeJA0Tunw
+                - UCR-DXc1voovS8nhAvccRZhg
+              limit: 12
+              collapse-after: 8
+              style: vertical-list
+            - type: twitch-channels
+              title: Twitch Streams
+              channels:
+                - domingo
+                - jirayalecochon
+                - ponce
+                - humility
+              collapse-after: 5
+
+    - size: small
+      widgets:
+
+        - type: custom-api
+          title: "Jellyfin Stats"
+          base-url: ${JELLYFIN_URL}
+          options:
+            url: ${JELLYFIN_URL}
+            key: ${JELLYFIN_API_KEY}
+
+          template: |
+            {{ $url := .Options.StringOr "url" "" }}
+            {{ $key := .Options.StringOr "key" "" }}
+
+            {{- if or (eq $url "") (eq $key "") -}}
+            
+              <p>Error: The URL or API Key was not configured in the widget options.</p>
+              
+            {{- else -}}
+
+              {{- $requestUrl := printf "%s/emby/Items/Counts?api_key=%s" $url $key -}}
+              {{- $jellyfinData := newRequest $requestUrl | getResponse -}}
+
+              {{- if eq $jellyfinData.Response.StatusCode 200 -}}
+                <div class="flex flex-column gap-5">
+                  <div class="flex justify-between text-center">
+                    
+                    <div>
+                      <div class="color-highlight size-h3">{{ $jellyfinData.JSON.Int "MovieCount" | formatNumber }}</div>
+                      <div class="size-h5 uppercase">Movies</div>
+                    </div>
+
+                    <div>
+                      <div class="color-highlight size-h3">{{ $jellyfinData.JSON.Int "SeriesCount" | formatNumber }}</div>
+                      <div class="size-h5 uppercase">TV Shows</div>
+                    </div>
+
+                    <div>
+                      <div class="color-highlight size-h3">{{ $jellyfinData.JSON.Int "EpisodeCount" | formatNumber }}</div>
+                      <div class="size-h5 uppercase">Episodes</div>
+                    </div>
+
+                  </div>
+                </div>
+              {{- else -}}
+                <p>Failed: {{ $jellyfinData.Response.Status }}</p>
+              {{- end -}}
+            {{- end -}}
+
+        - type: custom-api
+          title: Immich stats
+          cache: 1d
+          url: ${IMMICH_URL}/api/server/statistics
+          headers:
+            x-api-key: ${IMMICH_API_KEY}
+            Accept: application/json
+          template: |
+            <div class="flex justify-evenly text-center">
+              <div>
+                  <div class="color-highlight size-h3">{{ .JSON.Int "photos" | formatNumber }}</div>
+                  <div class="size-h6">PHOTOS</div>
+              </div>
+              <div>
+                  <div class="color-highlight size-h3">{{ .JSON.Int "videos" | formatNumber }}</div>
+                  <div class="size-h6">VIDEOS</div>
+              </div>
+            </div>
+
+        - type: releases
+          token: ${GITHUB_TOKEN}
+          title: Media App Updates
+          repositories:
+            - jellyfin/jellyfin
+            - immich-app/immich
+            - Sonarr/Sonarr
+            - Radarr/Radarr
+            - Readarr/Readarr
+            - Prowlarr/Prowlarr
+            - transmission/transmission
+            - dockerhub:thrnz/docker-wireguard-pia
+            - FlareSolverr/FlareSolverr
+          show-source-icon: true
+          limit: 25
+          collapse-after: 15
+          cache: 3h

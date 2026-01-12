@@ -1,0 +1,21 @@
+/* Reduce font sizes for RSS and Reddit widgets */
+/* RSS horizontal cards title and excerpt */
+.glance-widget.rss .rss-card .rss-card-title,
+.glance-widget.rss .rss-card .rss-card-subtitle,
+.glance-widget.rss .rss-card p {
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+}
+
+/* Reddit widget items */
+.glance-widget.reddit .reddit-item .reddit-title,
+.glance-widget.reddit .reddit-item .reddit-excerpt,
+.glance-widget.reddit .reddit-item p {
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+}
+
+/* Tweak card padding to keep layout compact */
+.glance-widget .card {
+    padding: 8px !important;
+}
