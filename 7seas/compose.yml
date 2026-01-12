@@ -117,10 +117,18 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
+      # Main router for / (with auth)
       - "traefik.http.routers.prowlarr.entrypoints=https"
       - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.corsair.tf`)"
       - "traefik.http.routers.prowlarr.middlewares=security@file,private@file,auth@docker"
       - "traefik.http.routers.prowlarr.service=prowlarr"
+      # API router for /api (without auth)
+      - "traefik.http.routers.prowlarr-api.entrypoints=https"
+      - "traefik.http.routers.prowlarr-api.rule=Host(`prowlarr.corsair.tf`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.prowlarr-api.middlewares=security@file,private@file"
+      - "traefik.http.routers.prowlarr-api.service=prowlarr"
+      - "traefik.http.routers.prowlarr-api.priority=100"
+      # Service definition
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
 
   ygege:
@@ -161,10 +169,18 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
+      # Main router for / (with auth)
       - "traefik.http.routers.shows.entrypoints=https"
       - "traefik.http.routers.shows.rule=Host(`shows.corsair.tf`)"
       - "traefik.http.routers.shows.middlewares=security@file,private@file,auth@docker"
       - "traefik.http.routers.shows.service=shows"
+      # API router for /api (without auth)
+      - "traefik.http.routers.shows-api.entrypoints=https"
+      - "traefik.http.routers.shows-api.rule=Host(`shows.corsair.tf`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.shows-api.middlewares=security@file,private@file"
+      - "traefik.http.routers.shows-api.service=shows"
+      - "traefik.http.routers.shows-api.priority=100"
+      # Service definition
       - "traefik.http.services.shows.loadbalancer.server.port=8989"
 
   radarr:
@@ -190,10 +206,18 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
+      # Main router for / (with auth)
       - "traefik.http.routers.movies.entrypoints=https"
       - "traefik.http.routers.movies.rule=Host(`movies.corsair.tf`)"
       - "traefik.http.routers.movies.middlewares=security@file,private@file,auth@docker"
       - "traefik.http.routers.movies.service=movies"
+      # API router for /api (without auth)
+      - "traefik.http.routers.movies-api.entrypoints=https"
+      - "traefik.http.routers.movies-api.rule=Host(`movies.corsair.tf`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.movies-api.middlewares=security@file,private@file"
+      - "traefik.http.routers.movies-api.service=movies"
+      - "traefik.http.routers.movies-api.priority=100"
+      # Service definition
       - "traefik.http.services.movies.loadbalancer.server.port=7878"
 
   readarr:
@@ -219,10 +243,18 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
+      # Main router for / (with auth)
       - "traefik.http.routers.readarr.entrypoints=https"
       - "traefik.http.routers.readarr.rule=Host(`books.corsair.tf`)"
       - "traefik.http.routers.readarr.middlewares=security@file,private@file,auth@docker"
       - "traefik.http.routers.readarr.service=readarr"
+      # API router for /api (without auth)
+      - "traefik.http.routers.readarr-api.entrypoints=https"
+      - "traefik.http.routers.readarr-api.rule=Host(`books.corsair.tf`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.readarr-api.middlewares=security@file,private@file"
+      - "traefik.http.routers.readarr-api.service=readarr"
+      - "traefik.http.routers.readarr-api.priority=100"
+      # Service definition
       - "traefik.http.services.readarr.loadbalancer.server.port=8787"
 
 networks:
