@@ -27,7 +27,7 @@ DAY_OF_MONTH=$(date +%d)
 HOUR=$(date +%H)
 
 # Available services
-AVAILABLE_SERVICES=(immich vaultwarden otterwiki homeassistant jellyfin tailscale traefik prowlarr sonarr radarr readarr zigbee2mqtt adguard)
+AVAILABLE_SERVICES=(immich vaultwarden homeassistant jellyfin tailscale traefik prowlarr sonarr radarr readarr zigbee2mqtt adguard)
 
 # Parse command line arguments
 SELECTED_SERVICES=()
@@ -137,7 +137,7 @@ log "=========================================="
 log ""
 
 # Create backup directories if they don't exist
-mkdir -p "$BACKUP_DIR"/{immich,vaultwarden,wiki,homeassistant,jellyfin,tailscale,traefik,prowlarr,sonarr,radarr,readarr,zigbee2mqtt,adguard}
+mkdir -p "$BACKUP_DIR"/{immich,vaultwarden,homeassistant,jellyfin,tailscale,traefik,prowlarr,sonarr,radarr,readarr,zigbee2mqtt,adguard}
 
 # ============================================
 # IMMICH - PostgreSQL Database + Storage
@@ -163,14 +163,14 @@ else
 fi
 
 # 2. Backup storage files (library, upload, profile only - exclude regenerable content)
-if [ -d "$APPS_BASE/immich/storage" ] && [ "$IMMICH_SUCCESS" = true ]; then
+if [ -d "$APPS_BASE/media/immich" ] && [ "$IMMICH_SUCCESS" = true ]; then
   IMMICH_STORAGE_FILE="$BACKUP_DIR/immich/storage-${BACKUP_TYPE}-$DATE.tar.gz"
   
   tar -czf "$IMMICH_STORAGE_FILE" \
     --exclude="thumbs" \
     --exclude="encoded-video" \
     --exclude="backups" \
-    -C "$APPS_BASE/immich/storage" . 2>&1 | grep -v "Removing leading" || true
+    -C "$APPS_BASE/media/immich" . 2>&1 | grep -v "Removing leading" || true
   
   if [ -f "$IMMICH_STORAGE_FILE" ]; then
     IMMICH_STORAGE_SIZE=$(du -h "$IMMICH_STORAGE_FILE" | cut -f1)
@@ -280,44 +280,6 @@ log ""
 fi
 
 # ============================================
-# OTTERWIKI - SQLite Database
-# ============================================
-if should_backup "otterwiki"; then
-log "Backing up OtterWiki (database)..."
-WIKI_SUCCESS=true
-
-if docker ps --format "{{.Names}}" | grep -q otterwiki; then
-  WIKI_DB_FILE="$BACKUP_DIR/wiki/db-${BACKUP_TYPE}-$DATE.sqlite3"
-  
-  if docker exec otterwiki python3 -c "import sqlite3; src=sqlite3.connect('/app-data/db.sqlite'); dst=sqlite3.connect('/tmp/wiki-backup.db'); src.backup(dst); src.close(); dst.close()" 2>&1 | tee -a "$LOG_FILE"; then
-    if docker cp "otterwiki:/tmp/wiki-backup.db" "$WIKI_DB_FILE" 2>&1; then
-      WIKI_SIZE=$(du -h "$WIKI_DB_FILE" | cut -f1)
-      log "  ✓ Database backed up: db-${BACKUP_TYPE}-$DATE.sqlite3 ($WIKI_SIZE)"
-      docker exec otterwiki rm -f /tmp/wiki-backup.db 2>/dev/null
-    else
-      log "  ✗ Database backup failed - could not copy backup file"
-      WIKI_SUCCESS=false
-    fi
-  else
-    log "  ✗ Database backup failed - Python backup command failed"
-    WIKI_SUCCESS=false
-  fi
-else
-  log "  ✗ otterwiki container not running"
-  WIKI_SUCCESS=false
-fi
-
-if [ "$WIKI_SUCCESS" = true ]; then
-  SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
-  BACKUP_STATUS="${BACKUP_STATUS}OtterWiki: ✓ SUCCESS\n"
-else
-  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
-  BACKUP_STATUS="${BACKUP_STATUS}OtterWiki: ✗ FAILED\n"
-fi
-log ""
-fi
-
-# ============================================
 # HOME ASSISTANT - SQLite Databases + YAML Configs
 # ============================================
 if should_backup "homeassistant"; then
@@ -391,7 +353,7 @@ if should_backup "jellyfin"; then
 log "Backing up Jellyfin (full backup)..."
 JELLYFIN_SUCCESS=true
 
-if [ -d "$APPS_BASE/tv/jellyfin/config" ]; then
+if [ -d "$APPS_BASE/media/jellyfin/config" ]; then
   if docker ps --format "{{.Names}}" | grep -q jellyfin; then
     JELLYFIN_FILE="$BACKUP_DIR/jellyfin/full-${BACKUP_TYPE}-$DATE.tar.gz"
     
@@ -399,7 +361,7 @@ if [ -d "$APPS_BASE/tv/jellyfin/config" ]; then
       --exclude="cache" \
       --exclude="log" \
       --exclude="transcodes" \
-      -C "$APPS_BASE/tv/jellyfin" config 2>&1 | grep -v "Removing leading" || true
+      -C "$APPS_BASE/media/jellyfin" config 2>&1 | grep -v "Removing leading" || true
     
     if [ -f "$JELLYFIN_FILE" ]; then
       JELLYFIN_SIZE=$(du -h "$JELLYFIN_FILE" | cut -f1)
@@ -433,7 +395,6 @@ if should_backup "tailscale"; then
 log "Backing up Tailscale (state files)..."
 TAILSCALE_SUCCESS=true
 
-# Updated path: network/tailscale
 if [ -d "$APPS_BASE/network/tailscale" ]; then
   TAILSCALE_FILE="$BACKUP_DIR/tailscale/state-${BACKUP_TYPE}-$DATE.tar.gz"
   
@@ -467,7 +428,6 @@ if should_backup "traefik"; then
 log "Backing up Traefik (SSL certificates)..."
 TRAEFIK_SUCCESS=true
 
-# Updated path: front/traefik/acme
 if [ -d "$APPS_BASE/front/traefik/acme" ]; then
   TRAEFIK_FILE="$BACKUP_DIR/traefik/acme-${BACKUP_TYPE}-$DATE.tar.gz"
   
@@ -498,13 +458,13 @@ if should_backup "prowlarr"; then
 log "Backing up Prowlarr (full backup)..."
 PROWLARR_SUCCESS=true
 
-if [ -d "$APPS_BASE/media/prowlarr" ]; then
+if [ -d "$APPS_BASE/7seas/prowlarr" ]; then
   PROWLARR_FILE="$BACKUP_DIR/prowlarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
   
   tar -czf "$PROWLARR_FILE" \
     --exclude="logs" \
     --exclude="Backups" \
-    -C "$APPS_BASE/media" prowlarr 2>&1 | grep -v "Removing leading" || true
+    -C "$APPS_BASE/7seas" prowlarr 2>&1 | grep -v "Removing leading" || true
   
   if [ -f "$PROWLARR_FILE" ]; then
     PROWLARR_SIZE=$(du -h "$PROWLARR_FILE" | cut -f1)
@@ -532,14 +492,14 @@ if should_backup "sonarr"; then
 log "Backing up Sonarr (full backup)..."
 SONARR_SUCCESS=true
 
-if [ -d "$APPS_BASE/media/sonarr" ]; then
+if [ -d "$APPS_BASE/7seas/sonarr" ]; then
   SONARR_FILE="$BACKUP_DIR/sonarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
   
   tar -czf "$SONARR_FILE" \
     --exclude="logs" \
     --exclude="Backups" \
     --exclude="MediaCover" \
-    -C "$APPS_BASE/media" sonarr 2>&1 | grep -v "Removing leading" || true
+    -C "$APPS_BASE/7seas" sonarr 2>&1 | grep -v "Removing leading" || true
   
   if [ -f "$SONARR_FILE" ]; then
     SONARR_SIZE=$(du -h "$SONARR_FILE" | cut -f1)
@@ -567,14 +527,14 @@ if should_backup "radarr"; then
 log "Backing up Radarr (full backup)..."
 RADARR_SUCCESS=true
 
-if [ -d "$APPS_BASE/media/radarr" ]; then
+if [ -d "$APPS_BASE/7seas/radarr" ]; then
   RADARR_FILE="$BACKUP_DIR/radarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
   
   tar -czf "$RADARR_FILE" \
     --exclude="logs" \
     --exclude="Backups" \
     --exclude="MediaCover" \
-    -C "$APPS_BASE/media" radarr 2>&1 | grep -v "Removing leading" || true
+    -C "$APPS_BASE/7seas" radarr 2>&1 | grep -v "Removing leading" || true
   
   if [ -f "$RADARR_FILE" ]; then
     RADARR_SIZE=$(du -h "$RADARR_FILE" | cut -f1)
@@ -602,14 +562,14 @@ if should_backup "readarr"; then
 log "Backing up Readarr (full backup)..."
 READARR_SUCCESS=true
 
-if [ -d "$APPS_BASE/media/readarr" ]; then
+if [ -d "$APPS_BASE/7seas/readarr" ]; then
   READARR_FILE="$BACKUP_DIR/readarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
   
   tar -czf "$READARR_FILE" \
     --exclude="logs" \
     --exclude="Backups" \
     --exclude="MediaCover" \
-    -C "$APPS_BASE/media" readarr 2>&1 | grep -v "Removing leading" || true
+    -C "$APPS_BASE/7seas" readarr 2>&1 | grep -v "Removing leading" || true
   
   if [ -f "$READARR_FILE" ]; then
     READARR_SIZE=$(du -h "$READARR_FILE" | cut -f1)
@@ -671,14 +631,13 @@ if should_backup "adguard"; then
 log "Backing up AdGuard Home (config + database)..."
 ADGUARD_SUCCESS=true
 
-# Updated path: dns/adguard
-if [ -d "$APPS_BASE/dns/adguard" ]; then
+if [ -d "$APPS_BASE/network/adguard" ]; then
   ADGUARD_FILE="$BACKUP_DIR/adguard/full-${BACKUP_TYPE}-$DATE.tar.gz"
   
   tar -czf "$ADGUARD_FILE" \
     --exclude="work/data/sessions.db" \
     --exclude="work/data/querylog.json*" \
-    -C "$APPS_BASE/dns" adguard 2>&1 | grep -v "Removing leading" || true
+    -C "$APPS_BASE/network" adguard 2>&1 | grep -v "Removing leading" || true
   
   if [ -f "$ADGUARD_FILE" ]; then
     ADGUARD_SIZE=$(du -h "$ADGUARD_FILE" | cut -f1)
