@@ -46,8 +46,6 @@ echo -n "  Immich Postgres: "
 docker ps --format "{{.Names}}" | grep -q immich_postgres && echo "✓ Running" || echo "✗ Not running"
 echo -n "  Vaultwarden: "
 docker ps --format "{{.Names}}" | grep -q vaultwarden && echo "✓ Running" || echo "✗ Not running"
-echo -n "  OtterWiki: "
-docker ps --format "{{.Names}}" | grep -q otterwiki && echo "✓ Running" || echo "✗ Not running"
 echo -n "  Home Assistant: "
 docker ps --format "{{.Names}}" | grep -q "^ha$" && echo "✓ Running" || echo "✗ Not running"
 echo -n "  Jellyfin: "
@@ -74,7 +72,6 @@ echo ""
 echo "Last backup times:"
 IMMICH_LAST=$(ls -lt /mnt/tank/backups/homelab/immich/db-*.sql.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
 VAULT_LAST=$(ls -lt /mnt/tank/backups/homelab/vaultwarden/db-*.sqlite3 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
-WIKI_LAST=$(ls -lt /mnt/tank/backups/homelab/wiki/db-*.sqlite3 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
 HA_LAST=$(ls -lt /mnt/tank/backups/homelab/homeassistant/db-*.sqlite3 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
 JELLYFIN_LAST=$(ls -lt /mnt/tank/backups/homelab/jellyfin/full-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
 TAILSCALE_LAST=$(ls -lt /mnt/tank/backups/homelab/tailscale/state-*.tar.gz 2>/dev/null | head -1 | awk '{print $6, $7, $8, $9}')
@@ -88,7 +85,6 @@ ADGUARD_LAST=$(ls -lt /mnt/tank/backups/homelab/adguard/full-*.tar.gz 2>/dev/nul
 
 echo "  Immich:          ${IMMICH_LAST:-No backups found}"
 echo "  Vaultwarden:     ${VAULT_LAST:-No backups found}"
-echo "  OtterWiki:       ${WIKI_LAST:-No backups found}"
 echo "  Home Assistant:  ${HA_LAST:-No backups found}"
 echo "  Jellyfin:        ${JELLYFIN_LAST:-No backups found}"
 echo "  Tailscale:       ${TAILSCALE_LAST:-No backups found}"
@@ -108,7 +104,6 @@ IMMICH_STORAGE_COUNT=$(ls -1 /mnt/tank/backups/homelab/immich/storage-*.tar.gz 2
 VAULT_DB_COUNT=$(ls -1 /mnt/tank/backups/homelab/vaultwarden/db-*.sqlite3 2>/dev/null | wc -l)
 VAULT_RSA_COUNT=$(ls -1 /mnt/tank/backups/homelab/vaultwarden/rsa_key-*.pem 2>/dev/null | wc -l)
 VAULT_ATT_COUNT=$(ls -1 /mnt/tank/backups/homelab/vaultwarden/attachments-*.tar.gz 2>/dev/null | wc -l)
-WIKI_COUNT=$(ls -1 /mnt/tank/backups/homelab/wiki/db-*.sqlite3 2>/dev/null | wc -l)
 HA_DB_COUNT=$(ls -1 /mnt/tank/backups/homelab/homeassistant/db-*.sqlite3 2>/dev/null | wc -l)
 HA_CONFIG_COUNT=$(ls -1 /mnt/tank/backups/homelab/homeassistant/config-*.tar.gz 2>/dev/null | wc -l)
 JELLYFIN_COUNT=$(ls -1 /mnt/tank/backups/homelab/jellyfin/full-*.tar.gz 2>/dev/null | wc -l)
@@ -124,7 +119,6 @@ ADGUARD_COUNT=$(ls -1 /mnt/tank/backups/homelab/adguard/full-*.tar.gz 2>/dev/nul
 
 echo "  Immich:          $IMMICH_DB_COUNT databases, $IMMICH_STORAGE_COUNT storage backups"
 echo "  Vaultwarden:     $VAULT_DB_COUNT databases, $VAULT_RSA_COUNT RSA keys, $VAULT_ATT_COUNT attachments"
-echo "  OtterWiki:       $WIKI_COUNT databases"
 echo "  Home Assistant:  $HA_DB_COUNT databases, $HA_CONFIG_COUNT configs"
 echo "  Jellyfin:        $JELLYFIN_COUNT full backups"
 echo "  Tailscale:       $TAILSCALE_COUNT state backups"
@@ -221,7 +215,7 @@ echo ""
 
 # Check backup sizes
 echo "Total backup sizes:"
-du -sh /mnt/tank/backups/homelab/immich /mnt/tank/backups/homelab/vaultwarden /mnt/tank/backups/homelab/wiki /mnt/tank/backups/homelab/homeassistant /mnt/tank/backups/homelab/jellyfin /mnt/tank/backups/homelab/tailscale /mnt/tank/backups/homelab/traefik /mnt/tank/backups/homelab/prowlarr /mnt/tank/backups/homelab/sonarr /mnt/tank/backups/homelab/radarr /mnt/tank/backups/homelab/readarr /mnt/tank/backups/homelab/zigbee2mqtt /mnt/tank/backups/homelab/adguard 2>/dev/null
+du -sh /mnt/tank/backups/homelab/immich /mnt/tank/backups/homelab/vaultwarden /mnt/tank/backups/homelab/homeassistant /mnt/tank/backups/homelab/jellyfin /mnt/tank/backups/homelab/tailscale /mnt/tank/backups/homelab/traefik /mnt/tank/backups/homelab/prowlarr /mnt/tank/backups/homelab/sonarr /mnt/tank/backups/homelab/radarr /mnt/tank/backups/homelab/readarr /mnt/tank/backups/homelab/zigbee2mqtt /mnt/tank/backups/homelab/adguard 2>/dev/null
 if [ -d "$TRUENAS_BACKUP_DIR" ]; then
   du -sh "$TRUENAS_BACKUP_DIR" 2>/dev/null | awk '{print $1 "\t" $2}'
 fi

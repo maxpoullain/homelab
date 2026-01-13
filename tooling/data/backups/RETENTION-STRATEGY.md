@@ -64,7 +64,6 @@ Now      ┊         │       │        │
 ```
 Immich:         323 MB  (251M db + 72M storage)
 Vaultwarden:    322 KB  (~876K db + 1.7K key + 9.4K attachments)
-OtterWiki:       12 KB
 Home Assistant:  73 MB  (2 databases + configs)
 Jellyfin:       1.6 GB  (full backup with metadata)
 Tailscale:        1 KB
@@ -196,14 +195,13 @@ This ensures:
 
 ## Services Covered
 
-All 7 homelab services backed up:
+All 6 homelab services backed up:
 1. **Immich**: PostgreSQL database + storage files (library, upload, profile)
 2. **Vaultwarden**: SQLite database + RSA keys + attachments
-3. **OtterWiki**: SQLite database
-4. **Home Assistant**: Main SQLite + Zigbee SQLite + YAML configs
-5. **Jellyfin**: Full backup (databases + metadata + plugins)
-6. **Tailscale**: State files
-7. **Traefik**: ACME SSL certificates
+3. **Home Assistant**: Main SQLite + Zigbee SQLite + YAML configs
+4. **Jellyfin**: Full backup (databases + metadata + plugins)
+5. **Tailscale**: State files
+6. **Traefik**: ACME SSL certificates
 
 ## Monitoring
 
