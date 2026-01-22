@@ -36,7 +36,7 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      - COLLECTIONS=crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/linux Dominic-Wagner/vaultwarden
+      - COLLECTIONS=crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/linux Dominic-Wagner/vaultwarden LePresidente/jellyfin gauth-fr/immich
       - GID=3002
       - UID=3000
       - CUSTOM_HOSTNAME=crowdsec
@@ -58,6 +58,12 @@ services:
       - traefik
     env_file:
       - .env
+    environment:
+      - BACKGROUND_IMAGE=/resources/background.jpg
+      - SESSION_EXPIRY=172800
+    volumes:
+      - ./tinyauth/resources:/data/resources
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.auth.entrypoints=https
@@ -66,6 +72,23 @@ services:
       - traefik.http.routers.auth.middlewares=security@file
       - traefik.http.services.auth.loadbalancer.server.port=3000
       - traefik.http.middlewares.auth.forwardauth.address=http://tinyauth:3000/api/auth/traefik
+      # ACLs
+      - tinyauth.apps.dockhand.config.domain=admin.corsair.tf
+      - tinyauth.apps.dockhand.users.allow=max
+      - tinyauth.apps.beszel.config.domain=status.corsair.tf
+      - tinyauth.apps.beszel.users.allow=max
+      - tinyauth.apps.traefik.config.domain=traefik.corsair.tf
+      - tinyauth.apps.traefik.users.allow=max
+      - tinyauth.apps.seedbox.config.domain=seedbox.corsair.tf
+      - tinyauth.apps.seedbox.users.allow=max
+      - tinyauth.apps.prowlarr.config.domain=prowlarr.corsair.tf
+      - tinyauth.apps.prowlarr.users.allow=max
+      - tinyauth.apps.shows.config.domain=shows.corsair.tf
+      - tinyauth.apps.shows.users.allow=max
+      - tinyauth.apps.movies.config.domain=movies.corsair.tf
+      - tinyauth.apps.movies.users.allow=max
+      - tinyauth.apps.books.config.domain=books.corsair.tf
+      - tinyauth.apps.books.users.allow=max
 
 networks:
   traefik:
