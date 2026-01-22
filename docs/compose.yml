@@ -94,6 +94,21 @@ services:
     networks:
       - affine
 
+  bentopdf:
+    image: ghcr.io/alam00000/bentopdf-simple:latest
+    container_name: bentopdf
+    restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bentopdf.entrypoints=https"
+      - "traefik.http.routers.bentopdf.rule=Host(`pdf.corsair.tf`)"
+      - "traefik.http.routers.bentopdf.middlewares=security@file,auth@docker"
+      - "traefik.http.routers.bentopdf.service=bentopdf"
+      - "traefik.http.services.bentopdf.loadbalancer.server.port=8080"
+      - "traefik.docker.network=traefik"
+
 networks:
   affine:
     external: true
