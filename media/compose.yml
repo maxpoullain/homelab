@@ -49,6 +49,8 @@ services:
       - "traefik.http.routers.jellyfin.service=jellyfin"
       - "traefik.http.services.jellyfin.loadBalancer.server.port=8096"
       - "traefik.http.services.jellyfin.loadBalancer.passHostHeader=true"
+      - "crowdsec.enable=true"
+      - "crowdsec.labels.type=jellyfin"
 
   immich-server:
     container_name: immich_server
@@ -86,6 +88,8 @@ services:
       - "traefik.http.routers.photos.rule=Host(`photos.corsair.tf`)"
       - "traefik.http.routers.photos.middlewares=security-soft@file"
       - "traefik.docker.network=traefik"
+      - "crowdsec.enable=true"
+      - "crowdsec.labels.type=immich"
 
   immich-machine-learning:
     container_name: immich_machine_learning
