@@ -23,6 +23,8 @@ services:
       - "traefik.http.routers.homeassistant.rule=Host(`home.corsair.tf`)"
       - "traefik.http.routers.homeassistant.middlewares=private@file,security-soft@file"
       - "traefik.http.services.homeassistant.loadbalancer.server.url=http://192.168.1.8:8123"
+      - "crowdsec.enable=true"
+      - "crowdsec.labels.type=home-assistant"
 
   mosquitto:
     container_name: mosquitto
