@@ -138,7 +138,7 @@ services:
     networks:
       - 7seas
     env_file:
-      - .env
+      - ygg.env
     healthcheck:
       test: ["CMD-SHELL", "curl --fail http://localhost:8715/health || exit 1"]
       interval: 1m30s
