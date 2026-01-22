@@ -1,5 +1,6 @@
 **/secrets.env
 **/.env
+7seas/ygg.env
 7seas/pia/*
 !7seas/pia/encrypted.env
 !7seas/pia/port.sh
