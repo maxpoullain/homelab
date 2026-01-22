@@ -36,7 +36,7 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      - COLLECTIONS=crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/linux Dominic-Wagner/vaultwarden LePresidente/jellyfin gauth-fr/immich
+      - COLLECTIONS=crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/linux crowdsecurity/home-assistant Dominic-Wagner/vaultwarden LePresidente/jellyfin gauth-fr/immich
       - GID=3002
       - UID=3000
       - CUSTOM_HOSTNAME=crowdsec
