@@ -17,6 +17,8 @@ admin/beszel/*
 admin/dockhand/*
 docs/affine/config/*
 docs/affine/storage/*
+docs/papra.env
+docs/papra/*
 dashy/config/conf.yml
 dashy/config/health.yml
 dashy/config/config-backups/*

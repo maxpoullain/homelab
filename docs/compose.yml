@@ -109,6 +109,26 @@ services:
       - "traefik.http.services.bentopdf.loadbalancer.server.port=8080"
       - "traefik.docker.network=traefik"
 
+  papra:
+    container_name: papra
+    image: ghcr.io/papra-hq/papra:latest
+    restart: unless-stopped
+    volumes:
+      - ./papra:/app/app-data
+    user: "3000:3000"
+    networks:
+      - traefik
+    env_file:
+      - papra.env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.papra.entrypoints=https"
+      - "traefik.http.routers.papra.rule=Host(`archive.corsair.tf`)"
+      - "traefik.http.routers.papra.middlewares=security@file,private@file,auth@docker"
+      - "traefik.http.routers.papra.service=papra"
+      - "traefik.http.services.papra.loadbalancer.server.port=1221"
+      - "traefik.docker.network=traefik"
+
 networks:
   affine:
     external: true
