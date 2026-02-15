@@ -1,7 +1,7 @@
 services:
-  dockhand:
-    image: fnsys/dockhand:latest
-    container_name: dockhand
+  arcane:
+    image: ghcr.io/getarcaneapp/arcane:latest
+    container_name: arcane
     depends_on:
       - socket-proxy
     restart: unless-stopped
@@ -10,17 +10,29 @@ services:
     group_add:
       - "999"  # Replace with your host's Docker GID
     volumes:
-      - ./dockhand:/app/data
+      - ./arcane:/app/data
+      - /mnt/fast/apps/homelab:/mnt/fast/apps/homelab:ro
+    env_file:
+      - .env
+    environment:
+      - APP_URL=https://docker.corsair.tf
+      - PUID=3000
+      - PGID=3002
+      - TZ=Europe/Paris
+      - DOCKER_HOST=tcp://socket-proxy:2375
+      - PROJECTS_DIRECTORY=/mnt/fast/apps/homelab
+      - GPU_MONITORING_ENABLED=true
+      - GPU_TYPE=intel
     networks:
       - traefik
       - admin
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dockhand.entrypoints=https"
-      - "traefik.http.routers.dockhand.rule=Host(`admin.corsair.tf`)"
-      - "traefik.http.routers.dockhand.middlewares=private@file,security@file,auth@docker"
-      - "traefik.http.routers.dockhand.service=dockhand"
-      - "traefik.http.services.dockhand.loadbalancer.server.port=3000"
+      - "traefik.http.routers.arcane.entrypoints=https"
+      - "traefik.http.routers.arcane.rule=Host(`docker.corsair.tf`)"
+      - "traefik.http.routers.arcane.middlewares=private@file,security-soft@file"
+      - "traefik.http.routers.arcane.service=arcane"
+      - "traefik.http.services.arcane.loadbalancer.server.port=3552"
       - "traefik.docker.network=traefik"
 
   socket-proxy:

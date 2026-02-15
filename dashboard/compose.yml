@@ -1,7 +1,7 @@
 services:
   glance:
     container_name: glance
-    image: glanceapp/glance
+    image: glanceapp/glance:latest
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
