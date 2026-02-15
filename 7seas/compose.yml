@@ -43,10 +43,11 @@ services:
       - "traefik.http.routers.seedbox.middlewares=security@file,private@file,auth@docker"
       - "traefik.http.routers.seedbox.service=seedbox"
       - "traefik.http.services.seedbox.loadbalancer.server.port=9091"
+      - "com.getarcaneapp.arcane.updater=false"
 
   transmission:
     container_name: transmission
-    image: linuxserver/transmission:latest
+    image: linuxserver/transmission:4.0.6
     restart: unless-stopped
     cpus: 4
     mem_limit: 2048m
@@ -75,7 +76,7 @@ services:
 
   flaresolverr:
     container_name: flaresolverr
-    image: ghcr.io/flaresolverr/flaresolverr:latest #21hsmw/flaresolverr:nodriver #ghcr.io/flaresolverr/flaresolverr:pr-1282
+    image: ghcr.io/flaresolverr/flaresolverr:latest
     restart: unless-stopped
     cpus: 4
     mem_limit: 1024m
@@ -256,6 +257,38 @@ services:
       - "traefik.http.routers.readarr-api.priority=100"
       # Service definition
       - "traefik.http.services.readarr.loadbalancer.server.port=8787"
+
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    container_name: seerr
+    restart: unless-stopped
+    cpus: 0.5
+    mem_limit: 256m
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik
+    environment:
+      - PUID=3000
+      - PGID=3002
+      - TZ=Europe/Paris
+    volumes:
+      - "./seerr:/app/config"
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.seerr.entrypoints=https"
+      - "traefik.http.routers.seerr.rule=Host(`seerr.corsair.tf`)"
+      - "traefik.http.routers.seerr.middlewares=security@file,private@file"
+      - "traefik.http.routers.seerr.service=seerr"
+      - "traefik.http.services.seerr.loadbalancer.server.port=5055"
 
 networks:
   traefik:
