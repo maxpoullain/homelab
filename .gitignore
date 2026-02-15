@@ -12,9 +12,10 @@
 7seas/radarr/*
 7seas/readarr/*
 7seas/sonarr/*
+7seas/seerr/*
 7seas/transmission/*
+admin/arcane/*
 admin/beszel/*
-admin/dockhand/*
 docs/affine/config/*
 docs/affine/storage/*
 docs/papra.env
