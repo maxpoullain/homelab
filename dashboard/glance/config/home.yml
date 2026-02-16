@@ -374,6 +374,9 @@
                     - title: Amazon
                       url: https://www.amazon.fr/
                       icon: di:amazon
+                    - title: BentoPDF
+                      url: https://www.pdf.corsair.tf/
+                      icon: di:bentopdf
                     - title: Météo France
                       url: https://meteofrance.com/previsions-meteo-france/saint-malo/35400
                       icon: mdi:weather-partly-cloudy

@@ -1785,11 +1785,12 @@
             - immich-app/immich
             - Sonarr/Sonarr
             - Radarr/Radarr
-            - Readarr/Readarr
             - Prowlarr/Prowlarr
+            - seerr-team/seerr
             - transmission/transmission
             - dockerhub:thrnz/docker-wireguard-pia
             - FlareSolverr/FlareSolverr
+            - UwUDev/ygege
           show-source-icon: true
           limit: 25
           collapse-after: 5
