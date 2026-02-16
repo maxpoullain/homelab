@@ -755,6 +755,12 @@
           title: 7Seas
           cache: 1m
           sites:
+            - title: Seerr
+              url: https://seerr.corsair.tf/
+              check-url: https://seerr.corsair.tf/
+              timeout: 5s
+              alt-status-codes: [401,403]
+              icon: di:overseerr
             - title: Sonarr
               url: https://shows.corsair.tf/
               check-url: https://shows.corsair.tf/

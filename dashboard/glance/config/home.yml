@@ -371,6 +371,9 @@
                     - title: VaultWarden
                       url: https://vault.corsair.tf/
                       icon: di:vaultwarden
+                    - title: Archive
+                      url: https://archive.corsair.tf/
+                      icon: di:papra
                     - title: Amazon
                       url: https://www.amazon.fr/
                       icon: di:amazon

@@ -431,7 +431,7 @@
           widgets:
 
             - type: dns-stats
-              title: DNS Stats
+              title: DNS Stats (7 days)
               service: adguard
               url: http://172.17.0.1:3000
               hide-graph: false
