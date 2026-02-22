@@ -1,0 +1,25 @@
+services:
+  octoprint:
+    container_name: octoprint
+    image: octoprint/octoprint:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    devices:
+      - /dev/ttyUSB1:/dev/ttyUSB1
+    volumes:
+      - ./octoprint:/octoprint
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.octoprint.entrypoints=https"
+      - "traefik.http.routers.octoprint.rule=Host(`octoprint.corsair.tf`)"
+      - "traefik.http.routers.octoprint.middlewares=private@file,security-soft@file"
+      - "traefik.http.routers.octoprint.service=octoprint"
+      - "traefik.http.services.octoprint.loadbalancer.server.port=80"
+      - "traefik.docker.network=traefik"
+
+networks:
+  traefik:
+    external: true
