@@ -15,8 +15,8 @@ sensors-detect
 # Follow the prompts and load recommended modules
 # Common modules:
 sudo modprobe nct6775  # For Nuvoton chips
-sudo modprobe it87     # For ITE chips
-sudo modprobe w83627ehf # For Winbond chips
+# sudo modprobe it87     # For ITE chips
+# sudo modprobe w83627ehf # For Winbond chips
 
 # Make the module load on boot
 echo "nct6775" | sudo tee -a /etc/modules
@@ -45,16 +45,16 @@ done
 
 # Test which PWM controls which fan
 # Example: Check current PWM value
-cat /sys/class/hwmon/hwmon0/pwm2
+cat /sys/class/hwmon/hwmon10/pwm2
 
 # Example: Check current fan RPM
-cat /sys/class/hwmon/hwmon0/fan2_input
+cat /sys/class/hwmon/hwmon10/fan2_input
 
 # Test by setting PWM value
-echo 1 | sudo tee /sys/class/hwmon/hwmon0/pwm2_enable  # Enable manual control
-echo 150 | sudo tee /sys/class/hwmon/hwmon0/pwm2       # Set to medium speed
+echo 1 | sudo tee /sys/class/hwmon/hwmon10/pwm2_enable  # Enable manual control
+echo 150 | sudo tee /sys/class/hwmon/hwmon10/pwm2       # Set to medium speed
 # Watch the RPM change to verify it's the correct fan
-watch -n 1 cat /sys/class/hwmon/hwmon0/fan2_input
+watch -n 1 cat /sys/class/hwmon/hwmon10/fan2_input
 ```
 
 ### 3. Configure the Script
@@ -63,9 +63,9 @@ Edit `hdd_fan_control.sh` and update the paths at the top of the file:
 
 ```bash
 # Edit these paths based on your system
-PWM_PATH="/sys/class/hwmon/hwmon6/pwm2"           # Your PWM control path
-PWM_ENABLE_PATH="/sys/class/hwmon/hwmon6/pwm2_enable"
-FAN_RPM_PATH="/sys/class/hwmon/hwmon6/fan2_input" # Your fan RPM sensor path
+PWM_PATH="/sys/class/hwmon/hwmon10/pwm2"           # Your PWM control path
+PWM_ENABLE_PATH="/sys/class/hwmon/hwmon10/pwm2_enable"
+FAN_RPM_PATH="/sys/class/hwmon/hwmon10/fan2_input" # Your fan RPM sensor path
 
 # Update the HDD devices you want to monitor
 HDD_DEVICES=("/dev/sda" "/dev/sdb" "/dev/sdc" "/dev/sdd")
@@ -89,7 +89,7 @@ sudo pacman -S smartmontools          # Arch Linux
 chmod +x hdd_fan_control.sh
 
 # Test without making changes
-./hdd_fan_control.sh -t
+sudo ./hdd_fan_control.sh -t
 
 # Test with verbose output (requires root)
 sudo ./hdd_fan_control.sh -v
@@ -100,8 +100,8 @@ sudo ./hdd_fan_control.sh
 
 ## Configuration
 
-- **PWM Path**: `/sys/class/hwmon/hwmon6/pwm2`
-- **Fan RPM Path**: `/sys/class/hwmon/hwmon6/fan2_input`
+- **PWM Path**: `/sys/class/hwmon/hwmon10/pwm2`
+- **Fan RPM Path**: `/sys/class/hwmon/hwmon10/fan2_input`
 - **Monitored HDDs**: `/dev/sda`, `/dev/sdb`, `/dev/sdc`, `/dev/sdd`
 
 ## Manual Fan Control
@@ -112,10 +112,10 @@ To manually set the fan RPM, you need to write a PWM value (0-255) to the PWM co
 
 ```bash
 # Enable manual PWM control
-echo 1 | sudo tee /sys/class/hwmon/hwmon6/pwm2_enable
+echo 1 | sudo tee /sys/class/hwmon/hwmon10/pwm2_enable
 
 # Set PWM value (0-255)
-echo <PWM_VALUE> | sudo tee /sys/class/hwmon/hwmon6/pwm2
+echo <PWM_VALUE> | sudo tee /sys/class/hwmon/hwmon10/pwm2
 ```
 
 ### PWM to RPM Reference
@@ -145,19 +145,19 @@ Based on the script's temperature map (very quiet until 43°C, then aggressive r
 
 ```bash
 # Set fan to quiet mode (~412 RPM)
-echo 1 | sudo tee /sys/class/hwmon/hwmon6/pwm2_enable
-echo 35 | sudo tee /sys/class/hwmon/hwmon6/pwm2
+echo 1 | sudo tee /sys/class/hwmon/hwmon10/pwm2_enable
+echo 35 | sudo tee /sys/class/hwmon/hwmon10/pwm2
 
 # Set fan to medium speed (~1529 RPM)
-echo 1 | sudo tee /sys/class/hwmon/hwmon6/pwm2_enable
-echo 130 | sudo tee /sys/class/hwmon/hwmon6/pwm2
+echo 1 | sudo tee /sys/class/hwmon/hwmon10/pwm2_enable
+echo 130 | sudo tee /sys/class/hwmon/hwmon10/pwm2
 
 # Set fan to maximum speed (~3000 RPM)
-echo 1 | sudo tee /sys/class/hwmon/hwmon6/pwm2_enable
-echo 255 | sudo tee /sys/class/hwmon/hwmon6/pwm2
+echo 1 | sudo tee /sys/class/hwmon/hwmon10/pwm2_enable
+echo 255 | sudo tee /sys/class/hwmon/hwmon10/pwm2
 
 # Check current fan RPM
-cat /sys/class/hwmon/hwmon6/fan2_input
+cat /sys/class/hwmon/hwmon10/fan2_input
 ```
 
 ## Using the Control Script
@@ -304,11 +304,11 @@ sudo systemctl stop hdd-fan-control.timer
 sudo systemctl status hdd-fan-control.timer
 
 # Now you can manually test PWM values
-echo 1 | sudo tee /sys/class/hwmon/hwmon6/pwm2_enable
-echo 145 | sudo tee /sys/class/hwmon/hwmon6/pwm2
+echo 1 | sudo tee /sys/class/hwmon/hwmon10/pwm2_enable
+echo 145 | sudo tee /sys/class/hwmon/hwmon10/pwm2
 
 # Monitor fan RPM while testing
-watch -n 1 cat /sys/class/hwmon/hwmon6/fan2_input
+watch -n 1 cat /sys/class/hwmon/hwmon10/fan2_input
 
 # When done testing, restart the timer
 sudo systemctl start hdd-fan-control.timer

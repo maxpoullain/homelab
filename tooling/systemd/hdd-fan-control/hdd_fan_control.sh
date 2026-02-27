@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # HDD Temperature-based Fan Control Script
-# Controls hwmon/pwm2 based on maximum HDD temperature
+# Controls hwmon/pwm1 based on maximum HDD temperature
 
 # Configuration - adjust these paths based on your system
-PWM_PATH="/sys/class/hwmon/hwmon6/pwm2"
-PWM_ENABLE_PATH="/sys/class/hwmon/hwmon6/pwm2_enable"
-FAN_RPM_PATH="/sys/class/hwmon/hwmon6/fan2_input"
+PWM_PATH="/sys/class/hwmon/hwmon10/pwm1"
+PWM_ENABLE_PATH="/sys/class/hwmon/hwmon10/pwm1_enable"
+FAN_RPM_PATH="/sys/class/hwmon/hwmon10/fan1_input"
 LOG_FILE="/var/log/hdd_fan_control.log"
 
 # HDD devices to monitor
@@ -16,7 +16,7 @@ HDD_DEVICES=("/dev/sda" "/dev/sdb" "/dev/sdc" "/dev/sdd")
 # Very quiet below 43°C, then aggressive ramp to 55°C
 declare -A TEMP_MAP
 TEMP_MAP[30]=28    # ≤30°C: ~329 RPM (very quiet)
-TEMP_MAP[35]=35    # ≤35°C: ~412 RPM (very quiet)  
+TEMP_MAP[35]=35    # ≤35°C: ~412 RPM (very quiet)
 TEMP_MAP[40]=55    # ≤40°C: ~647 RPM (very quiet)
 TEMP_MAP[43]=80    # ≤43°C: ~941 RPM (very quiet)
 TEMP_MAP[44]=105   # ≤44°C: ~1235 RPM (starting ramp)
@@ -41,7 +41,7 @@ log_message() {
 get_hdd_temp() {
     local device=$1
     local temp
-    
+
     # Try different SMART temperature attributes
     temp=$(smartctl -A "$device" 2>/dev/null | awk '/Temperature_Celsius/ {print $10}' | head -1)
     if [[ -z "$temp" ]]; then
@@ -50,7 +50,7 @@ get_hdd_temp() {
     if [[ -z "$temp" ]]; then
         temp=$(smartctl -A "$device" 2>/dev/null | awk '/Current Drive Temperature/ {print $4}' | head -1)
     fi
-    
+
     # Return temperature or 0 if not found
     echo "${temp:-0}"
 }
@@ -59,7 +59,7 @@ get_hdd_temp() {
 get_max_hdd_temp() {
     local max_temp=0
     local temp
-    
+
     for device in "${HDD_DEVICES[@]}"; do
         if [[ -e "$device" ]]; then
             temp=$(get_hdd_temp "$device")
@@ -68,22 +68,22 @@ get_max_hdd_temp() {
             fi
         fi
     done
-    
+
     echo "$max_temp"
 }
 
 # Function to set PWM value
 set_pwm() {
     local pwm_value=$1
-    
+
     # Enable PWM control if not already enabled
     if [[ ! -w "$PWM_ENABLE_PATH" ]]; then
         log_message "ERROR: Cannot write to PWM enable path: $PWM_ENABLE_PATH"
         return 1
     fi
-    
+
     echo 1 > "$PWM_ENABLE_PATH" 2>/dev/null
-    
+
     # Set PWM value
     if [[ -w "$PWM_PATH" ]]; then
         echo "$pwm_value" > "$PWM_PATH"
@@ -107,7 +107,7 @@ get_fan_rpm() {
 get_pwm_for_temp() {
     local temp=$1
     local pwm_value=255  # Default to maximum
-    
+
     # Find appropriate PWM value based on temperature thresholds
     for threshold in $(echo "${!TEMP_MAP[@]}" | tr ' ' '\n' | sort -n); do
         if [[ "$temp" -le "$threshold" ]]; then
@@ -115,7 +115,7 @@ get_pwm_for_temp() {
             break
         fi
     done
-    
+
     echo "$pwm_value"
 }
 
@@ -139,23 +139,23 @@ main() {
         echo "This script must be run as root"
         exit 1
     fi
-    
+
     # Get maximum HDD temperature
     max_temp=$(get_max_hdd_temp)
-    
+
     if [[ "$max_temp" -eq 0 ]]; then
         log_message "WARNING: No HDD temperatures detected, setting fan to medium speed"
         set_pwm 120
         exit 1
     fi
-    
+
     # Determine required PWM value
     required_pwm=$(get_pwm_for_temp "$max_temp")
-    
+
     # Get current PWM and fan RPM
     current_pwm=$(cat "$PWM_PATH" 2>/dev/null || echo "0")
     current_rpm=$(get_fan_rpm)
-    
+
     # Only change PWM if different (avoid unnecessary writes)
     if [[ "$current_pwm" -ne "$required_pwm" ]]; then
         if set_pwm "$required_pwm"; then
@@ -168,7 +168,7 @@ main() {
             exit 1
         fi
     fi
-    
+
     # If verbose mode requested
     if [[ "$1" == "-v" || "$1" == "--verbose" ]]; then
         show_hdd_temps
