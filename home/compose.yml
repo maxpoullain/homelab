@@ -55,7 +55,7 @@ services:
     group_add:
         - dialout
     devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_14787df09829ec11a6986d7840c9ce8d-if00-port0:/dev/ttyUSB0
     volumes:
       - ./zigbee2mqtt:/app/data
       - /run/udev:/run/udev:ro

@@ -6,7 +6,7 @@ services:
     security_opt:
       - no-new-privileges:true
     devices:
-      - /dev/ttyUSB1:/dev/ttyUSB1
+      - /dev/serial/by-id/usb-1a86_USB_Serial-if00-port0:/dev/ttyUSB0
     volumes:
       - ./octoprint:/octoprint
     networks:
