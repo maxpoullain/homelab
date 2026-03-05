@@ -37,8 +37,8 @@ docker compose stop beszel
 ### 2. Backup Current Data (Optional but Recommended)
 
 ```bash
-sudo mv /mnt/fast/apps/homelab/admin/beszel/beszel_data \
-   /mnt/fast/apps/homelab/admin/beszel/beszel_data.backup.$(date +%Y%m%d-%H%M)
+sudo mv /mnt/fast/apps/homelab/corsair/admin/beszel/beszel_data \
+   /mnt/fast/apps/homelab/corsair/admin/beszel/beszel_data.backup.$(date +%Y%m%d-%H%M)
 ```
 
 ### 3. Restore Full Backup
@@ -48,13 +48,13 @@ sudo mv /mnt/fast/apps/homelab/admin/beszel/beszel_data \
 BACKUP_FILE="/mnt/tank/backups/homelab/beszel/full-daily-20251104-1900.tar.gz"
 
 # Create parent directory if needed
-sudo mkdir -p /mnt/fast/apps/homelab/admin/beszel/
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/admin/beszel/
 
 # Extract backup (restores beszel_data/ directory)
-sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/admin/beszel/
+sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/admin/beszel/
 
 # Fix permissions
-sudo chown -R max:homelab /mnt/fast/apps/homelab/admin/beszel/beszel_data
+sudo chown -R max:homelab /mnt/fast/apps/homelab/corsair/admin/beszel/beszel_data
 ```
 
 ### 4. Start Beszel
@@ -108,16 +108,16 @@ tar -tzf /mnt/tank/backups/homelab/beszel/full-daily-20251104-1900.tar.gz | head
 
 ```bash
 # 1. Create directory structure
-sudo mkdir -p /mnt/fast/apps/homelab/admin/beszel/{beszel_data,beszel_agent_data,beszel_socket}
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/admin/beszel/{beszel_data,beszel_agent_data,beszel_socket}
 
 # 2. Choose backup file
 BACKUP_FILE="/mnt/tank/backups/homelab/beszel/full-daily-20251104-1900.tar.gz"
 
 # 3. Extract backup
-sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/admin/beszel/
+sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/admin/beszel/
 
 # 4. Fix ownership
-sudo chown -R max:homelab /mnt/fast/apps/homelab/admin/beszel/beszel_data
+sudo chown -R max:homelab /mnt/fast/apps/homelab/corsair/admin/beszel/beszel_data
 
 # 5. Deploy the stack
 cd /mnt/fast/apps/homelab/admin
@@ -145,15 +145,15 @@ If PocketBase reports a corrupted database:
 
 ```bash
 # Stop container
-cd /mnt/fast/apps/homelab/admin
+cd /mnt/fast/apps/homelab/corsair/admin
 docker compose stop beszel
 
 # Verify SQLite integrity
-sqlite3 /mnt/fast/apps/homelab/admin/beszel/beszel_data/data.db "PRAGMA integrity_check;"
+sqlite3 /mnt/fast/apps/homelab/corsair/admin/beszel/beszel_data/data.db "PRAGMA integrity_check;"
 
 # If corrupt, try an older backup
 BACKUP_FILE="/mnt/tank/backups/homelab/beszel/full-weekly-20251110-1900.tar.gz"
-sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/admin/beszel/
+sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/admin/beszel/
 
 docker compose up -d beszel
 ```
@@ -174,18 +174,18 @@ docker logs beszel-agent --tail 30
 The agent authenticates via the socket file — ensure `beszel_socket/` exists and is writable:
 
 ```bash
-ls -la /mnt/fast/apps/homelab/admin/beszel/beszel_socket/
+ls -la /mnt/fast/apps/homelab/corsair/admin/beszel/beszel_socket/
 ```
 
 ### Permission Errors
 
 ```bash
 # Fix ownership
-sudo chown -R max:homelab /mnt/fast/apps/homelab/admin/beszel/beszel_data
+sudo chown -R max:homelab /mnt/fast/apps/homelab/corsair/admin/beszel/beszel_data
 
 # Fix permissions
-sudo chmod -R 755 /mnt/fast/apps/homelab/admin/beszel/beszel_data
-sudo chmod 644 /mnt/fast/apps/homelab/admin/beszel/beszel_data/data.db
+sudo chmod -R 755 /mnt/fast/apps/homelab/corsair/admin/beszel/beszel_data
+sudo chmod 644 /mnt/fast/apps/homelab/corsair/admin/beszel/beszel_data/data.db
 ```
 
 ### Can't Log In After Restore
@@ -206,10 +206,10 @@ To move Beszel to a new server:
 
 1. **On old server**: Backup is already automated
 2. **On new server**:
-   - Clone the compose stack from `/mnt/fast/apps/homelab/admin/compose.yml`
+   - Clone the compose stack from `/mnt/fast/apps/homelab/corsair/admin/compose.yml`
    - Create the directory skeleton:
      ```bash
-     mkdir -p /mnt/fast/apps/homelab/admin/beszel/{beszel_data,beszel_agent_data,beszel_socket}
+     mkdir -p /mnt/fast/apps/homelab/corsair/admin/beszel/{beszel_data,beszel_agent_data,beszel_socket}
      ```
    - Restore backup as described above
    - Update DNS to point `status.corsair.tf` to the new server IP

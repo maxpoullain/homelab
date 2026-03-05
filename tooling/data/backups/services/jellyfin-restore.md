@@ -25,15 +25,15 @@ This guide explains how to restore Jellyfin from backups located in `/mnt/tank/b
 ### 1. Stop Jellyfin
 
 ```bash
-cd /mnt/fast/apps/homelab/tv
+cd /mnt/fast/apps/homelab/corsair/media
 docker compose down
 ```
 
 ### 2. Backup Current Config (Optional but Recommended)
 
 ```bash
-mv /mnt/fast/apps/homelab/tv/jellyfin/config \
-   /mnt/fast/apps/homelab/tv/jellyfin/config.backup.$(date +%Y%m%d)
+mv /mnt/fast/apps/homelab/corsair/media/jellyfin/config \
+   /mnt/fast/apps/homelab/corsair/media/jellyfin/config.backup.$(date +%Y%m%d)
 ```
 
 ### 3. Restore Full Backup
@@ -43,16 +43,16 @@ mv /mnt/fast/apps/homelab/tv/jellyfin/config \
 BACKUP_FILE="/mnt/tank/backups/homelab/jellyfin/full-daily-20251025-2236.tar.gz"
 
 # Extract to Jellyfin directory
-tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/tv/jellyfin/
+tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/media/jellyfin/
 
 # Fix permissions
-sudo chown -R 1000:1000 /mnt/fast/apps/homelab/tv/jellyfin/config/
+sudo chown -R 1000:1000 /mnt/fast/apps/homelab/corsair/media/jellyfin/config/
 ```
 
 ### 4. Start Jellyfin
 
 ```bash
-cd /mnt/fast/apps/homelab/tv
+cd /mnt/fast/apps/homelab/corsair/media
 docker compose up -d
 ```
 
@@ -101,8 +101,8 @@ tar -xzf /mnt/tank/backups/homelab/jellyfin/full-daily-20251025-2236.tar.gz \
   config/data/data/authentication.db
 
 # Copy to Jellyfin directory
-cp /tmp/config/data/data/*.db /mnt/fast/apps/homelab/tv/jellyfin/config/data/data/
-sudo chown 1000:1000 /mnt/fast/apps/homelab/tv/jellyfin/config/data/data/*.db
+cp /tmp/config/data/data/*.db /mnt/fast/apps/homelab/corsair/media/jellyfin/config/data/data/
+sudo chown 1000:1000 /mnt/fast/apps/homelab/corsair/media/jellyfin/config/data/data/*.db
 ```
 
 ### Restore Configuration Only (No Databases)
@@ -110,7 +110,7 @@ sudo chown 1000:1000 /mnt/fast/apps/homelab/tv/jellyfin/config/data/data/*.db
 ```bash
 # Extract everything except databases
 tar -xzf /mnt/tank/backups/homelab/jellyfin/full-daily-20251025-2236.tar.gz \
-  -C /mnt/fast/apps/homelab/tv/jellyfin/ \
+  -C /mnt/fast/apps/homelab/corsair/media/jellyfin/ \
   --exclude="config/data/data/*.db"
 ```
 
@@ -119,7 +119,7 @@ tar -xzf /mnt/tank/backups/homelab/jellyfin/full-daily-20251025-2236.tar.gz \
 To restore Jellyfin on a new server:
 
 1. Install Docker and Docker Compose
-2. Copy compose.yml from `/mnt/fast/apps/homelab/tv/`
+2. Copy compose.yml from `/mnt/fast/apps/homelab/corsair/media/`
 3. Ensure media files are accessible at the same paths
 4. Restore full backup before first start
 5. Start Jellyfin
@@ -145,10 +145,10 @@ To restore Jellyfin on a new server:
 docker compose down
 
 # Verify no processes are using the database
-lsof /mnt/fast/apps/homelab/tv/jellyfin/config/data/data/jellyfin.db
+lsof /mnt/fast/apps/homelab/corsair/media/jellyfin/config/data/data/jellyfin.db
 
 # Restore again
-tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/tv/jellyfin/
+tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/media/jellyfin/
 ```
 
 ### Users can't log in after restore
@@ -156,7 +156,7 @@ tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/tv/jellyfin/
 Check authentication database was restored:
 
 ```bash
-ls -lh /mnt/fast/apps/homelab/tv/jellyfin/config/data/data/authentication.db
+ls -lh /mnt/fast/apps/homelab/corsair/media/jellyfin/config/data/data/authentication.db
 
 # If missing, extract it specifically
 tar -xzf /mnt/tank/backups/homelab/jellyfin/full-daily-20251025-2236.tar.gz \
@@ -164,18 +164,18 @@ tar -xzf /mnt/tank/backups/homelab/jellyfin/full-daily-20251025-2236.tar.gz \
   config/data/data/authentication.db
 
 cp /tmp/config/data/data/authentication.db \
-   /mnt/fast/apps/homelab/tv/jellyfin/config/data/data/
+   /mnt/fast/apps/homelab/corsair/media/jellyfin/config/data/data/
 ```
 
 ### Plugins missing after restore
 
 ```bash
 # Check plugins directory was restored
-ls -lah /mnt/fast/apps/homelab/tv/jellyfin/config/plugins/
+ls -lah /mnt/fast/apps/homelab/corsair/media/jellyfin/config/plugins/
 
 # If empty, extract plugins specifically
 tar -xzf /mnt/tank/backups/homelab/jellyfin/full-daily-20251025-2236.tar.gz \
-  -C /mnt/fast/apps/homelab/tv/jellyfin/ \
+  -C /mnt/fast/apps/homelab/corsair/media/jellyfin/ \
   config/plugins/
 ```
 
@@ -183,8 +183,8 @@ tar -xzf /mnt/tank/backups/homelab/jellyfin/full-daily-20251025-2236.tar.gz \
 
 ```bash
 # Fix all permissions
-sudo chown -R 1000:1000 /mnt/fast/apps/homelab/tv/jellyfin/config/
-sudo chmod -R 755 /mnt/fast/apps/homelab/tv/jellyfin/config/
+sudo chown -R 1000:1000 /mnt/fast/apps/homelab/corsair/media/jellyfin/config/
+sudo chmod -R 755 /mnt/fast/apps/homelab/corsair/media/jellyfin/config/
 ```
 
 ## Important Notes

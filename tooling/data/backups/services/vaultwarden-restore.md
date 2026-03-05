@@ -27,7 +27,7 @@ BACKUP_DATE="daily-20251025-2236"
 BACKUP_DIR="/mnt/tank/backups/homelab/vaultwarden"
 
 # Get the Vaultwarden data directory
-DATA_DIR="/mnt/fast/apps/homelab/vault/vw-data"
+DATA_DIR="/mnt/fast/apps/homelab/corsair/vault/vw-data"
 
 # Restore database
 cp "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3" "$DATA_DIR/db.sqlite3"
@@ -71,7 +71,7 @@ Only do this if you're certain the RSA key hasn't changed:
 
 ```bash
 cp /mnt/tank/backups/homelab/vaultwarden/db-daily-20251025-2236.sqlite3 \
-   /mnt/fast/apps/homelab/vault/vw-data/db.sqlite3
+   /mnt/fast/apps/homelab/corsair/vault/vw-data/db.sqlite3
 ```
 
 ### Attachments Only
@@ -80,8 +80,8 @@ If you only need to restore file attachments:
 
 ```bash
 tar -xzf /mnt/tank/backups/homelab/vaultwarden/attachments-daily-20251025-2236.tar.gz \
-  -C /mnt/fast/apps/homelab/vault/vw-data/
-sudo chown -R 1000:1000 /mnt/fast/apps/homelab/vault/vw-data/attachments/
+  -C /mnt/fast/apps/homelab/corsair/vault/vw-data/
+sudo chown -R 1000:1000 /mnt/fast/apps/homelab/corsair/vault/vw-data/attachments/
 ```
 
 ## Verify Backup Integrity
@@ -106,7 +106,7 @@ sqlite3 "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3" "PRAGMA integrity_check;"
 If you need to restore to a **new server**:
 
 1. Install Docker and Docker Compose
-2. Copy the entire compose.yml from `/mnt/fast/apps/homelab/vault/`
+2. Copy the entire compose.yml from `/mnt/fast/apps/homelab/corsair/vault/`
 3. Follow the restore steps above before first starting Vaultwarden
 4. Update DNS/reverse proxy to point to new server
 5. Verify SSL certificates are valid
@@ -133,9 +133,9 @@ If the archive is empty or very small, you may not have had attachments.
 ### Permission errors
 
 ```bash
-sudo chown -R 1000:1000 /mnt/fast/apps/homelab/vault/vw-data/
-sudo chmod 600 /mnt/fast/apps/homelab/vault/vw-data/rsa_key.pem
-sudo chmod 644 /mnt/fast/apps/homelab/vault/vw-data/db.sqlite3
+sudo chown -R 1000:1000 /mnt/fast/apps/homelab/corsair/vault/vw-data/
+sudo chmod 600 /mnt/fast/apps/homelab/corsair/vault/vw-data/rsa_key.pem
+sudo chmod 644 /mnt/fast/apps/homelab/corsair/vault/vw-data/db.sqlite3
 ```
 
 ## Important Notes

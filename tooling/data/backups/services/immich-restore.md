@@ -12,7 +12,7 @@ This guide explains how to restore Immich from backups located in `/mnt/tank/bac
 ### 1. Stop Immich Services
 
 ```bash
-cd /mnt/fast/apps/homelab/immich
+cd /mnt/fast/apps/homelab/corsair/media
 docker compose down
 ```
 
@@ -38,16 +38,16 @@ gunzip -c "$BACKUP_FILE" | docker exec -i immich_postgres psql -U postgres
 STORAGE_BACKUP="/mnt/tank/backups/homelab/immich/storage-daily-20251025-2236.tar.gz"
 
 # Extract to storage directory
-tar -xzf "$STORAGE_BACKUP" -C /mnt/fast/apps/homelab/immich/storage/
+tar -xzf "$STORAGE_BACKUP" -C /mnt/fast/apps/homelab/corsair/media/immich/storage/
 
 # Fix permissions
-sudo chown -R 1000:1000 /mnt/fast/apps/homelab/immich/storage/
+sudo chown -R 1000:1000 /mnt/fast/apps/homelab/corsair/media/immich/storage/
 ```
 
 ### 4. Start All Services
 
 ```bash
-cd /mnt/fast/apps/homelab/immich
+cd /mnt/fast/apps/homelab/corsair/media
 docker compose up -d
 ```
 
@@ -66,8 +66,8 @@ If you only restored library/upload/profile (not thumbs/encoded-video):
 docker exec -it immich_postgres psql -U postgres -c "\l"
 
 # Check storage files exist
-ls -lah /mnt/fast/apps/homelab/immich/storage/library/
-ls -lah /mnt/fast/apps/homelab/immich/storage/upload/
+ls -lah /mnt/fast/apps/homelab/corsair/media/immich/storage/library/
+ls -lah /mnt/fast/apps/homelab/corsair/media/immich/storage/upload/
 
 # Check Immich logs
 docker logs immich_server
@@ -90,8 +90,8 @@ If you only need to restore photos/videos (keeping existing database):
 
 ```bash
 tar -xzf /mnt/tank/backups/homelab/immich/storage-daily-20251025-2236.tar.gz \
-  -C /mnt/fast/apps/homelab/immich/storage/
-sudo chown -R 1000:1000 /mnt/fast/apps/homelab/immich/storage/
+  -C /mnt/fast/apps/homelab/corsair/media/immich/storage/
+sudo chown -R 1000:1000 /mnt/fast/apps/homelab/corsair/media/immich/storage/
 ```
 
 ## Troubleshooting
@@ -115,8 +115,8 @@ gunzip -c "$BACKUP_FILE" | docker exec -i immich_postgres psql -U postgres
 
 ```bash
 # Fix storage permissions
-sudo chown -R 1000:1000 /mnt/fast/apps/homelab/immich/storage/
-sudo chmod -R 755 /mnt/fast/apps/homelab/immich/storage/
+sudo chown -R 1000:1000 /mnt/fast/apps/homelab/corsair/media/immich/storage/
+sudo chmod -R 755 /mnt/fast/apps/homelab/corsair/media/immich/storage/
 ```
 
 ### Missing thumbnails after restore

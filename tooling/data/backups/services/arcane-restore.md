@@ -32,8 +32,8 @@ docker compose stop arcane
 ### 2. Backup Current Database (Optional but Recommended)
 
 ```bash
-cp /mnt/fast/apps/homelab/admin/arcane/arcane.db \
-   /mnt/fast/apps/homelab/admin/arcane/arcane.db.backup.$(date +%Y%m%d-%H%M)
+cp /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db \
+   /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db.backup.$(date +%Y%m%d-%H%M)
 ```
 
 ### 3. Restore Database
@@ -43,14 +43,14 @@ cp /mnt/fast/apps/homelab/admin/arcane/arcane.db \
 BACKUP_FILE="/mnt/tank/backups/homelab/arcane/db-daily-20251104-1900.sqlite3"
 
 # Copy database into place
-cp "$BACKUP_FILE" /mnt/fast/apps/homelab/admin/arcane/arcane.db
+cp "$BACKUP_FILE" /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db
 
 # Remove any stale WAL/SHM files to avoid conflicts
-rm -f /mnt/fast/apps/homelab/admin/arcane/arcane.db-shm
-rm -f /mnt/fast/apps/homelab/admin/arcane/arcane.db-wal
+rm -f /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db-shm
+rm -f /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db-wal
 
 # Fix permissions (Arcane runs as PUID=3000 / PGID=3002)
-sudo chown 3000:3002 /mnt/fast/apps/homelab/admin/arcane/arcane.db
+sudo chown 3000:3002 /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db
 ```
 
 ### 4. Start Arcane
@@ -100,20 +100,20 @@ sqlite3 /mnt/tank/backups/homelab/arcane/db-daily-20251104-1900.sqlite3 \
 
 ```bash
 # 1. Create directory structure
-sudo mkdir -p /mnt/fast/apps/homelab/admin/arcane/templates
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/admin/arcane/templates
 
 # 2. Choose backup file
 BACKUP_FILE="/mnt/tank/backups/homelab/arcane/db-daily-20251104-1900.sqlite3"
 
 # 3. Copy database into place
-cp "$BACKUP_FILE" /mnt/fast/apps/homelab/admin/arcane/arcane.db
+cp "$BACKUP_FILE" /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db
 
 # 4. Remove stale WAL/SHM if present
-rm -f /mnt/fast/apps/homelab/admin/arcane/arcane.db-shm
-rm -f /mnt/fast/apps/homelab/admin/arcane/arcane.db-wal
+rm -f /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db-shm
+rm -f /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db-wal
 
 # 5. Fix ownership
-sudo chown 3000:3002 /mnt/fast/apps/homelab/admin/arcane/arcane.db
+sudo chown 3000:3002 /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db
 
 # 6. Deploy the stack
 cd /mnt/fast/apps/homelab/admin
@@ -138,13 +138,13 @@ docker logs arcane --tail 50
 Fix stale WAL files:
 
 ```bash
-cd /mnt/fast/apps/homelab/admin
+cd /mnt/fast/apps/homelab/corsair/admin
 docker compose stop arcane
 
 # Force WAL checkpoint and remove files
-sqlite3 /mnt/fast/apps/homelab/admin/arcane/arcane.db "PRAGMA wal_checkpoint(TRUNCATE);"
-rm -f /mnt/fast/apps/homelab/admin/arcane/arcane.db-shm
-rm -f /mnt/fast/apps/homelab/admin/arcane/arcane.db-wal
+sqlite3 /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db "PRAGMA wal_checkpoint(TRUNCATE);"
+rm -f /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db-shm
+rm -f /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db-wal
 
 docker compose up -d arcane
 ```
@@ -184,8 +184,8 @@ done
 
 ```bash
 # Arcane runs as PUID=3000 / PGID=3002
-sudo chown 3000:3002 /mnt/fast/apps/homelab/admin/arcane/arcane.db
-sudo chmod 644 /mnt/fast/apps/homelab/admin/arcane/arcane.db
+sudo chown 3000:3002 /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db
+sudo chmod 644 /mnt/fast/apps/homelab/corsair/admin/arcane/arcane.db
 ```
 
 ## Backup Validation

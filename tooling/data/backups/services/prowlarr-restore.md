@@ -31,8 +31,8 @@ docker compose stop prowlarr
 ### 2. Backup Current Config (Optional but Recommended)
 
 ```bash
-sudo mv /mnt/fast/apps/homelab/media/prowlarr \
-   /mnt/fast/apps/homelab/media/prowlarr.backup.$(date +%Y%m%d-%H%M)
+sudo mv /mnt/fast/apps/homelab/corsair/7seas/prowlarr \
+   /mnt/fast/apps/homelab/corsair/7seas/prowlarr.backup.$(date +%Y%m%d-%H%M)
 ```
 
 ### 3. Restore Full Backup
@@ -42,13 +42,13 @@ sudo mv /mnt/fast/apps/homelab/media/prowlarr \
 BACKUP_FILE="/mnt/tank/backups/homelab/prowlarr/full-daily-20251104-1900.tar.gz"
 
 # Create directory
-sudo mkdir -p /mnt/fast/apps/homelab/media/
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/7seas/
 
 # Extract backup
-sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/media/
+sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/7seas/
 
 # Fix permissions
-sudo chown -R max:homelab /mnt/fast/apps/homelab/media/prowlarr
+sudo chown -R max:homelab /mnt/fast/apps/homelab/corsair/7seas/prowlarr
 ```
 
 ### 4. Start Prowlarr
@@ -91,16 +91,16 @@ tar -tzf /mnt/tank/backups/homelab/prowlarr/full-daily-20251104-1900.tar.gz | he
 
 ```bash
 # 1. Create directory structure
-sudo mkdir -p /mnt/fast/apps/homelab/media/
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/7seas/
 
 # 2. Choose backup file
 BACKUP_FILE="/mnt/tank/backups/homelab/prowlarr/full-daily-20251104-1900.tar.gz"
 
 # 3. Extract backup
-sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/media/
+sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/7seas/
 
 # 4. Fix ownership
-sudo chown -R max:homelab /mnt/fast/apps/homelab/media/prowlarr
+sudo chown -R max:homelab /mnt/fast/apps/homelab/corsair/7seas/prowlarr
 
 # 5. Start Prowlarr
 cd /mnt/fast/apps/homelab/media
@@ -114,7 +114,7 @@ docker compose up -d prowlarr
 docker ps | grep prowlarr
 
 # Check file sizes
-ls -lh /mnt/fast/apps/homelab/media/prowlarr/*.db
+ls -lh /mnt/fast/apps/homelab/corsair/7seas/prowlarr/*.db
 ```
 
 ## Common Issues
@@ -123,7 +123,7 @@ ls -lh /mnt/fast/apps/homelab/media/prowlarr/*.db
 
 ```bash
 # Fix ownership
-sudo chown -R max:homelab /mnt/fast/apps/homelab/media/prowlarr
+sudo chown -R max:homelab /mnt/fast/apps/homelab/corsair/7seas/prowlarr
 ```
 
 ### List Available Backups

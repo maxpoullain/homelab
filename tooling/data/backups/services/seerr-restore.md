@@ -27,15 +27,15 @@ Restore Seerr (media request management) configuration and request database.
 ### 1. Stop Seerr
 
 ```bash
-cd /mnt/fast/apps/homelab/7seas
+cd /mnt/fast/apps/homelab/corsair/7seas
 docker compose stop seerr
 ```
 
 ### 2. Backup Current Data (Optional but Recommended)
 
 ```bash
-sudo mv /mnt/fast/apps/homelab/7seas/seerr \
-   /mnt/fast/apps/homelab/7seas/seerr.backup.$(date +%Y%m%d-%H%M)
+sudo mv /mnt/fast/apps/homelab/corsair/7seas/seerr \
+   /mnt/fast/apps/homelab/corsair/7seas/seerr.backup.$(date +%Y%m%d-%H%M)
 ```
 
 ### 3. Restore Full Backup
@@ -45,19 +45,19 @@ sudo mv /mnt/fast/apps/homelab/7seas/seerr \
 BACKUP_FILE="/mnt/tank/backups/homelab/seerr/full-daily-20251104-1900.tar.gz"
 
 # Create parent directory if needed
-sudo mkdir -p /mnt/fast/apps/homelab/7seas/
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/7seas/
 
 # Extract backup
-sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/7seas/
+sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/7seas/
 
 # Fix permissions
-sudo chown -R 3000:3002 /mnt/fast/apps/homelab/7seas/seerr
+sudo chown -R 3000:3002 /mnt/fast/apps/homelab/corsair/7seas/seerr
 ```
 
 ### 4. Start Seerr
 
 ```bash
-cd /mnt/fast/apps/homelab/7seas
+cd /mnt/fast/apps/homelab/corsair/7seas
 docker compose up -d seerr
 ```
 
@@ -117,10 +117,10 @@ tar -xzf /mnt/tank/backups/homelab/seerr/full-daily-20251104-1900.tar.gz \
   -C /tmp/ seerr/settings.json
 
 # Copy to target
-sudo cp /tmp/seerr/settings.json /mnt/fast/apps/homelab/7seas/seerr/settings.json
+sudo cp /tmp/seerr/settings.json /mnt/fast/apps/homelab/corsair/7seas/seerr/settings.json
 
 # Fix permissions
-sudo chown 3000:3002 /mnt/fast/apps/homelab/7seas/seerr/settings.json
+sudo chown 3000:3002 /mnt/fast/apps/homelab/corsair/7seas/seerr/settings.json
 
 # Restart
 docker compose restart seerr
@@ -136,13 +136,13 @@ tar -xzf /mnt/tank/backups/homelab/seerr/full-daily-20251104-1900.tar.gz \
   -C /tmp/ seerr/db/
 
 # Stop container
-cd /mnt/fast/apps/homelab/7seas
+cd /mnt/fast/apps/homelab/corsair/7seas
 docker compose stop seerr
 
 # Replace db directory
-sudo rm -rf /mnt/fast/apps/homelab/7seas/seerr/db
-sudo cp -r /tmp/seerr/db /mnt/fast/apps/homelab/7seas/seerr/db
-sudo chown -R 3000:3002 /mnt/fast/apps/homelab/7seas/seerr/db
+sudo rm -rf /mnt/fast/apps/homelab/corsair/7seas/seerr/db
+sudo cp -r /tmp/seerr/db /mnt/fast/apps/homelab/corsair/7seas/seerr/db
+sudo chown -R 3000:3002 /mnt/fast/apps/homelab/corsair/7seas/seerr/db
 
 # Start container
 docker compose up -d seerr
@@ -152,19 +152,19 @@ docker compose up -d seerr
 
 ```bash
 # 1. Create directory structure
-sudo mkdir -p /mnt/fast/apps/homelab/7seas/
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/7seas/
 
 # 2. Choose backup file
 BACKUP_FILE="/mnt/tank/backups/homelab/seerr/full-daily-20251104-1900.tar.gz"
 
 # 3. Extract backup
-sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/7seas/
+sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/7seas/
 
 # 4. Fix ownership
-sudo chown -R 3000:3002 /mnt/fast/apps/homelab/7seas/seerr
+sudo chown -R 3000:3002 /mnt/fast/apps/homelab/corsair/7seas/seerr
 
 # 5. Start Seerr
-cd /mnt/fast/apps/homelab/7seas
+cd /mnt/fast/apps/homelab/corsair/7seas
 docker compose up -d seerr
 ```
 
@@ -181,7 +181,7 @@ If Seerr can't connect to Plex/Jellyfin:
 
 2. **Check settings.json** has the correct server URL and API key:
    ```bash
-   cat /mnt/fast/apps/homelab/7seas/seerr/settings.json | python3 -m json.tool | grep -A5 "mediaServer"
+   cat /mnt/fast/apps/homelab/corsair/7seas/seerr/settings.json | python3 -m json.tool | grep -A5 "mediaServer"
    ```
 
 3. **Re-enter credentials** via web UI: Settings → Plex/Jellyfin
@@ -203,9 +203,9 @@ If the *arr integrations show as unreachable:
 
 ```bash
 # Fix ownership recursively
-sudo chown -R 3000:3002 /mnt/fast/apps/homelab/7seas/seerr
-sudo chmod -R 755 /mnt/fast/apps/homelab/7seas/seerr
-sudo chmod 644 /mnt/fast/apps/homelab/7seas/seerr/settings.json
+sudo chown -R 3000:3002 /mnt/fast/apps/homelab/corsair/7seas/seerr
+sudo chmod -R 755 /mnt/fast/apps/homelab/corsair/7seas/seerr
+sudo chmod 644 /mnt/fast/apps/homelab/corsair/7seas/seerr/settings.json
 ```
 
 ### Requests Missing After Restore
@@ -237,7 +237,7 @@ If `settings.json` is corrupted:
 
 ```bash
 # Validate JSON syntax
-cat /mnt/fast/apps/homelab/7seas/seerr/settings.json | python3 -m json.tool
+cat /mnt/fast/apps/homelab/corsair/7seas/seerr/settings.json | python3 -m json.tool
 ```
 
 ## Migration to New Server
@@ -246,7 +246,7 @@ To move Seerr to a new server:
 
 1. **On old server**: Backup is already automated
 2. **On new server**:
-   - Deploy the compose stack from `/mnt/fast/apps/homelab/7seas/compose.yml`
+   - Deploy the compose stack from `/mnt/fast/apps/homelab/corsair/7seas/compose.yml`
    - Stop the container before it initializes
    - Restore backup as described above
    - Update DNS to point to new server

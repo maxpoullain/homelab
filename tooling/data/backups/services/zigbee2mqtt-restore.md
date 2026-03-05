@@ -34,24 +34,24 @@ docker compose stop zigbee2mqtt
 
 ```bash
 # Only if you want to keep current state
-sudo mv /mnt/fast/apps/homelab/home/zigbee2mqtt /mnt/fast/apps/homelab/home/zigbee2mqtt.old
+sudo mv /mnt/fast/apps/homelab/corsair/home/zigbee2mqtt /mnt/fast/apps/homelab/corsair/home/zigbee2mqtt.old
 ```
 
 ### 3. Extract Backup
 
 ```bash
 # Create directory
-sudo mkdir -p /mnt/fast/apps/homelab/home/zigbee2mqtt
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/home/zigbee2mqtt
 
 # Extract the backup (choose the appropriate backup file)
 sudo tar -xzf /mnt/tank/backups/homelab/zigbee2mqtt/full-daily-YYYYMMDD-HHMM.tar.gz \
-  -C /mnt/fast/apps/homelab/home/
+  -C /mnt/fast/apps/homelab/corsair/home/
 ```
 
 ### 4. Fix Permissions
 
 ```bash
-sudo chown -R 1000:1000 /mnt/fast/apps/homelab/home/zigbee2mqtt
+sudo chown -R 1000:1000 /mnt/fast/apps/homelab/corsair/home/zigbee2mqtt
 ```
 
 ### 5. Start Zigbee2mqtt
@@ -113,11 +113,11 @@ If there are configuration errors:
 
 1. **Check configuration.yaml syntax**:
    ```bash
-   cat /mnt/fast/apps/homelab/home/zigbee2mqtt/configuration.yaml
+   cat /mnt/fast/apps/homelab/corsair/home/zigbee2mqtt/configuration.yaml
    ```
 2. **Use a backup version if needed**:
    ```bash
-   cd /mnt/fast/apps/homelab/home/zigbee2mqtt
+   cd /mnt/fast/apps/homelab/corsair/home/zigbee2mqtt
    cp configuration_backup_v2.yaml configuration.yaml
    ```
 
@@ -125,12 +125,12 @@ If there are configuration errors:
 
 ```bash
 # Fix ownership
-sudo chown -R 1000:1000 /mnt/fast/apps/homelab/home/zigbee2mqtt
+sudo chown -R 1000:1000 /mnt/fast/apps/homelab/corsair/home/zigbee2mqtt
 
 # Fix permissions
-sudo chmod -R 755 /mnt/fast/apps/homelab/home/zigbee2mqtt
-sudo chmod 644 /mnt/fast/apps/homelab/home/zigbee2mqtt/configuration.yaml
-sudo chmod 644 /mnt/fast/apps/homelab/home/zigbee2mqtt/database.db
+sudo chmod -R 755 /mnt/fast/apps/homelab/corsair/home/zigbee2mqtt
+sudo chmod 644 /mnt/fast/apps/homelab/corsair/home/zigbee2mqtt/configuration.yaml
+sudo chmod 644 /mnt/fast/apps/homelab/corsair/home/zigbee2mqtt/database.db
 ```
 
 ## Disaster Recovery
@@ -142,7 +142,7 @@ If you lose all data but have backups:
 1. **Stop container** (if running)
 2. **Remove old data**:
    ```bash
-   sudo rm -rf /mnt/fast/apps/homelab/home/zigbee2mqtt
+   sudo rm -rf /mnt/fast/apps/homelab/corsair/home/zigbee2mqtt
    ```
 3. **Follow Quick Restore steps above**
 4. **Verify coordinator backup is loaded**:
@@ -171,10 +171,10 @@ sudo tar -xzf /mnt/tank/backups/homelab/zigbee2mqtt/full-daily-YYYYMMDD-HHMM.tar
   -C /tmp/ zigbee2mqtt/configuration.yaml
 
 # Copy to target
-sudo cp /tmp/zigbee2mqtt/configuration.yaml /mnt/fast/apps/homelab/home/zigbee2mqtt/
+sudo cp /tmp/zigbee2mqtt/configuration.yaml /mnt/fast/apps/homelab/corsair/home/zigbee2mqtt/
 
 # Fix ownership
-sudo chown 1000:1000 /mnt/fast/apps/homelab/home/zigbee2mqtt/configuration.yaml
+sudo chown 1000:1000 /mnt/fast/apps/homelab/corsair/home/zigbee2mqtt/configuration.yaml
 
 # Restart
 docker compose restart zigbee2mqtt

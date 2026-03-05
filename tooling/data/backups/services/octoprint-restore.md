@@ -39,8 +39,8 @@ docker compose stop octoprint
 ### 2. Backup Current Data (Optional but Recommended)
 
 ```bash
-sudo mv /mnt/fast/apps/homelab/misc/octoprint/octoprint \
-   /mnt/fast/apps/homelab/misc/octoprint/octoprint.backup.$(date +%Y%m%d-%H%M)
+sudo mv /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint \
+   /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint.backup.$(date +%Y%m%d-%H%M)
 ```
 
 ### 3. Restore Full Backup
@@ -50,17 +50,17 @@ sudo mv /mnt/fast/apps/homelab/misc/octoprint/octoprint \
 BACKUP_FILE="/mnt/tank/backups/homelab/octoprint/full-daily-20251104-1900.tar.gz"
 
 # Create the octoprint data directory if needed
-sudo mkdir -p /mnt/fast/apps/homelab/misc/octoprint/octoprint
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint
 
 # Extract backup into the octoprint data directory
 # (the archive root is the contents of octoprint/, not octoprint/ itself)
-sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/misc/octoprint/octoprint/
+sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/
 
 # Fix permissions (container runs as root, files should be root:homelab)
-sudo chown -R root:homelab /mnt/fast/apps/homelab/misc/octoprint/octoprint
-sudo chmod -R 755 /mnt/fast/apps/homelab/misc/octoprint/octoprint
-sudo chmod 640 /mnt/fast/apps/homelab/misc/octoprint/octoprint/config.yaml
-sudo chmod 640 /mnt/fast/apps/homelab/misc/octoprint/octoprint/users.yaml 2>/dev/null || true
+sudo chown -R root:homelab /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint
+sudo chmod -R 755 /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint
+sudo chmod 640 /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/config.yaml
+sudo chmod 640 /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/users.yaml 2>/dev/null || true
 ```
 
 ### 4. Start OctoPrint
@@ -133,16 +133,16 @@ cd /mnt/fast/apps/homelab/misc
 docker compose stop octoprint
 
 sudo cp /tmp/octoprint-restore/config.yaml \
-   /mnt/fast/apps/homelab/misc/octoprint/octoprint/config.yaml
+   /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/config.yaml
 sudo cp /tmp/octoprint-restore/users.yaml \
-   /mnt/fast/apps/homelab/misc/octoprint/octoprint/users.yaml
+   /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/users.yaml
 
 sudo chown root:homelab \
-   /mnt/fast/apps/homelab/misc/octoprint/octoprint/config.yaml \
-   /mnt/fast/apps/homelab/misc/octoprint/octoprint/users.yaml
+   /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/config.yaml \
+   /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/users.yaml
 sudo chmod 640 \
-   /mnt/fast/apps/homelab/misc/octoprint/octoprint/config.yaml \
-   /mnt/fast/apps/homelab/misc/octoprint/octoprint/users.yaml
+   /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/config.yaml \
+   /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/users.yaml
 
 rm -rf /tmp/octoprint-restore
 docker compose up -d octoprint
@@ -157,14 +157,14 @@ mkdir -p /tmp/octoprint-restore
 tar -xzf /mnt/tank/backups/homelab/octoprint/full-daily-20251104-1900.tar.gz \
   -C /tmp/octoprint-restore/
 
-cd /mnt/fast/apps/homelab/misc
+cd /mnt/fast/apps/homelab/corsair/misc
 docker compose stop octoprint
 
-sudo rm -rf /mnt/fast/apps/homelab/misc/octoprint/octoprint/uploads
+sudo rm -rf /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/uploads
 sudo cp -r /tmp/octoprint-restore/uploads \
-   /mnt/fast/apps/homelab/misc/octoprint/octoprint/uploads
+   /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/uploads
 sudo chown -R root:homelab \
-   /mnt/fast/apps/homelab/misc/octoprint/octoprint/uploads
+   /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/uploads
 
 rm -rf /tmp/octoprint-restore
 docker compose up -d octoprint
@@ -179,14 +179,14 @@ mkdir -p /tmp/octoprint-restore
 tar -xzf /mnt/tank/backups/homelab/octoprint/full-daily-20251104-1900.tar.gz \
   -C /tmp/octoprint-restore/
 
-cd /mnt/fast/apps/homelab/misc
+cd /mnt/fast/apps/homelab/corsair/misc
 docker compose stop octoprint
 
-sudo rm -rf /mnt/fast/apps/homelab/misc/octoprint/octoprint/plugins
+sudo rm -rf /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/plugins
 sudo cp -r /tmp/octoprint-restore/plugins \
-   /mnt/fast/apps/homelab/misc/octoprint/octoprint/plugins
+   /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/plugins
 sudo chown -R root:homelab \
-   /mnt/fast/apps/homelab/misc/octoprint/octoprint/plugins
+   /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/plugins
 
 rm -rf /tmp/octoprint-restore
 docker compose up -d octoprint
@@ -196,22 +196,22 @@ docker compose up -d octoprint
 
 ```bash
 # 1. Create directory structure
-sudo mkdir -p /mnt/fast/apps/homelab/misc/octoprint/octoprint
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint
 
 # 2. Choose backup file
 BACKUP_FILE="/mnt/tank/backups/homelab/octoprint/full-daily-20251104-1900.tar.gz"
 
 # 3. Extract backup into the data directory
-sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/misc/octoprint/octoprint/
+sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/
 
 # 4. Fix ownership (container runs as root)
-sudo chown -R root:homelab /mnt/fast/apps/homelab/misc/octoprint/octoprint
-sudo chmod -R 755 /mnt/fast/apps/homelab/misc/octoprint/octoprint
-sudo chmod 640 /mnt/fast/apps/homelab/misc/octoprint/octoprint/config.yaml
-sudo chmod 640 /mnt/fast/apps/homelab/misc/octoprint/octoprint/users.yaml 2>/dev/null || true
+sudo chown -R root:homelab /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint
+sudo chmod -R 755 /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint
+sudo chmod 640 /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/config.yaml
+sudo chmod 640 /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/users.yaml 2>/dev/null || true
 
 # 5. Verify USB serial device path in compose.yml matches new system
-cat /mnt/fast/apps/homelab/misc/compose.yml | grep devices -A5
+cat /mnt/fast/apps/homelab/corsair/misc/compose.yml | grep devices -A5
 ls /dev/serial/by-id/
 
 # 6. Update device path in compose.yml if needed, then deploy
@@ -233,7 +233,7 @@ The USB serial device path may have changed or the printer may not be detected:
 
 2. **Verify device path in compose.yml**:
    ```bash
-   cat /mnt/fast/apps/homelab/misc/compose.yml | grep -A2 devices
+   cat /mnt/fast/apps/homelab/corsair/misc/compose.yml | grep -A2 devices
    # Should match the actual /dev/serial/by-id/... path
    ```
 
@@ -263,10 +263,10 @@ OctoPrint runs as `root` inside the container. On the host the files are owned b
 
 ```bash
 # Fix all permissions recursively
-sudo chown -R root:homelab /mnt/fast/apps/homelab/misc/octoprint/octoprint
-sudo chmod -R 755 /mnt/fast/apps/homelab/misc/octoprint/octoprint
-sudo chmod 640 /mnt/fast/apps/homelab/misc/octoprint/octoprint/config.yaml
-sudo chmod 640 /mnt/fast/apps/homelab/misc/octoprint/octoprint/users.yaml 2>/dev/null || true
+sudo chown -R root:homelab /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint
+sudo chmod -R 755 /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint
+sudo chmod 640 /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/config.yaml
+sudo chmod 640 /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/users.yaml 2>/dev/null || true
 ```
 
 ### Container Keeps Restarting
@@ -288,7 +288,7 @@ Validate config.yaml syntax:
 # YAML syntax check
 python3 -c "
 import yaml
-with open('/mnt/fast/apps/homelab/misc/octoprint/octoprint/config.yaml') as f:
+with open('/mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/config.yaml') as f:
     yaml.safe_load(f)
 print('config.yaml is valid')
 "
@@ -318,12 +318,12 @@ cd /mnt/fast/apps/homelab/misc
 docker compose stop octoprint
 
 # Remove users.yaml to trigger first-run setup wizard
-sudo mv /mnt/fast/apps/homelab/misc/octoprint/octoprint/users.yaml \
-   /mnt/fast/apps/homelab/misc/octoprint/octoprint/users.yaml.bak
+sudo mv /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/users.yaml \
+   /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/users.yaml.bak
 
 # Also disable access control temporarily in config.yaml
 sudo sed -i 's/enabled: true/enabled: false/' \
-   /mnt/fast/apps/homelab/misc/octoprint/octoprint/config.yaml
+   /mnt/fast/apps/homelab/corsair/misc/octoprint/octoprint/config.yaml
 
 # Start and set up new credentials via UI, then re-enable access control
 docker compose up -d octoprint
@@ -337,7 +337,7 @@ To move OctoPrint to a new server:
 2. **On new server**:
    - Check that a compatible USB serial adapter is available
    - Note the device path: `ls /dev/serial/by-id/`
-   - Deploy the compose stack from `/mnt/fast/apps/homelab/misc/compose.yml`
+   - Deploy the compose stack from `/mnt/fast/apps/homelab/corsair/misc/compose.yml`
    - Update the `devices:` section in `compose.yml` to match the new device path if needed
    - Restore backup as described in **Restore to New System** above
    - Update DNS to point `octoprint.corsair.tf` to the new server

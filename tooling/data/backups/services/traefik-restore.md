@@ -18,7 +18,7 @@ This guide explains how to restore Traefik from backups located in `/mnt/tank/ba
 ### 1. Stop Traefik
 
 ```bash
-cd /mnt/fast/apps/homelab/traefik
+cd /mnt/fast/apps/homelab/corsair/front
 docker compose down
 ```
 
@@ -29,23 +29,23 @@ docker compose down
 BACKUP_FILE="/mnt/tank/backups/homelab/traefik/acme-daily-20251025-2236.tar.gz"
 
 # Backup current acme.json (if it exists)
-if [ -f "/mnt/fast/apps/homelab/traefik/traefik/acme/acme.json" ]; then
-  cp /mnt/fast/apps/homelab/traefik/traefik/acme/acme.json \
-     /mnt/fast/apps/homelab/traefik/traefik/acme/acme.json.backup.$(date +%Y%m%d)
+if [ -f "/mnt/fast/apps/homelab/corsair/front/traefik/acme/acme.json" ]; then
+  cp /mnt/fast/apps/homelab/corsair/front/traefik/acme/acme.json \
+     /mnt/fast/apps/homelab/corsair/front/traefik/acme/acme.json.backup.$(date +%Y%m%d)
 fi
 
 # Extract backup
-tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/traefik/traefik/
+tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/front/traefik/
 
 # Fix permissions (CRITICAL for security)
-sudo chmod 600 /mnt/fast/apps/homelab/traefik/traefik/acme/acme.json
-sudo chown root:root /mnt/fast/apps/homelab/traefik/traefik/acme/acme.json
+sudo chmod 600 /mnt/fast/apps/homelab/corsair/front/traefik/acme/acme.json
+sudo chown root:root /mnt/fast/apps/homelab/corsair/front/traefik/acme/acme.json
 ```
 
 ### 3. Start Traefik
 
 ```bash
-cd /mnt/fast/apps/homelab/traefik
+cd /mnt/fast/apps/homelab/corsair/front
 docker compose up -d
 ```
 
@@ -82,7 +82,7 @@ Common scenarios:
 
 ```bash
 # Start with empty acme.json
-cd /mnt/fast/apps/homelab/traefik
+cd /mnt/fast/apps/homelab/corsair/front
 docker compose down
 rm traefik/acme/acme.json
 touch traefik/acme/acme.json
@@ -120,10 +120,10 @@ cat /tmp/traefik-test/acme/acme.json | jq '.letsencrypt.Certificates[].domain'
 To restore Traefik certificates on a new server:
 
 1. Install Docker and Docker Compose
-2. Copy compose.yml and traefik.yml from `/mnt/fast/apps/homelab/traefik/`
+2. Copy compose.yml and traefik.yml from `/mnt/fast/apps/homelab/corsair/front/`
 3. Create directory structure:
    ```bash
-   mkdir -p /mnt/fast/apps/homelab/traefik/traefik/acme
+   mkdir -p /mnt/fast/apps/homelab/corsair/front/traefik/acme
    ```
 4. Restore certificates from backup
 5. **Important**: Ensure DNS points to new server BEFORE starting Traefik
@@ -147,7 +147,7 @@ curl -I https://yourdomain.com 2>&1 | grep -i certificate
 If expired:
 ```bash
 # Remove old certificates and let Traefik re-issue
-cd /mnt/fast/apps/homelab/traefik
+cd /mnt/fast/apps/homelab/corsair/front
 docker compose down
 rm traefik/acme/acme.json
 touch traefik/acme/acme.json
@@ -159,8 +159,8 @@ docker compose up -d
 
 ```bash
 # Fix permissions (MUST be 600)
-sudo chmod 600 /mnt/fast/apps/homelab/traefik/traefik/acme/acme.json
-sudo chown root:root /mnt/fast/apps/homelab/traefik/traefik/acme/acme.json
+sudo chmod 600 /mnt/fast/apps/homelab/corsair/front/traefik/acme/acme.json
+sudo chown root:root /mnt/fast/apps/homelab/corsair/front/traefik/acme/acme.json
 
 # Restart Traefik
 docker compose restart
@@ -177,10 +177,10 @@ docker compose restart
 **Solutions**:
 ```bash
 # Check acme.json location
-ls -l /mnt/fast/apps/homelab/traefik/traefik/acme/acme.json
+ls -l /mnt/fast/apps/homelab/corsair/front/traefik/acme/acme.json
 
 # Verify in docker volume mapping (compose.yml)
-grep acme /mnt/fast/apps/homelab/traefik/compose.yaml
+grep acme /mnt/fast/apps/homelab/corsair/front/compose.yml
 
 # Check Traefik logs for details
 docker logs traefik | grep -i acme

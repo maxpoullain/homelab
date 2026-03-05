@@ -28,7 +28,7 @@ Restore AdGuard Home configuration, filters, and statistics database.
 ### 1. Stop AdGuard Container
 
 ```bash
-cd /mnt/fast/apps/homelab/adguard
+cd /mnt/fast/apps/homelab/corsair/network
 docker compose stop adguard
 ```
 
@@ -36,31 +36,31 @@ docker compose stop adguard
 
 ```bash
 # Only if you want to keep current state
-sudo mv /mnt/fast/apps/homelab/adguard /mnt/fast/apps/homelab/adguard.old
+sudo mv /mnt/fast/apps/homelab/corsair/network/adguard /mnt/fast/apps/homelab/corsair/network/adguard.old
 ```
 
 ### 3. Extract Backup
 
 ```bash
 # Create directory
-sudo mkdir -p /mnt/fast/apps/homelab/adguard
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/network/adguard
 
 # Extract the backup (choose the appropriate backup file)
 sudo tar -xzf /mnt/tank/backups/homelab/adguard/full-daily-YYYYMMDD-HHMM.tar.gz \
-  -C /mnt/fast/apps/homelab/
+  -C /mnt/fast/apps/homelab/corsair/network/
 ```
 
 ### 4. Fix Permissions
 
 ```bash
-sudo chown -R root:root /mnt/fast/apps/homelab/adguard
-sudo chmod -R 755 /mnt/fast/apps/homelab/adguard
+sudo chown -R root:root /mnt/fast/apps/homelab/corsair/network/adguard
+sudo chmod -R 755 /mnt/fast/apps/homelab/corsair/network/adguard
 ```
 
 ### 5. Start AdGuard
 
 ```bash
-cd /mnt/fast/apps/homelab/adguard
+cd /mnt/fast/apps/homelab/corsair/network
 docker compose up -d adguard
 ```
 
@@ -97,7 +97,7 @@ If AdGuard fails to start:
 
 1. **Check configuration syntax**:
    ```bash
-   cat /mnt/fast/apps/homelab/adguard/conf/AdGuardHome.yaml
+   cat /mnt/fast/apps/homelab/corsair/network/adguard/conf/AdGuardHome.yaml
    ```
 
 2. **Check container logs**:
@@ -107,8 +107,8 @@ If AdGuard fails to start:
 
 3. **Verify permissions**:
    ```bash
-   ls -la /mnt/fast/apps/homelab/adguard/
-   sudo chown -R root:root /mnt/fast/apps/homelab/adguard
+   ls -la /mnt/fast/apps/homelab/corsair/network/adguard/
+   sudo chown -R root:root /mnt/fast/apps/homelab/corsair/network/adguard
    ```
 
 ### Port 53 Conflicts
@@ -169,7 +169,7 @@ If statistics are missing after restore:
 
 1. **Check stats database exists**:
    ```bash
-   ls -la /mnt/fast/apps/homelab/adguard/work/data/
+   ls -la /mnt/fast/apps/homelab/corsair/network/adguard/work/data/
    ```
 
 2. **Statistics may have been cleared** - This is normal if retention period expired
@@ -186,7 +186,7 @@ If you lose all data but have backups:
 1. **Stop container** (if running)
 2. **Remove old data**:
    ```bash
-   sudo rm -rf /mnt/fast/apps/homelab/adguard
+   sudo rm -rf /mnt/fast/apps/homelab/corsair/network/adguard
    ```
 3. **Follow Quick Restore steps above**
 4. **All settings, filters, and clients will be restored**
@@ -201,10 +201,10 @@ sudo tar -xzf /mnt/tank/backups/homelab/adguard/full-daily-YYYYMMDD-HHMM.tar.gz 
   -C /tmp/ adguard/conf/AdGuardHome.yaml
 
 # Copy to target
-sudo cp /tmp/adguard/conf/AdGuardHome.yaml /mnt/fast/apps/homelab/adguard/conf/
+sudo cp /tmp/adguard/conf/AdGuardHome.yaml /mnt/fast/apps/homelab/corsair/network/adguard/conf/
 
 # Fix ownership
-sudo chown root:root /mnt/fast/apps/homelab/adguard/conf/AdGuardHome.yaml
+sudo chown root:root /mnt/fast/apps/homelab/corsair/network/adguard/conf/AdGuardHome.yaml
 
 # Restart
 docker compose restart adguard
@@ -221,7 +221,7 @@ If you've lost the admin password and need to reset:
 
 2. **Edit AdGuardHome.yaml** and remove the users section:
    ```bash
-   sudo nano /mnt/fast/apps/homelab/adguard/conf/AdGuardHome.yaml
+   sudo nano /mnt/fast/apps/homelab/corsair/network/adguard/conf/AdGuardHome.yaml
    # Remove or comment out the 'users:' section
    ```
 
@@ -306,7 +306,7 @@ AdGuard Home is standalone but may interact with:
 For issues:
 
 1. Check AdGuard logs: `docker logs adguard`
-2. Verify configuration: `cat /mnt/fast/apps/homelab/adguard/conf/AdGuardHome.yaml`
+2. Verify configuration: `cat /mnt/fast/apps/homelab/corsair/network/adguard/conf/AdGuardHome.yaml`
 3. Check AdGuard documentation: https://github.com/AdguardTeam/AdGuardHome/wiki
 4. Test DNS resolution: `dig @<server-ip> google.com`
 5. Verify port 53 is not blocked by firewall

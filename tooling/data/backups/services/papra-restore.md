@@ -43,12 +43,12 @@ docker compose stop papra
 
 ```bash
 # Backup current database
-cp /mnt/fast/apps/homelab/docs/papra/db/papra.db \
-   /mnt/fast/apps/homelab/docs/papra/db/papra.db.backup.$(date +%Y%m%d-%H%M)
+cp /mnt/fast/apps/homelab/corsair/docs/papra/db/papra.db \
+   /mnt/fast/apps/homelab/corsair/docs/papra/db/papra.db.backup.$(date +%Y%m%d-%H%M)
 
 # Backup current documents
-sudo mv /mnt/fast/apps/homelab/docs/papra/documents \
-   /mnt/fast/apps/homelab/docs/papra/documents.backup.$(date +%Y%m%d-%H%M)
+sudo mv /mnt/fast/apps/homelab/corsair/docs/papra/documents \
+   /mnt/fast/apps/homelab/corsair/docs/papra/documents.backup.$(date +%Y%m%d-%H%M)
 ```
 
 ### 3. Restore Database
@@ -60,21 +60,21 @@ BACKUP_DIR="/mnt/tank/backups/homelab/papra"
 
 # Restore main database file
 cp "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3" \
-   /mnt/fast/apps/homelab/docs/papra/db/db.sqlite
+   /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite
 
 # Restore WAL and SHM files if they exist in the backup
 # (required for a consistent restore if Papra was running during backup)
 [ -f "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3-wal" ] && \
   cp "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3-wal" \
-     /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-wal
+     /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-wal
 [ -f "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3-shm" ] && \
   cp "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3-shm" \
-     /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-shm
+     /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-shm
 
 # Fix permissions (Papra runs as user 3000:3000)
-sudo chown 3000:3000 /mnt/fast/apps/homelab/docs/papra/db/db.sqlite
-sudo chown 3000:3000 /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-wal 2>/dev/null || true
-sudo chown 3000:3000 /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-shm 2>/dev/null || true
+sudo chown 3000:3000 /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite
+sudo chown 3000:3000 /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-wal 2>/dev/null || true
+sudo chown 3000:3000 /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-shm 2>/dev/null || true
 ```
 
 ### 4. Restore Documents
@@ -82,10 +82,10 @@ sudo chown 3000:3000 /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-shm 2>/dev/n
 ```bash
 # Restore documents directory
 sudo tar -xzf "$BACKUP_DIR/documents-$BACKUP_DATE.tar.gz" \
-  -C /mnt/fast/apps/homelab/docs/papra/
+  -C /mnt/fast/apps/homelab/corsair/docs/papra/
 
 # Fix permissions
-sudo chown -R 3000:3000 /mnt/fast/apps/homelab/docs/papra/documents
+sudo chown -R 3000:3000 /mnt/fast/apps/homelab/corsair/docs/papra/documents
 ```
 
 ### 5. Start Papra
@@ -160,18 +160,18 @@ cd /mnt/fast/apps/homelab/docs
 docker compose stop papra
 
 cp "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3" \
-   /mnt/fast/apps/homelab/docs/papra/db/db.sqlite
+   /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite
 
 [ -f "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3-wal" ] && \
   cp "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3-wal" \
-     /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-wal
+     /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-wal
 [ -f "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3-shm" ] && \
   cp "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3-shm" \
-     /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-shm
+     /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-shm
 
-sudo chown 3000:3000 /mnt/fast/apps/homelab/docs/papra/db/db.sqlite
-sudo chown 3000:3000 /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-wal 2>/dev/null || true
-sudo chown 3000:3000 /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-shm 2>/dev/null || true
+sudo chown 3000:3000 /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite
+sudo chown 3000:3000 /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-wal 2>/dev/null || true
+sudo chown 3000:3000 /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-shm 2>/dev/null || true
 
 docker compose up -d papra
 ```
@@ -184,13 +184,13 @@ If you only need to restore document files (keeping existing database):
 BACKUP_DIR="/mnt/tank/backups/homelab/papra"
 BACKUP_DATE="daily-20251104-1900"
 
-cd /mnt/fast/apps/homelab/docs
+cd /mnt/fast/apps/homelab/corsair/docs
 docker compose stop papra
 
-sudo rm -rf /mnt/fast/apps/homelab/docs/papra/documents
+sudo rm -rf /mnt/fast/apps/homelab/corsair/docs/papra/documents
 sudo tar -xzf "$BACKUP_DIR/documents-$BACKUP_DATE.tar.gz" \
-  -C /mnt/fast/apps/homelab/docs/papra/
-sudo chown -R 3000:3000 /mnt/fast/apps/homelab/docs/papra/documents
+  -C /mnt/fast/apps/homelab/corsair/docs/papra/
+sudo chown -R 3000:3000 /mnt/fast/apps/homelab/corsair/docs/papra/documents
 
 docker compose up -d papra
 ```
@@ -199,7 +199,7 @@ docker compose up -d papra
 
 ```bash
 # 1. Create directory structure
-sudo mkdir -p /mnt/fast/apps/homelab/docs/papra/{db,documents}
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/docs/papra/{db,documents}
 
 # 2. Choose backup timestamp
 BACKUP_DATE="daily-20251104-1900"
@@ -207,22 +207,22 @@ BACKUP_DIR="/mnt/tank/backups/homelab/papra"
 
 # 3. Restore database
 cp "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3" \
-   /mnt/fast/apps/homelab/docs/papra/db/db.sqlite
+   /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite
 
 [ -f "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3-wal" ] && \
   cp "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3-wal" \
-     /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-wal
+     /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-wal
 [ -f "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3-shm" ] && \
   cp "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3-shm" \
-     /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-shm
+     /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-shm
 
 # 4. Restore documents
 sudo tar -xzf "$BACKUP_DIR/documents-$BACKUP_DATE.tar.gz" \
-  -C /mnt/fast/apps/homelab/docs/papra/
+  -C /mnt/fast/apps/homelab/corsair/docs/papra/
 
 # 5. Fix permissions
-sudo chown -R 3000:3000 /mnt/fast/apps/homelab/docs/papra/db
-sudo chown -R 3000:3000 /mnt/fast/apps/homelab/docs/papra/documents
+sudo chown -R 3000:3000 /mnt/fast/apps/homelab/corsair/docs/papra/db
+sudo chown -R 3000:3000 /mnt/fast/apps/homelab/corsair/docs/papra/documents
 
 # 6. Deploy the stack
 cd /mnt/fast/apps/homelab/docs
@@ -250,7 +250,7 @@ docker logs papra --tail 50
 # Common causes:
 # - Stale .db-shm / .db-wal files
 # - Permissions on db/ or documents/ directories
-# - Missing papra.env file (check /mnt/fast/apps/homelab/docs/papra.env)
+# - Missing papra.env file (check /mnt/fast/apps/homelab/corsair/docs/papra.env)
 ```
 
 Fix stale WAL files (if you have `sqlite3` available on the host):
@@ -259,10 +259,10 @@ Fix stale WAL files (if you have `sqlite3` available on the host):
 cd /mnt/fast/apps/homelab/docs
 docker compose stop papra
 
-sqlite3 /mnt/fast/apps/homelab/docs/papra/db/db.sqlite \
+sqlite3 /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite \
   "PRAGMA wal_checkpoint(TRUNCATE);"
-rm -f /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-shm
-rm -f /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-wal
+rm -f /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-shm
+rm -f /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-wal
 
 docker compose up -d papra
 ```
@@ -279,11 +279,11 @@ Papra runs as user `3000:3000`:
 
 ```bash
 # Fix all permissions under the papra data directory
-sudo chown -R 3000:3000 /mnt/fast/apps/homelab/docs/papra
-sudo chmod -R 755 /mnt/fast/apps/homelab/docs/papra
-sudo chmod 644 /mnt/fast/apps/homelab/docs/papra/db/db.sqlite
-sudo chmod 644 /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-wal 2>/dev/null || true
-sudo chmod 644 /mnt/fast/apps/homelab/docs/papra/db/db.sqlite-shm 2>/dev/null || true
+sudo chown -R 3000:3000 /mnt/fast/apps/homelab/corsair/docs/papra
+sudo chmod -R 755 /mnt/fast/apps/homelab/corsair/docs/papra
+sudo chmod 644 /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite
+sudo chmod 644 /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-wal 2>/dev/null || true
+sudo chmod 644 /mnt/fast/apps/homelab/corsair/docs/papra/db/db.sqlite-shm 2>/dev/null || true
 ```
 
 ### Database Corruption
@@ -314,10 +314,10 @@ Papra reads its configuration from `papra.env`:
 
 ```bash
 # Verify env file exists and is readable
-cat /mnt/fast/apps/homelab/docs/papra.env
+cat /mnt/fast/apps/homelab/corsair/docs/papra.env
 
 # The encrypted version is at:
-# /mnt/fast/apps/homelab/docs/encrypted.papra.env
+# /mnt/fast/apps/homelab/corsair/docs/encrypted.papra.env
 ```
 
 ## Migration to New Server
@@ -326,11 +326,11 @@ To move Papra to a new server:
 
 1. **On old server**: Backup is already automated
 2. **On new server**:
-   - Set up the compose stack from `/mnt/fast/apps/homelab/docs/compose.yml`
+   - Set up the compose stack from `/mnt/fast/apps/homelab/corsair/docs/compose.yml`
    - Ensure `papra.env` is present (decrypt from `encrypted.papra.env` if needed)
    - Create the directory skeleton:
      ```bash
-     sudo mkdir -p /mnt/fast/apps/homelab/docs/papra/{db,documents}
+     sudo mkdir -p /mnt/fast/apps/homelab/corsair/docs/papra/{db,documents}
      ```
    - Restore backup as described in **Restore to New System** above
    - Update DNS to point `archive.corsair.tf` to the new server

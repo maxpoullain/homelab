@@ -5,9 +5,8 @@
 # Each service section handles its complete backup (databases + configs + files)
 #
 # NOTE: Service paths updated for 2025:
-#   - Tailscale:   $APPS_BASE/network/tailscale
-#   - Traefik:     $APPS_BASE/front/traefik
-#   - AdGuard:     $APPS_BASE/dns/adguard
+#   - Traefik:     $SERVICES_BASE/front/traefik
+#   - AdGuard:     $SERVICES_BASE/network/adguard
 #
 # Usage:
 #   ./backup-services.sh                    # Backup all services
@@ -19,6 +18,7 @@ set +e  # Don't exit on errors - we want to continue even if one service fails
 # Configuration
 BACKUP_DIR="/mnt/tank/backups/homelab"
 APPS_BASE="/mnt/fast/apps/homelab"
+SERVICES_BASE="$APPS_BASE/corsair"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="$SCRIPT_DIR/backup-services.log"
 DATE=$(date +%Y%m%d-%H%M)
@@ -160,14 +160,14 @@ else
 fi
 
 # 2. Backup storage files (library, upload, profile only - exclude regenerable content)
-if [ -d "$APPS_BASE/media/immich" ] && [ "$IMMICH_SUCCESS" = true ]; then
+if [ -d "$SERVICES_BASE/media/immich" ] && [ "$IMMICH_SUCCESS" = true ]; then
   IMMICH_STORAGE_FILE="$BACKUP_DIR/immich/storage-${BACKUP_TYPE}-$DATE.tar.gz"
 
   tar -czf "$IMMICH_STORAGE_FILE" \
     --exclude="thumbs" \
     --exclude="encoded-video" \
     --exclude="backups" \
-    -C "$APPS_BASE/media/immich" . 2>&1 | grep -v "Removing leading" || true
+    -C "$SERVICES_BASE/media/immich" . 2>&1 | grep -v "Removing leading" || true
 
   if [ -f "$IMMICH_STORAGE_FILE" ]; then
     IMMICH_STORAGE_SIZE=$(du -h "$IMMICH_STORAGE_FILE" | cut -f1)
@@ -307,7 +307,7 @@ fi
 
 # 2. Backup YAML configuration files
 # NOTE: Zigbee database is no longer backed up here - it's covered by the zigbee2mqtt service backup
-if [ -d "$APPS_BASE/home/ha" ] && [ "$HA_SUCCESS" = true ]; then
+if [ -d "$SERVICES_BASE/home/ha" ] && [ "$HA_SUCCESS" = true ]; then
   HA_CONFIG_FILE="$BACKUP_DIR/homeassistant/config-${BACKUP_TYPE}-$DATE.tar.gz"
 
   tar -czf "$HA_CONFIG_FILE" \
@@ -317,7 +317,7 @@ if [ -d "$APPS_BASE/home/ha" ] && [ "$HA_SUCCESS" = true ]; then
     --exclude="deps" \
     --exclude="tts" \
     --exclude="image" \
-    -C "$APPS_BASE/home" ha 2>&1 | grep -v "Removing leading" || true
+    -C "$SERVICES_BASE/home" ha 2>&1 | grep -v "Removing leading" || true
 
   if [ -f "$HA_CONFIG_FILE" ]; then
     HA_CONFIG_SIZE=$(du -h "$HA_CONFIG_FILE" | cut -f1)
@@ -351,7 +351,7 @@ if should_backup "jellyfin"; then
 log "Backing up Jellyfin (full backup)..."
 JELLYFIN_SUCCESS=true
 
-if [ -d "$APPS_BASE/media/jellyfin/config" ]; then
+if [ -d "$SERVICES_BASE/media/jellyfin/config" ]; then
   if docker ps --format "{{.Names}}" | grep -q jellyfin; then
     JELLYFIN_FILE="$BACKUP_DIR/jellyfin/full-${BACKUP_TYPE}-$DATE.tar.gz"
 
@@ -359,7 +359,7 @@ if [ -d "$APPS_BASE/media/jellyfin/config" ]; then
       --exclude="cache" \
       --exclude="log" \
       --exclude="transcodes" \
-      -C "$APPS_BASE/media/jellyfin" config 2>&1 | grep -v "Removing leading" || true
+      -C "$SERVICES_BASE/media/jellyfin" config 2>&1 | grep -v "Removing leading" || true
 
     if [ -f "$JELLYFIN_FILE" ]; then
       JELLYFIN_SIZE=$(du -h "$JELLYFIN_FILE" | cut -f1)
@@ -437,13 +437,13 @@ if should_backup "prowlarr"; then
 log "Backing up Prowlarr (full backup)..."
 PROWLARR_SUCCESS=true
 
-if [ -d "$APPS_BASE/7seas/prowlarr" ]; then
+if [ -d "$SERVICES_BASE/7seas/prowlarr" ]; then
   PROWLARR_FILE="$BACKUP_DIR/prowlarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
 
   tar -czf "$PROWLARR_FILE" \
     --exclude="logs" \
     --exclude="Backups" \
-    -C "$APPS_BASE/7seas" prowlarr 2>&1 | grep -v "Removing leading" || true
+    -C "$SERVICES_BASE/7seas" prowlarr 2>&1 | grep -v "Removing leading" || true
 
   if [ -f "$PROWLARR_FILE" ]; then
     PROWLARR_SIZE=$(du -h "$PROWLARR_FILE" | cut -f1)
@@ -471,14 +471,14 @@ if should_backup "sonarr"; then
 log "Backing up Sonarr (full backup)..."
 SONARR_SUCCESS=true
 
-if [ -d "$APPS_BASE/7seas/sonarr" ]; then
+if [ -d "$SERVICES_BASE/7seas/sonarr" ]; then
   SONARR_FILE="$BACKUP_DIR/sonarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
 
   tar -czf "$SONARR_FILE" \
     --exclude="logs" \
     --exclude="Backups" \
     --exclude="MediaCover" \
-    -C "$APPS_BASE/7seas" sonarr 2>&1 | grep -v "Removing leading" || true
+    -C "$SERVICES_BASE/7seas" sonarr 2>&1 | grep -v "Removing leading" || true
 
   if [ -f "$SONARR_FILE" ]; then
     SONARR_SIZE=$(du -h "$SONARR_FILE" | cut -f1)
@@ -508,14 +508,14 @@ if should_backup "radarr"; then
 log "Backing up Radarr (full backup)..."
 RADARR_SUCCESS=true
 
-if [ -d "$APPS_BASE/7seas/radarr" ]; then
+if [ -d "$SERVICES_BASE/7seas/radarr" ]; then
   RADARR_FILE="$BACKUP_DIR/radarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
 
   tar -czf "$RADARR_FILE" \
     --exclude="logs" \
     --exclude="Backups" \
     --exclude="MediaCover" \
-    -C "$APPS_BASE/7seas" radarr 2>&1 | grep -v "Removing leading" || true
+    -C "$SERVICES_BASE/7seas" radarr 2>&1 | grep -v "Removing leading" || true
 
   if [ -f "$RADARR_FILE" ]; then
     RADARR_SIZE=$(du -h "$RADARR_FILE" | cut -f1)
@@ -543,12 +543,12 @@ if should_backup "zigbee2mqtt"; then
 log "Backing up Zigbee2mqtt (config + database + coordinator)..."
 Z2M_SUCCESS=true
 
-if [ -d "$APPS_BASE/home/zigbee2mqtt" ]; then
+if [ -d "$SERVICES_BASE/home/zigbee2mqtt" ]; then
   Z2M_FILE="$BACKUP_DIR/zigbee2mqtt/full-${BACKUP_TYPE}-$DATE.tar.gz"
 
   tar -czf "$Z2M_FILE" \
     --exclude="log" \
-    -C "$APPS_BASE/home" zigbee2mqtt 2>&1 | grep -v "Removing leading" || true
+    -C "$SERVICES_BASE/home" zigbee2mqtt 2>&1 | grep -v "Removing leading" || true
 
   if [ -f "$Z2M_FILE" ]; then
     Z2M_SIZE=$(du -h "$Z2M_FILE" | cut -f1)
@@ -632,13 +632,13 @@ if should_backup "seerr"; then
 log "Backing up Seerr (config + database)..."
 SEERR_SUCCESS=true
 
-if [ -d "$APPS_BASE/7seas/seerr" ]; then
+if [ -d "$SERVICES_BASE/7seas/seerr" ]; then
   SEERR_FILE="$BACKUP_DIR/seerr/full-${BACKUP_TYPE}-$DATE.tar.gz"
 
   tar -czf "$SEERR_FILE" \
     --exclude="logs" \
     --exclude="cache" \
-    -C "$APPS_BASE/7seas" seerr 2>&1 | grep -v "Removing leading" || true
+    -C "$SERVICES_BASE/7seas" seerr 2>&1 | grep -v "Removing leading" || true
 
   if [ -f "$SEERR_FILE" ]; then
     SEERR_SIZE=$(du -h "$SEERR_FILE" | cut -f1)
@@ -667,13 +667,13 @@ if should_backup "beszel"; then
 log "Backing up Beszel (database + data)..."
 BESZEL_SUCCESS=true
 
-if [ -d "$APPS_BASE/admin/beszel/beszel_data" ]; then
+if [ -d "$SERVICES_BASE/admin/beszel/beszel_data" ]; then
   BESZEL_FILE="$BACKUP_DIR/beszel/full-${BACKUP_TYPE}-$DATE.tar.gz"
 
   tar -czf "$BESZEL_FILE" \
     --exclude="logs" \
     --exclude="id_ed25519" \
-    -C "$APPS_BASE/admin/beszel" beszel_data 2>&1 | grep -v "Removing leading" || true
+    -C "$SERVICES_BASE/admin/beszel" beszel_data 2>&1 | grep -v "Removing leading" || true
 
   if [ -f "$BESZEL_FILE" ]; then
     BESZEL_SIZE=$(du -h "$BESZEL_FILE" | cut -f1)
@@ -757,7 +757,7 @@ if should_backup "papra"; then
 log "Backing up Papra (database + documents)..."
 PAPRA_SUCCESS=true
 
-if [ -d "$APPS_BASE/docs/papra" ]; then
+if [ -d "$SERVICES_BASE/docs/papra" ]; then
   # 1. Backup SQLite database using online backup for consistency
   PAPRA_DB_FILE="$BACKUP_DIR/papra/db-${BACKUP_TYPE}-$DATE.sqlite3"
   PAPRA_DOCS_FILE=""
@@ -794,9 +794,9 @@ if [ -d "$APPS_BASE/docs/papra" ]; then
   if [ "$PAPRA_SUCCESS" = true ]; then
     PAPRA_DOCS_FILE="$BACKUP_DIR/papra/documents-${BACKUP_TYPE}-$DATE.tar.gz"
 
-    if [ -d "$APPS_BASE/docs/papra/documents" ]; then
+    if [ -d "$SERVICES_BASE/docs/papra/documents" ]; then
       tar -czf "$PAPRA_DOCS_FILE" \
-        -C "$APPS_BASE/docs/papra" documents 2>&1 | grep -v "Removing leading" || true
+        -C "$SERVICES_BASE/docs/papra" documents 2>&1 | grep -v "Removing leading" || true
 
       if [ -f "$PAPRA_DOCS_FILE" ]; then
         PAPRA_DOCS_SIZE=$(du -h "$PAPRA_DOCS_FILE" | cut -f1)

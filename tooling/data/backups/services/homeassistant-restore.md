@@ -23,7 +23,7 @@ docker compose down
 # Choose your backup timestamp
 BACKUP_DATE="daily-20251025-2236"
 BACKUP_DIR="/mnt/tank/backups/homelab/homeassistant"
-HA_DIR="/mnt/fast/apps/homelab/home/ha"
+HA_DIR="/mnt/fast/apps/homelab/corsair/home/ha"
 
 # Restore main database
 cp "$BACKUP_DIR/db-$BACKUP_DATE.sqlite3" "$HA_DIR/home-assistant_v2.db"
@@ -41,10 +41,10 @@ sudo chown -R root:root "$HA_DIR"/*.db
 
 ```bash
 # Extract configs (this will overwrite existing files)
-tar -xzf "$BACKUP_DIR/config-$BACKUP_DATE.tar.gz" -C /mnt/fast/apps/homelab/home/
+tar -xzf "$BACKUP_DIR/config-$BACKUP_DATE.tar.gz" -C /mnt/fast/apps/homelab/corsair/home/
 
 # Fix permissions
-sudo chown -R root:root /mnt/fast/apps/homelab/home/ha/
+sudo chown -R root:root /mnt/fast/apps/homelab/corsair/home/ha/
 ```
 
 ### 4. Start Home Assistant
@@ -78,7 +78,7 @@ cd /mnt/fast/apps/homelab/home
 docker compose down
 
 cp /mnt/tank/backups/homelab/homeassistant/db-daily-20251025-2236.sqlite3 \
-   /mnt/fast/apps/homelab/home/ha/home-assistant_v2.db
+   /mnt/fast/apps/homelab/corsair/home/ha/home-assistant_v2.db
 
 docker compose up -d
 ```
@@ -92,7 +92,7 @@ cd /mnt/fast/apps/homelab/home
 docker compose down
 
 tar -xzf /mnt/tank/backups/homelab/homeassistant/config-daily-20251025-2236.tar.gz \
-  -C /mnt/fast/apps/homelab/home/
+  -C /mnt/fast/apps/homelab/corsair/home/
 
 docker compose up -d
 ```
@@ -106,7 +106,7 @@ cd /mnt/fast/apps/homelab/home
 docker compose down
 
 cp /mnt/tank/backups/homelab/homeassistant/zigbee-daily-20251025-2236.sqlite3 \
-   /mnt/fast/apps/homelab/home/ha/zigbee.db
+   /mnt/fast/apps/homelab/corsair/home/ha/zigbee.db
 
 docker compose up -d
 ```
@@ -131,8 +131,8 @@ tar -tzf /mnt/tank/backups/homelab/homeassistant/config-daily-20251025-2236.tar.
 To restore Home Assistant on a new server:
 
 1. Install Docker and Docker Compose
-2. Copy compose.yml from `/mnt/fast/apps/homelab/home/`
-3. Create directory: `mkdir -p /mnt/fast/apps/homelab/home/ha`
+2. Copy compose.yml from `/mnt/fast/apps/homelab/corsair/home/`
+3. Create directory: `mkdir -p /mnt/fast/apps/homelab/corsair/home/ha`
 4. Restore databases and configs before first start
 5. Start Home Assistant
 6. Update DNS/reverse proxy
@@ -180,9 +180,9 @@ docker ps | grep ha  # Should return nothing
 
 ```bash
 # Fix all permissions
-sudo chown -R root:root /mnt/fast/apps/homelab/home/ha/
-sudo chmod 644 /mnt/fast/apps/homelab/home/ha/*.db
-sudo chmod 644 /mnt/fast/apps/homelab/home/ha/*.yaml
+sudo chown -R root:root /mnt/fast/apps/homelab/corsair/home/ha/
+sudo chmod 644 /mnt/fast/apps/homelab/corsair/home/ha/*.db
+sudo chmod 644 /mnt/fast/apps/homelab/corsair/home/ha/*.yaml
 ```
 
 ## Important Notes

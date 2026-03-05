@@ -30,8 +30,8 @@ docker compose stop radarr
 ### 2. Backup Current Config (Optional but Recommended)
 
 ```bash
-sudo mv /mnt/fast/apps/homelab/media/radarr \
-   /mnt/fast/apps/homelab/media/radarr.backup.$(date +%Y%m%d-%H%M)
+sudo mv /mnt/fast/apps/homelab/corsair/media/radarr \
+   /mnt/fast/apps/homelab/corsair/media/radarr.backup.$(date +%Y%m%d-%H%M)
 ```
 
 ### 3. Restore Full Backup
@@ -41,13 +41,13 @@ sudo mv /mnt/fast/apps/homelab/media/radarr \
 BACKUP_FILE="/mnt/tank/backups/homelab/radarr/full-daily-20251104-1900.tar.gz"
 
 # Create directory
-sudo mkdir -p /mnt/fast/apps/homelab/media/
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/media/
 
 # Extract backup
-sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/media/
+sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/media/
 
 # Fix permissions
-sudo chown -R max:homelab /mnt/fast/apps/homelab/media/radarr
+sudo chown -R max:homelab /mnt/fast/apps/homelab/corsair/media/radarr
 ```
 
 ### 4. Start Radarr
@@ -90,16 +90,16 @@ tar -tzf /mnt/tank/backups/homelab/radarr/full-daily-20251104-1900.tar.gz | head
 
 ```bash
 # 1. Create directory structure
-sudo mkdir -p /mnt/fast/apps/homelab/media/
+sudo mkdir -p /mnt/fast/apps/homelab/corsair/media/
 
 # 2. Choose backup file
 BACKUP_FILE="/mnt/tank/backups/homelab/radarr/full-daily-20251104-1900.tar.gz"
 
 # 3. Extract backup
-sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/media/
+sudo tar -xzf "$BACKUP_FILE" -C /mnt/fast/apps/homelab/corsair/media/
 
 # 4. Fix ownership
-sudo chown -R max:homelab /mnt/fast/apps/homelab/media/radarr
+sudo chown -R max:homelab /mnt/fast/apps/homelab/corsair/media/radarr
 
 # 5. Start Radarr
 cd /mnt/fast/apps/homelab/media
@@ -112,7 +112,7 @@ docker compose up -d radarr
 
 ```bash
 # Fix ownership
-sudo chown -R max:homelab /mnt/fast/apps/homelab/media/radarr
+sudo chown -R max:homelab /mnt/fast/apps/homelab/corsair/media/radarr
 ```
 
 ### List Available Backups
