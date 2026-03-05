@@ -31,7 +31,7 @@ This backup system uses a **tiered retention strategy** that balances recovery f
 └─────────────┴──────────────┴────────────┴──────────────┘
 
 Total Recovery Points: ~23 per service
-Total Storage: ~50GB at full retention (all 7 services)
+Total Storage: ~75GB at full retention (all 11 services)
 ```
 
 ## Timeline Visualization
@@ -62,26 +62,31 @@ Now      ┊         │       │        │
 
 ### Current Backup Sizes (per run):
 ```
-Immich:         323 MB  (251M db + 72M storage)
-Vaultwarden:    322 KB  (~876K db + 1.7K key + 9.4K attachments)
-Home Assistant:  73 MB  (2 databases + configs)
-Jellyfin:       1.6 GB  (full backup with metadata)
-Tailscale:        1 KB
-Traefik:          1 KB
-──────────────────────
-Total per run:  ~2.0 GB
+Immich:           ~265 MB  (db + storage)
+Vaultwarden:       ~1.5 KB  (db + RSA key + attachments)
+Home Assistant:    ~73 MB  (db + configs)
+Jellyfin:         ~1.7 GB  (full backup with metadata)
+Tailscale:           ~1 KB
+Traefik:             ~1 KB
+Prowlarr:          ~1.5 MB  (full backup)
+Sonarr:            ~3.5 MB  (full backup)
+Radarr:            ~1.0 MB  (full backup)
+Zigbee2mqtt:         ~1 KB
+AdGuard:             ~5 MB
+──────────────────────────
+Total per run:    ~2.05 GB
 ```
 
 ### Full Retention Storage:
 ```
-Twice-daily: 6 backups  × 2.0 GB = 12 GB
-Daily:       7 backups  × 2.0 GB = 14 GB
-Weekly:      4 backups  × 2.0 GB =  8 GB
-Monthly:     6 backups  × 2.0 GB = 12 GB
+Twice-daily: 6 backups  × 2.05 GB = 12 GB
+Daily:       7 backups  × 2.05 GB = 14 GB
+Weekly:      4 backups  × 2.05 GB =  8 GB
+Monthly:     6 backups  × 2.05 GB = 12 GB
 ────────────────────────────────────────
-Total:      23 backups           = 46 GB
+Total:      23 backups            = 47 GB
 
-With headroom for growth: ~50 GB
+With headroom for growth: ~75 GB
 ```
 
 ## Offsite Backup (B2) Strategy
@@ -90,10 +95,10 @@ For cloud backup to Backblaze B2, **exclude daily backups** to reduce costs:
 
 ### Services (homelab directory)
 ```
-Weekly:   4 backups × 2.0 GB =  8 GB
-Monthly:  6 backups × 2.0 GB = 12 GB
+Weekly:   4 backups × 2.05 GB =  8 GB
+Monthly:  6 backups × 2.05 GB = 12 GB
 ──────────────────────────────────────
-Total:   10 backups           = 20 GB
+Total:   10 backups            = 20 GB
 ```
 
 ### TrueNAS Config (truenas directory)
@@ -168,17 +173,24 @@ fi
 Automatic cleanup runs after each backup:
 
 ```bash
-# Core backups (databases, configs, storage)
-Twice-daily: Delete if > 3 days old
-Daily:       Delete if > 7 days old
-Weekly:      Delete if > 28 days old
-Monthly:     Delete if > 180 days old
+# All backup files use the naming convention:
+#   <prefix>-<type>-<YYYYMMDD>-<HHMM>.<ext>
+# e.g. db-twice-daily-20251101-0700.sql.gz
+#      full-weekly-20251109-1900.tar.gz
+
+# Each tier is matched by the exact segment "-<type>-" in the filename,
+# so "daily" never accidentally matches "twice-daily" or "weekly".
+Twice-daily: find -name "*-twice-daily-*" -mtime +3  → delete
+Daily:       find -name "*-daily-*"       -mtime +7  → delete
+Weekly:      find -name "*-weekly-*"      -mtime +28 → delete
+Monthly:     find -name "*-monthly-*"     -mtime +180 → delete
 
 # Vaultwarden RSA keys and attachments
 Only deleted if corresponding database backup no longer exists (orphan cleanup)
 ```
 
 This ensures:
+- Tiers are fully isolated — no overlap between cleanup passes
 - Complete backup sets are kept together
 - RSA keys never deleted while database exists
 - All 3 Vaultwarden files (db + key + attachments) remain synchronized
@@ -195,13 +207,21 @@ This ensures:
 
 ## Services Covered
 
-All 6 homelab services backed up:
+All 11 homelab services backed up:
 1. **Immich**: PostgreSQL database + storage files (library, upload, profile)
 2. **Vaultwarden**: SQLite database + RSA keys + attachments
-3. **Home Assistant**: Main SQLite + Zigbee SQLite + YAML configs
+3. **Home Assistant**: Main SQLite database + YAML configs
 4. **Jellyfin**: Full backup (databases + metadata + plugins)
 5. **Tailscale**: State files
 6. **Traefik**: ACME SSL certificates
+7. **Prowlarr**: Full backup (database + config.xml + Definitions)
+8. **Sonarr**: Full backup (database + config.xml)
+9. **Radarr**: Full backup (database + config.xml)
+10. **Zigbee2mqtt**: Full backup (configuration.yaml + database.db + coordinator_backup.json)
+11. **AdGuard**: Config + stats database (excludes sessions.db and query logs)
+
+> **Note:** The Zigbee SQLite database previously backed up inside the Home Assistant service
+> has been removed — it is fully covered by the dedicated Zigbee2mqtt service backup (#10).
 
 ## Monitoring
 
@@ -211,11 +231,11 @@ Check retention status for both systems:
 # Full status report (both systems)
 /mnt/fast/apps/homelab/tooling/data/backups/backup-check.sh
 
-# Or manually count by type (services only)
-echo "Twice-daily: $(find /mnt/tank/backups/homelab -name '*twice-daily*' | wc -l)"
-echo "Daily:       $(find /mnt/tank/backups/homelab -name '*daily*' | wc -l)"
-echo "Weekly:      $(find /mnt/tank/backups/homelab -name '*weekly*' | wc -l)"
-echo "Monthly:     $(find /mnt/tank/backups/homelab -name '*monthly*' | wc -l)"
+# Or manually count by type (services only) — uses exact segment matching
+echo "Twice-daily: $(find /mnt/tank/backups/homelab -name '*-twice-daily-*' | wc -l)"
+echo "Daily:       $(find /mnt/tank/backups/homelab -name '*-daily-*' | wc -l)"
+echo "Weekly:      $(find /mnt/tank/backups/homelab -name '*-weekly-*' | wc -l)"
+echo "Monthly:     $(find /mnt/tank/backups/homelab -name '*-monthly-*' | wc -l)"
 
 # TrueNAS config backups
 echo "Daily:       $(find /mnt/tank/backups/truenas -type d -name 'daily-*' | wc -l)"
@@ -230,19 +250,19 @@ echo "Monthly:     $(find /mnt/tank/backups/truenas -type d -name 'monthly-*' | 
 To adjust retention periods, edit `backup-services.sh`:
 
 ```bash
-# In the cleanup section around line 420, change these values:
+# In the cleanup section (search for "Cleaning up old backups"), change these values:
 
 # Twice-daily retention (currently 3 days)
--mtime +3 -delete
+find "$BACKUP_DIR" -type f -name "*-twice-daily-*" -mtime +3 -delete
 
 # Daily retention (currently 7 days)
--mtime +7 -delete
+find "$BACKUP_DIR" -type f -name "*-daily-*" -mtime +7 -delete
 
 # Weekly retention (currently 28 days / 4 weeks)
--mtime +28 -delete
+find "$BACKUP_DIR" -type f -name "*-weekly-*" -mtime +28 -delete
 
 # Monthly retention (currently 180 days / 6 months)
--mtime +180 -delete
+find "$BACKUP_DIR" -type f -name "*-monthly-*" -mtime +180 -delete
 ```
 
 ### TrueNAS Config Retention

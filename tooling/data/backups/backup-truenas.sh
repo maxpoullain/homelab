@@ -8,11 +8,8 @@ DATE=$(date +%Y%m%d-%H%M)
 DAY_OF_WEEK=$(date +%u)  # 1-7 (Monday-Sunday)
 DAY_OF_MONTH=$(date +%d)
 
-# Rotate log file if it's larger than 10MB
-if [ -f "$LOG_FILE" ] && [ $(stat -f%z "$LOG_FILE" 2>/dev/null || stat -c%s "$LOG_FILE" 2>/dev/null) -gt 10485760 ]; then
-  mv "$LOG_FILE" "$LOG_FILE.old"
-  rm -f "$LOG_FILE.old.old" 2>/dev/null
-fi
+# Rotate logs before each run
+"$SCRIPT_DIR/rotate-logs.sh" 2>/dev/null || true
 
 # Logging function
 log() {

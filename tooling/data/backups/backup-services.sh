@@ -27,7 +27,7 @@ DAY_OF_MONTH=$(date +%d)
 HOUR=$(date +%H)
 
 # Available services
-AVAILABLE_SERVICES=(immich vaultwarden homeassistant jellyfin tailscale traefik prowlarr sonarr radarr readarr zigbee2mqtt adguard)
+AVAILABLE_SERVICES=(immich vaultwarden homeassistant jellyfin tailscale traefik prowlarr sonarr radarr zigbee2mqtt adguard)
 
 # Parse command line arguments
 SELECTED_SERVICES=()
@@ -78,11 +78,8 @@ else
   done
 fi
 
-# Rotate log file if it's larger than 10MB
-if [ -f "$LOG_FILE" ] && [ $(stat -f%z "$LOG_FILE" 2>/dev/null || stat -c%s "$LOG_FILE" 2>/dev/null) -gt 10485760 ]; then
-  mv "$LOG_FILE" "$LOG_FILE.old"
-  rm -f "$LOG_FILE.old.old" 2>/dev/null
-fi
+# Rotate logs before each run
+"$SCRIPT_DIR/rotate-logs.sh" 2>/dev/null || true
 
 # Determine backup type based on time
 # 7 PM (19:00) is used for daily/weekly/monthly, 7 AM is twice-daily
@@ -137,7 +134,7 @@ log "=========================================="
 log ""
 
 # Create backup directories if they don't exist
-mkdir -p "$BACKUP_DIR"/{immich,vaultwarden,homeassistant,jellyfin,tailscale,traefik,prowlarr,sonarr,radarr,readarr,zigbee2mqtt,adguard}
+mkdir -p "$BACKUP_DIR"/{immich,vaultwarden,homeassistant,jellyfin,tailscale,traefik,prowlarr,sonarr,radarr,zigbee2mqtt,adguard}
 
 # ============================================
 # IMMICH - PostgreSQL Database + Storage
@@ -149,7 +146,7 @@ IMMICH_SUCCESS=true
 # 1. Backup PostgreSQL database
 if docker ps --format "{{.Names}}" | grep -q immich_postgres; then
   IMMICH_DB_FILE="$BACKUP_DIR/immich/db-${BACKUP_TYPE}-$DATE.sql.gz"
-  
+
   if docker exec -t immich_postgres pg_dumpall --clean --if-exists --username=postgres | gzip > "$IMMICH_DB_FILE" 2>&1; then
     IMMICH_DB_SIZE=$(du -h "$IMMICH_DB_FILE" | cut -f1)
     log "  ✓ Database backed up: db-${BACKUP_TYPE}-$DATE.sql.gz ($IMMICH_DB_SIZE)"
@@ -165,13 +162,13 @@ fi
 # 2. Backup storage files (library, upload, profile only - exclude regenerable content)
 if [ -d "$APPS_BASE/media/immich" ] && [ "$IMMICH_SUCCESS" = true ]; then
   IMMICH_STORAGE_FILE="$BACKUP_DIR/immich/storage-${BACKUP_TYPE}-$DATE.tar.gz"
-  
+
   tar -czf "$IMMICH_STORAGE_FILE" \
     --exclude="thumbs" \
     --exclude="encoded-video" \
     --exclude="backups" \
     -C "$APPS_BASE/media/immich" . 2>&1 | grep -v "Removing leading" || true
-  
+
   if [ -f "$IMMICH_STORAGE_FILE" ]; then
     IMMICH_STORAGE_SIZE=$(du -h "$IMMICH_STORAGE_FILE" | cut -f1)
     log "  ✓ Storage backed up: storage-${BACKUP_TYPE}-$DATE.tar.gz ($IMMICH_STORAGE_SIZE)"
@@ -207,13 +204,13 @@ VAULTWARDEN_SUCCESS=true
 
 if docker ps --format "{{.Names}}" | grep -q vaultwarden; then
   VAULT_DB_FILE="$BACKUP_DIR/vaultwarden/db-${BACKUP_TYPE}-$DATE.sqlite3"
-  
+
   # 1. Backup database using built-in backup command
   BACKUP_OUTPUT=$(docker exec vaultwarden /vaultwarden backup 2>&1 | tee -a "$LOG_FILE")
-  
+
   # Extract the actual backup filename from the output (e.g., "db_20251025_211508.sqlite3")
   BACKUP_FILENAME=$(echo "$BACKUP_OUTPUT" | grep -oE "db_[0-9]+_[0-9]+\.sqlite3")
-  
+
   if [ -n "$BACKUP_FILENAME" ]; then
     if docker cp "vaultwarden:/data/$BACKUP_FILENAME" "$VAULT_DB_FILE" 2>&1; then
       VAULT_DB_SIZE=$(du -h "$VAULT_DB_FILE" | cut -f1)
@@ -227,7 +224,7 @@ if docker ps --format "{{.Names}}" | grep -q vaultwarden; then
     log "  ✗ Database backup failed - could not determine backup filename"
     VAULTWARDEN_SUCCESS=false
   fi
-  
+
   # Only continue if database backup succeeded
   if [ "$VAULTWARDEN_SUCCESS" = true ]; then
     # 2. Backup RSA keys
@@ -238,7 +235,7 @@ if docker ps --format "{{.Names}}" | grep -q vaultwarden; then
       log "  ✗ RSA key backup failed"
       VAULTWARDEN_SUCCESS=false
     fi
-    
+
     # 3. Backup attachments if they exist (only if previous steps succeeded)
     if [ "$VAULTWARDEN_SUCCESS" = true ]; then
       VAULT_ATT_FILE="$BACKUP_DIR/vaultwarden/attachments-${BACKUP_TYPE}-$DATE.tar.gz"
@@ -258,7 +255,7 @@ if docker ps --format "{{.Names}}" | grep -q vaultwarden; then
         touch "$VAULT_ATT_FILE"
       fi
     fi
-    
+
     # Cleanup incomplete backups if any step failed
     if [ "$VAULTWARDEN_SUCCESS" = false ]; then
       rm -f "$VAULT_DB_FILE" "$VAULT_KEY_FILE" "$VAULT_ATT_FILE"
@@ -289,7 +286,7 @@ HA_SUCCESS=true
 # 1. Backup main database
 if docker ps --format "{{.Names}}" | grep -q "^ha$"; then
   HA_DB_FILE="$BACKUP_DIR/homeassistant/db-${BACKUP_TYPE}-$DATE.sqlite3"
-  
+
   if docker exec ha python3 -c "import sqlite3; src=sqlite3.connect('/config/home-assistant_v2.db'); dst=sqlite3.connect('/tmp/ha-backup.db'); src.backup(dst); src.close(); dst.close()" 2>&1 | tee -a "$LOG_FILE"; then
     if docker cp "ha:/tmp/ha-backup.db" "$HA_DB_FILE" 2>&1; then
       HA_DB_SIZE=$(du -h "$HA_DB_FILE" | cut -f1)
@@ -309,9 +306,10 @@ else
 fi
 
 # 2. Backup YAML configuration files
+# NOTE: Zigbee database is no longer backed up here - it's covered by the zigbee2mqtt service backup
 if [ -d "$APPS_BASE/home/ha" ] && [ "$HA_SUCCESS" = true ]; then
   HA_CONFIG_FILE="$BACKUP_DIR/homeassistant/config-${BACKUP_TYPE}-$DATE.tar.gz"
-  
+
   tar -czf "$HA_CONFIG_FILE" \
     --exclude="home-assistant_v2.db*" \
     --exclude="*.log*" \
@@ -320,7 +318,7 @@ if [ -d "$APPS_BASE/home/ha" ] && [ "$HA_SUCCESS" = true ]; then
     --exclude="tts" \
     --exclude="image" \
     -C "$APPS_BASE/home" ha 2>&1 | grep -v "Removing leading" || true
-  
+
   if [ -f "$HA_CONFIG_FILE" ]; then
     HA_CONFIG_SIZE=$(du -h "$HA_CONFIG_FILE" | cut -f1)
     log "  ✓ Configs backed up: config-${BACKUP_TYPE}-$DATE.tar.gz ($HA_CONFIG_SIZE)"
@@ -356,13 +354,13 @@ JELLYFIN_SUCCESS=true
 if [ -d "$APPS_BASE/media/jellyfin/config" ]; then
   if docker ps --format "{{.Names}}" | grep -q jellyfin; then
     JELLYFIN_FILE="$BACKUP_DIR/jellyfin/full-${BACKUP_TYPE}-$DATE.tar.gz"
-    
+
     tar -czf "$JELLYFIN_FILE" \
       --exclude="cache" \
       --exclude="log" \
       --exclude="transcodes" \
       -C "$APPS_BASE/media/jellyfin" config 2>&1 | grep -v "Removing leading" || true
-    
+
     if [ -f "$JELLYFIN_FILE" ]; then
       JELLYFIN_SIZE=$(du -h "$JELLYFIN_FILE" | cut -f1)
       log "  ✓ Full backup completed: full-${BACKUP_TYPE}-$DATE.tar.gz ($JELLYFIN_SIZE)"
@@ -397,12 +395,12 @@ TAILSCALE_SUCCESS=true
 
 if [ -d "$APPS_BASE/network/tailscale" ]; then
   TAILSCALE_FILE="$BACKUP_DIR/tailscale/state-${BACKUP_TYPE}-$DATE.tar.gz"
-  
+
   tar -czf "$TAILSCALE_FILE" \
     --exclude="*.log*" \
     --exclude="*.txt" \
     -C "$APPS_BASE/network" tailscale 2>&1 | grep -v "Removing leading" || true
-  
+
   if [ -f "$TAILSCALE_FILE" ]; then
     TAILSCALE_SIZE=$(du -h "$TAILSCALE_FILE" | cut -f1)
     log "  ✓ State backed up: state-${BACKUP_TYPE}-$DATE.tar.gz ($TAILSCALE_SIZE)"
@@ -430,10 +428,10 @@ TRAEFIK_SUCCESS=true
 
 if [ -d "$APPS_BASE/front/traefik/acme" ]; then
   TRAEFIK_FILE="$BACKUP_DIR/traefik/acme-${BACKUP_TYPE}-$DATE.tar.gz"
-  
+
   tar -czf "$TRAEFIK_FILE" \
     -C "$APPS_BASE/front/traefik" acme 2>&1 | grep -v "Removing leading" || true
-  
+
   if [ -f "$TRAEFIK_FILE" ]; then
     TRAEFIK_SIZE=$(du -h "$TRAEFIK_FILE" | cut -f1)
     log "  ✓ ACME certificates backed up: acme-${BACKUP_TYPE}-$DATE.tar.gz ($TRAEFIK_SIZE)"
@@ -460,12 +458,12 @@ PROWLARR_SUCCESS=true
 
 if [ -d "$APPS_BASE/7seas/prowlarr" ]; then
   PROWLARR_FILE="$BACKUP_DIR/prowlarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
-  
+
   tar -czf "$PROWLARR_FILE" \
     --exclude="logs" \
     --exclude="Backups" \
     -C "$APPS_BASE/7seas" prowlarr 2>&1 | grep -v "Removing leading" || true
-  
+
   if [ -f "$PROWLARR_FILE" ]; then
     PROWLARR_SIZE=$(du -h "$PROWLARR_FILE" | cut -f1)
     log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($PROWLARR_SIZE)"
@@ -494,13 +492,13 @@ SONARR_SUCCESS=true
 
 if [ -d "$APPS_BASE/7seas/sonarr" ]; then
   SONARR_FILE="$BACKUP_DIR/sonarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
-  
+
   tar -czf "$SONARR_FILE" \
     --exclude="logs" \
     --exclude="Backups" \
     --exclude="MediaCover" \
     -C "$APPS_BASE/7seas" sonarr 2>&1 | grep -v "Removing leading" || true
-  
+
   if [ -f "$SONARR_FILE" ]; then
     SONARR_SIZE=$(du -h "$SONARR_FILE" | cut -f1)
     log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($SONARR_SIZE)"
@@ -520,6 +518,8 @@ fi
 log ""
 fi
 
+
+
 # ============================================
 # RADARR - Full Backup
 # ============================================
@@ -529,13 +529,13 @@ RADARR_SUCCESS=true
 
 if [ -d "$APPS_BASE/7seas/radarr" ]; then
   RADARR_FILE="$BACKUP_DIR/radarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
-  
+
   tar -czf "$RADARR_FILE" \
     --exclude="logs" \
     --exclude="Backups" \
     --exclude="MediaCover" \
     -C "$APPS_BASE/7seas" radarr 2>&1 | grep -v "Removing leading" || true
-  
+
   if [ -f "$RADARR_FILE" ]; then
     RADARR_SIZE=$(du -h "$RADARR_FILE" | cut -f1)
     log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($RADARR_SIZE)"
@@ -556,41 +556,6 @@ log ""
 fi
 
 # ============================================
-# READARR - Full Backup
-# ============================================
-if should_backup "readarr"; then
-log "Backing up Readarr (full backup)..."
-READARR_SUCCESS=true
-
-if [ -d "$APPS_BASE/7seas/readarr" ]; then
-  READARR_FILE="$BACKUP_DIR/readarr/full-${BACKUP_TYPE}-$DATE.tar.gz"
-  
-  tar -czf "$READARR_FILE" \
-    --exclude="logs" \
-    --exclude="Backups" \
-    --exclude="MediaCover" \
-    -C "$APPS_BASE/7seas" readarr 2>&1 | grep -v "Removing leading" || true
-  
-  if [ -f "$READARR_FILE" ]; then
-    READARR_SIZE=$(du -h "$READARR_FILE" | cut -f1)
-    log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($READARR_SIZE)"
-    log "    Includes: databases, config.xml"
-    SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
-    BACKUP_STATUS="${BACKUP_STATUS}Readarr: ✓ SUCCESS\n"
-  else
-    log "  ✗ Backup failed"
-    FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
-    BACKUP_STATUS="${BACKUP_STATUS}Readarr: ✗ FAILED\n"
-  fi
-else
-  log "  ✗ readarr directory not found"
-  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
-  BACKUP_STATUS="${BACKUP_STATUS}Readarr: ✗ FAILED\n"
-fi
-log ""
-fi
-
-# ============================================
 # ZIGBEE2MQTT - Configuration + Database + Coordinator Backup
 # ============================================
 if should_backup "zigbee2mqtt"; then
@@ -599,11 +564,11 @@ Z2M_SUCCESS=true
 
 if [ -d "$APPS_BASE/home/zigbee2mqtt" ]; then
   Z2M_FILE="$BACKUP_DIR/zigbee2mqtt/full-${BACKUP_TYPE}-$DATE.tar.gz"
-  
+
   tar -czf "$Z2M_FILE" \
     --exclude="log" \
     -C "$APPS_BASE/home" zigbee2mqtt 2>&1 | grep -v "Removing leading" || true
-  
+
   if [ -f "$Z2M_FILE" ]; then
     Z2M_SIZE=$(du -h "$Z2M_FILE" | cut -f1)
     log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($Z2M_SIZE)"
@@ -633,12 +598,12 @@ ADGUARD_SUCCESS=true
 
 if [ -d "$APPS_BASE/network/adguard" ]; then
   ADGUARD_FILE="$BACKUP_DIR/adguard/full-${BACKUP_TYPE}-$DATE.tar.gz"
-  
+
   tar -czf "$ADGUARD_FILE" \
     --exclude="work/data/sessions.db" \
     --exclude="work/data/querylog.json*" \
     -C "$APPS_BASE/network" adguard 2>&1 | grep -v "Removing leading" || true
-  
+
   if [ -f "$ADGUARD_FILE" ]; then
     ADGUARD_SIZE=$(du -h "$ADGUARD_FILE" | cut -f1)
     log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($ADGUARD_SIZE)"
@@ -664,36 +629,41 @@ fi
 # ============================================
 log "Cleaning up old backups..."
 
+# Cleanup uses exact type-segment matching to avoid overlap between tiers.
+# File naming convention: <prefix>-<type>-<YYYYMMDD>-<HHMM>.<ext>
+# Types are: twice-daily, daily, weekly, monthly
+# The patterns below match only files whose name contains "-<type>-" as a segment,
+# so "daily" never accidentally matches "twice-daily" or "weekly".
+
 # Cleanup twice-daily backups (older than 3 days)
-# Only delete core backup files (databases, configs, storage) - NOT RSA keys or attachments
 log "  Twice-daily backups (>3 days)..."
-TWICE_DAILY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "full-*twice-daily*.tar.gz" -o -name "*twice-daily*.tar.gz" \) | wc -l)
-find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "full-*twice-daily*.tar.gz" -o -name "*twice-daily*.tar.gz" \) -mtime +3 -delete 2>&1
-TWICE_DAILY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*twice-daily*.sql.gz" -o -name "db-*twice-daily*.sqlite3" -o -name "full-*twice-daily*.tar.gz" -o -name "*twice-daily*.tar.gz" \) | wc -l)
+TWICE_DAILY_BEFORE=$(find "$BACKUP_DIR" -type f -name "*-twice-daily-*" | wc -l)
+find "$BACKUP_DIR" -type f -name "*-twice-daily-*" -mtime +3 -delete 2>&1
+TWICE_DAILY_AFTER=$(find "$BACKUP_DIR" -type f -name "*-twice-daily-*" | wc -l)
 log "    Deleted $((TWICE_DAILY_BEFORE - TWICE_DAILY_AFTER)) twice-daily backups, $TWICE_DAILY_AFTER remaining"
 
 # Cleanup daily backups (older than 7 days)
 log "  Daily backups (>7 days)..."
-DAILY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "full-*daily*.tar.gz" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" | wc -l)
-find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "full-*daily*.tar.gz" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" -mtime +7 -delete 2>&1
-DAILY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*daily*.sql.gz" -o -name "db-*daily*.sqlite3" -o -name "full-*daily*.tar.gz" -o -name "*daily*.tar.gz" \) ! -name "*twice-daily*" | wc -l)
+DAILY_BEFORE=$(find "$BACKUP_DIR" -type f -name "*-daily-*" | wc -l)
+find "$BACKUP_DIR" -type f -name "*-daily-*" -mtime +7 -delete 2>&1
+DAILY_AFTER=$(find "$BACKUP_DIR" -type f -name "*-daily-*" | wc -l)
 log "    Deleted $((DAILY_BEFORE - DAILY_AFTER)) daily backups, $DAILY_AFTER remaining"
 
 # Cleanup weekly backups (older than 28 days / 4 weeks)
 log "  Weekly backups (>28 days)..."
-WEEKLY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "full-*weekly*.tar.gz" -o -name "*weekly*.tar.gz" \) | wc -l)
-find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "full-*weekly*.tar.gz" -o -name "*weekly*.tar.gz" \) -mtime +28 -delete 2>&1
-WEEKLY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*weekly*.sql.gz" -o -name "db-*weekly*.sqlite3" -o -name "full-*weekly*.tar.gz" -o -name "*weekly*.tar.gz" \) | wc -l)
+WEEKLY_BEFORE=$(find "$BACKUP_DIR" -type f -name "*-weekly-*" | wc -l)
+find "$BACKUP_DIR" -type f -name "*-weekly-*" -mtime +28 -delete 2>&1
+WEEKLY_AFTER=$(find "$BACKUP_DIR" -type f -name "*-weekly-*" | wc -l)
 log "    Deleted $((WEEKLY_BEFORE - WEEKLY_AFTER)) weekly backups, $WEEKLY_AFTER remaining"
 
 # Cleanup monthly backups (older than 180 days / 6 months)
 log "  Monthly backups (>180 days)..."
-MONTHLY_BEFORE=$(find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "full-*monthly*.tar.gz" -o -name "*monthly*.tar.gz" \) | wc -l)
-find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "full-*monthly*.tar.gz" -o -name "*monthly*.tar.gz" \) -mtime +180 -delete 2>&1
-MONTHLY_AFTER=$(find "$BACKUP_DIR" -type f \( -name "db-*monthly*.sql.gz" -o -name "db-*monthly*.sqlite3" -o -name "full-*monthly*.tar.gz" -o -name "*monthly*.tar.gz" \) | wc -l)
+MONTHLY_BEFORE=$(find "$BACKUP_DIR" -type f -name "*-monthly-*" | wc -l)
+find "$BACKUP_DIR" -type f -name "*-monthly-*" -mtime +180 -delete 2>&1
+MONTHLY_AFTER=$(find "$BACKUP_DIR" -type f -name "*-monthly-*" | wc -l)
 log "    Deleted $((MONTHLY_BEFORE - MONTHLY_AFTER)) monthly backups, $MONTHLY_AFTER remaining"
 
-# Cleanup orphaned Vaultwarden files (no matching database backup)
+# Cleanup orphaned Vaultwarden files (rsa_key or attachments without a matching db backup)
 log "  Cleaning up orphaned Vaultwarden RSA keys and attachments..."
 ORPHANED_COUNT=0
 for backup_type in twice-daily daily weekly monthly; do
