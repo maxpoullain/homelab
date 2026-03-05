@@ -14,8 +14,8 @@
 7seas/sonarr/*
 7seas/seerr/*
 7seas/transmission/*
-admin/arcane/*
-admin/beszel/*
+**/admin/arcane/*
+**/admin/beszel/*
 docs/affine/config/*
 docs/affine/storage/*
 docs/papra.env
@@ -41,8 +41,8 @@ home/mosquitto/*
 home/zigbee2mqtt/*
 media/immich/*
 media/jellyfin/*
-network/adguard/*
-network/tailscale/*
+**/network/adguard/*
+**/network/tailscale/*
 misc/octoprint/*
 tooling/data/backups/backup-services.log
 tooling/data/backups/backup-services.log.old
@@ -53,4 +53,3 @@ tooling/dns/duckdns/duck.log
 vault/vaultwarden/*
 wiki/otter/settings.cfg
 wiki/otter/db.sqlite
-
