@@ -31,7 +31,7 @@ This backup system uses a **tiered retention strategy** that balances recovery f
 └─────────────┴──────────────┴────────────┴──────────────┘
 
 Total Recovery Points: ~23 per service
-Total Storage: ~75GB at full retention (all 11 services)
+Total Storage: ~100GB at full retention (all 15 services)
 ```
 
 ## Timeline Visualization
@@ -63,30 +63,34 @@ Now      ┊         │       │        │
 ### Current Backup Sizes (per run):
 ```
 Immich:           ~265 MB  (db + storage)
-Vaultwarden:       ~1.5 KB  (db + RSA key + attachments)
+Vaultwarden:        ~2 MB  (db + RSA key + attachments)
 Home Assistant:    ~73 MB  (db + configs)
-Jellyfin:         ~1.7 GB  (full backup with metadata)
-Tailscale:           ~1 KB
-Traefik:             ~1 KB
+Jellyfin:         ~2.0 GB  (full backup with metadata)
+Traefik:            ~35 KB
 Prowlarr:          ~1.5 MB  (full backup)
 Sonarr:            ~3.5 MB  (full backup)
 Radarr:            ~1.0 MB  (full backup)
-Zigbee2mqtt:         ~1 KB
-AdGuard:             ~5 MB
-──────────────────────────
-Total per run:    ~2.05 GB
+Zigbee2mqtt:        ~15 KB
+AdGuard:            ~47 MB  (config + filters + stats db)
+Seerr:             ~1.2 MB  (settings + request db)
+Beszel:            ~1.5 MB  (PocketBase database)
+Arcane:            ~0.5 MB  (SQLite database)
+Papra:              ~0.5 KB  (db + documents)
+OctoPrint:         ~5.5 MB  (config + plugins + uploads)
+──────────────────────────────────
+Total per run:    ~2.40 GB
 ```
 
 ### Full Retention Storage:
 ```
-Twice-daily: 6 backups  × 2.05 GB = 12 GB
-Daily:       7 backups  × 2.05 GB = 14 GB
-Weekly:      4 backups  × 2.05 GB =  8 GB
-Monthly:     6 backups  × 2.05 GB = 12 GB
-────────────────────────────────────────
-Total:      23 backups            = 47 GB
+Twice-daily: 6 backups  × 2.40 GB = 14.4 GB
+Daily:       7 backups  × 2.40 GB = 16.8 GB
+Weekly:      4 backups  × 2.40 GB =  9.6 GB
+Monthly:     6 backups  × 2.40 GB = 14.4 GB
+────────────────────────────────────────────
+Total:      23 backups            = 55.2 GB
 
-With headroom for growth: ~75 GB
+With headroom for growth: ~100 GB
 ```
 
 ## Offsite Backup (B2) Strategy
@@ -95,10 +99,10 @@ For cloud backup to Backblaze B2, **exclude daily backups** to reduce costs:
 
 ### Services (homelab directory)
 ```
-Weekly:   4 backups × 2.05 GB =  8 GB
-Monthly:  6 backups × 2.05 GB = 12 GB
-──────────────────────────────────────
-Total:   10 backups            = 20 GB
+Weekly:   4 backups × 2.40 GB =  9.6 GB
+Monthly:  6 backups × 2.40 GB = 14.4 GB
+──────────────────────────────────────────
+Total:   10 backups            = 24.0 GB
 ```
 
 ### TrueNAS Config (truenas directory)
@@ -121,7 +125,7 @@ This single pattern excludes:
 - Service backups: `*-twice-daily-*` files  
 - TrueNAS backups: `daily-YYYYMMDD-HHMM/` folders
 
-**Estimated B2 cost: ~$0.27/month or $3.24/year**
+**Estimated B2 cost: ~$0.30/month or $3.60/year**
 
 This keeps costs minimal while maintaining 4 weeks + 6 months of offsite backups for both systems.
 
@@ -207,21 +211,30 @@ This ensures:
 
 ## Services Covered
 
-All 11 homelab services backed up:
+All 15 homelab services backed up:
 1. **Immich**: PostgreSQL database + storage files (library, upload, profile)
 2. **Vaultwarden**: SQLite database + RSA keys + attachments
 3. **Home Assistant**: Main SQLite database + YAML configs
 4. **Jellyfin**: Full backup (databases + metadata + plugins)
-5. **Tailscale**: State files
-6. **Traefik**: ACME SSL certificates
+5. **Traefik**: ACME SSL certificates (via `docker cp` — files are root-owned on host)
 7. **Prowlarr**: Full backup (database + config.xml + Definitions)
 8. **Sonarr**: Full backup (database + config.xml)
 9. **Radarr**: Full backup (database + config.xml)
 10. **Zigbee2mqtt**: Full backup (configuration.yaml + database.db + coordinator_backup.json)
-11. **AdGuard**: Config + stats database (excludes sessions.db and query logs)
+11. **AdGuard**: Config + stats database (via `docker cp` — files are root-owned on host; excludes sessions.db and query logs)
+12. **Seerr**: Full backup (settings.json + request database)
+13. **Beszel**: PocketBase database (users + monitored systems + alert rules)
+14. **Arcane**: SQLite database (via Python online backup inside container)
+15. **Papra**: SQLite database (via `docker cp`) + documents archive
+16. **OctoPrint**: Full backup (config + plugins + uploads, via `docker cp` — files are root-owned on host)
 
 > **Note:** The Zigbee SQLite database previously backed up inside the Home Assistant service
 > has been removed — it is fully covered by the dedicated Zigbee2mqtt service backup (#10).
+
+> **Note on root-owned files:** Several services (Tailscale, Traefik, AdGuard, OctoPrint) run as
+> root inside their containers, making their bind-mounted data files unreadable by the backup user
+> on the host. These services use `docker cp` to extract data from the running container instead
+> of reading files directly from disk.
 
 ## Monitoring
 

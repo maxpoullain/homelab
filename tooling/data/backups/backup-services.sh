@@ -27,7 +27,7 @@ DAY_OF_MONTH=$(date +%d)
 HOUR=$(date +%H)
 
 # Available services
-AVAILABLE_SERVICES=(immich vaultwarden homeassistant jellyfin tailscale traefik prowlarr sonarr radarr zigbee2mqtt adguard)
+AVAILABLE_SERVICES=(immich vaultwarden homeassistant jellyfin traefik prowlarr sonarr radarr zigbee2mqtt adguard seerr beszel arcane papra octoprint)
 
 # Parse command line arguments
 SELECTED_SERVICES=()
@@ -134,7 +134,7 @@ log "=========================================="
 log ""
 
 # Create backup directories if they don't exist
-mkdir -p "$BACKUP_DIR"/{immich,vaultwarden,homeassistant,jellyfin,tailscale,traefik,prowlarr,sonarr,radarr,zigbee2mqtt,adguard}
+mkdir -p "$BACKUP_DIR"/{immich,vaultwarden,homeassistant,jellyfin,traefik,prowlarr,sonarr,radarr,zigbee2mqtt,adguard,seerr,beszel,arcane,papra,octoprint}
 
 # ============================================
 # IMMICH - PostgreSQL Database + Storage
@@ -387,63 +387,44 @@ log ""
 fi
 
 # ============================================
-# TAILSCALE - State Files
-# ============================================
-if should_backup "tailscale"; then
-log "Backing up Tailscale (state files)..."
-TAILSCALE_SUCCESS=true
-
-if [ -d "$APPS_BASE/network/tailscale" ]; then
-  TAILSCALE_FILE="$BACKUP_DIR/tailscale/state-${BACKUP_TYPE}-$DATE.tar.gz"
-
-  tar -czf "$TAILSCALE_FILE" \
-    --exclude="*.log*" \
-    --exclude="*.txt" \
-    -C "$APPS_BASE/network" tailscale 2>&1 | grep -v "Removing leading" || true
-
-  if [ -f "$TAILSCALE_FILE" ]; then
-    TAILSCALE_SIZE=$(du -h "$TAILSCALE_FILE" | cut -f1)
-    log "  ✓ State backed up: state-${BACKUP_TYPE}-$DATE.tar.gz ($TAILSCALE_SIZE)"
-    SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
-    BACKUP_STATUS="${BACKUP_STATUS}Tailscale: ✓ SUCCESS\n"
-  else
-    log "  ✗ Backup failed"
-    FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
-    BACKUP_STATUS="${BACKUP_STATUS}Tailscale: ✗ FAILED\n"
-  fi
-else
-  log "  ✗ Tailscale data directory not found"
-  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
-  BACKUP_STATUS="${BACKUP_STATUS}Tailscale: ✗ FAILED\n"
-fi
-log ""
-fi
-
-# ============================================
 # TRAEFIK - SSL Certificates
 # ============================================
 if should_backup "traefik"; then
 log "Backing up Traefik (SSL certificates)..."
 TRAEFIK_SUCCESS=true
 
-if [ -d "$APPS_BASE/front/traefik/acme" ]; then
+if docker ps --format "{{.Names}}" | grep -q "^traefik$"; then
   TRAEFIK_FILE="$BACKUP_DIR/traefik/acme-${BACKUP_TYPE}-$DATE.tar.gz"
+  TRAEFIK_TMP="$BACKUP_DIR/traefik/tmp-$$"
 
-  tar -czf "$TRAEFIK_FILE" \
-    -C "$APPS_BASE/front/traefik" acme 2>&1 | grep -v "Removing leading" || true
+  # acme.json is root:homelab 600 on the host — use docker cp to bypass.
+  # Traefik stores its full config dir at /etc/traefik inside the container.
+  mkdir -p "$TRAEFIK_TMP"
 
-  if [ -f "$TRAEFIK_FILE" ]; then
-    TRAEFIK_SIZE=$(du -h "$TRAEFIK_FILE" | cut -f1)
-    log "  ✓ ACME certificates backed up: acme-${BACKUP_TYPE}-$DATE.tar.gz ($TRAEFIK_SIZE)"
-    SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
-    BACKUP_STATUS="${BACKUP_STATUS}Traefik: ✓ SUCCESS\n"
+  if docker cp "traefik:/etc/traefik/acme/." "$TRAEFIK_TMP" 2>&1 | tee -a "$LOG_FILE"; then
+    tar -czf "$TRAEFIK_FILE" \
+      -C "$TRAEFIK_TMP" . 2>&1 | grep -v "Removing leading" || true
+
+    rm -rf "$TRAEFIK_TMP"
+
+    if [ -f "$TRAEFIK_FILE" ]; then
+      TRAEFIK_SIZE=$(du -h "$TRAEFIK_FILE" | cut -f1)
+      log "  ✓ ACME certificates backed up: acme-${BACKUP_TYPE}-$DATE.tar.gz ($TRAEFIK_SIZE)"
+      SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+      BACKUP_STATUS="${BACKUP_STATUS}Traefik: ✓ SUCCESS\n"
+    else
+      log "  ✗ Backup failed - tar produced no output"
+      FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+      BACKUP_STATUS="${BACKUP_STATUS}Traefik: ✗ FAILED\n"
+    fi
   else
-    log "  ✗ Backup failed"
+    rm -rf "$TRAEFIK_TMP"
+    log "  ✗ docker cp failed"
     FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
     BACKUP_STATUS="${BACKUP_STATUS}Traefik: ✗ FAILED\n"
   fi
 else
-  log "  ⚠ ACME directory not found - skipping"
+  log "  ⚠ traefik container not running - skipping"
   BACKUP_STATUS="${BACKUP_STATUS}Traefik: ⚠ SKIPPED\n"
 fi
 log ""
@@ -596,30 +577,306 @@ if should_backup "adguard"; then
 log "Backing up AdGuard Home (config + database)..."
 ADGUARD_SUCCESS=true
 
-if [ -d "$APPS_BASE/network/adguard" ]; then
+if docker ps --format "{{.Names}}" | grep -q "^adguard$"; then
   ADGUARD_FILE="$BACKUP_DIR/adguard/full-${BACKUP_TYPE}-$DATE.tar.gz"
+  ADGUARD_TMP="$BACKUP_DIR/adguard/tmp-$$"
 
-  tar -czf "$ADGUARD_FILE" \
-    --exclude="work/data/sessions.db" \
-    --exclude="work/data/querylog.json*" \
-    -C "$APPS_BASE/network" adguard 2>&1 | grep -v "Removing leading" || true
+  # AdGuard runs as root (required for DHCP/DNS raw sockets). Its config and data
+  # files are root:homelab 600 on the host — use docker cp to bypass.
+  # The container exposes conf/ at /opt/adguardhome/conf and work/ at /opt/adguardhome/work.
+  mkdir -p "$ADGUARD_TMP/conf" "$ADGUARD_TMP/work"
 
-  if [ -f "$ADGUARD_FILE" ]; then
-    ADGUARD_SIZE=$(du -h "$ADGUARD_FILE" | cut -f1)
-    log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($ADGUARD_SIZE)"
-    log "    Includes: AdGuardHome.yaml (config), filters, stats database"
-    log "    Excludes: sessions.db, large query logs"
-    SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
-    BACKUP_STATUS="${BACKUP_STATUS}AdGuard: ✓ SUCCESS\n"
+  ADGUARD_CP_OK=true
+  docker cp "adguard:/opt/adguardhome/conf/." "$ADGUARD_TMP/conf" 2>&1 | tee -a "$LOG_FILE" || ADGUARD_CP_OK=false
+  docker cp "adguard:/opt/adguardhome/work/." "$ADGUARD_TMP/work" 2>&1 | tee -a "$LOG_FILE" || ADGUARD_CP_OK=false
+
+  if [ "$ADGUARD_CP_OK" = true ]; then
+    tar -czf "$ADGUARD_FILE" \
+      --exclude="work/data/sessions.db" \
+      --exclude="work/data/querylog.json*" \
+      --exclude="work/data/querylog.json.1" \
+      -C "$ADGUARD_TMP" . 2>&1 | grep -v "Removing leading" || true
+
+    rm -rf "$ADGUARD_TMP"
+
+    if [ -f "$ADGUARD_FILE" ]; then
+      ADGUARD_SIZE=$(du -h "$ADGUARD_FILE" | cut -f1)
+      log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($ADGUARD_SIZE)"
+      log "    Includes: AdGuardHome.yaml (config), filters, stats database"
+      log "    Excludes: sessions.db, large query logs"
+      SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+      BACKUP_STATUS="${BACKUP_STATUS}AdGuard: ✓ SUCCESS\n"
+    else
+      log "  ✗ Backup failed - tar produced no output"
+      FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+      BACKUP_STATUS="${BACKUP_STATUS}AdGuard: ✗ FAILED\n"
+    fi
   else
-    log "  ✗ Backup failed"
+    rm -rf "$ADGUARD_TMP"
+    log "  ✗ docker cp failed"
     FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
     BACKUP_STATUS="${BACKUP_STATUS}AdGuard: ✗ FAILED\n"
   fi
 else
-  log "  ✗ AdGuard directory not found"
+  log "  ✗ adguard container not running"
   FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
   BACKUP_STATUS="${BACKUP_STATUS}AdGuard: ✗ FAILED\n"
+fi
+log ""
+fi
+
+# ============================================
+# SEERR - Configuration + Database
+# ============================================
+if should_backup "seerr"; then
+log "Backing up Seerr (config + database)..."
+SEERR_SUCCESS=true
+
+if [ -d "$APPS_BASE/7seas/seerr" ]; then
+  SEERR_FILE="$BACKUP_DIR/seerr/full-${BACKUP_TYPE}-$DATE.tar.gz"
+
+  tar -czf "$SEERR_FILE" \
+    --exclude="logs" \
+    --exclude="cache" \
+    -C "$APPS_BASE/7seas" seerr 2>&1 | grep -v "Removing leading" || true
+
+  if [ -f "$SEERR_FILE" ]; then
+    SEERR_SIZE=$(du -h "$SEERR_FILE" | cut -f1)
+    log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($SEERR_SIZE)"
+    log "    Includes: settings.json, db/ (request database)"
+    log "    Excludes: logs/, cache/"
+    SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Seerr: ✓ SUCCESS\n"
+  else
+    log "  ✗ Backup failed"
+    FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Seerr: ✗ FAILED\n"
+  fi
+else
+  log "  ✗ Seerr directory not found"
+  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+  BACKUP_STATUS="${BACKUP_STATUS}Seerr: ✗ FAILED\n"
+fi
+log ""
+fi
+
+# ============================================
+# BESZEL - PocketBase Database + Data
+# ============================================
+if should_backup "beszel"; then
+log "Backing up Beszel (database + data)..."
+BESZEL_SUCCESS=true
+
+if [ -d "$APPS_BASE/admin/beszel/beszel_data" ]; then
+  BESZEL_FILE="$BACKUP_DIR/beszel/full-${BACKUP_TYPE}-$DATE.tar.gz"
+
+  tar -czf "$BESZEL_FILE" \
+    --exclude="logs" \
+    --exclude="id_ed25519" \
+    -C "$APPS_BASE/admin/beszel" beszel_data 2>&1 | grep -v "Removing leading" || true
+
+  if [ -f "$BESZEL_FILE" ]; then
+    BESZEL_SIZE=$(du -h "$BESZEL_FILE" | cut -f1)
+    log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($BESZEL_SIZE)"
+    log "    Includes: PocketBase database, users, system configs, alert rules"
+    SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Beszel: ✓ SUCCESS\n"
+  else
+    log "  ✗ Backup failed"
+    FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Beszel: ✗ FAILED\n"
+  fi
+else
+  log "  ✗ Beszel data directory not found"
+  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+  BACKUP_STATUS="${BACKUP_STATUS}Beszel: ✗ FAILED\n"
+fi
+log ""
+fi
+
+# ============================================
+# ARCANE - SQLite Database
+# ============================================
+if should_backup "arcane"; then
+log "Backing up Arcane (SQLite database)..."
+ARCANE_SUCCESS=true
+
+if docker ps --format "{{.Names}}" | grep -q "^arcane$"; then
+  ARCANE_DB_FILE="$BACKUP_DIR/arcane/db-${BACKUP_TYPE}-$DATE.sqlite3"
+
+  # Use SQLite online backup via Python to ensure consistency while running
+  if docker exec arcane python3 -c "
+import sqlite3, shutil, os
+src = sqlite3.connect('/app/data/arcane.db')
+dst = sqlite3.connect('/tmp/arcane-backup.db')
+src.backup(dst)
+src.close()
+dst.close()
+" 2>&1 | tee -a "$LOG_FILE"; then
+    if docker cp "arcane:/tmp/arcane-backup.db" "$ARCANE_DB_FILE" 2>&1; then
+      ARCANE_DB_SIZE=$(du -h "$ARCANE_DB_FILE" | cut -f1)
+      log "  ✓ Database backed up: db-${BACKUP_TYPE}-$DATE.sqlite3 ($ARCANE_DB_SIZE)"
+      docker exec arcane rm -f /tmp/arcane-backup.db 2>/dev/null
+      SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+      BACKUP_STATUS="${BACKUP_STATUS}Arcane: ✓ SUCCESS\n"
+    else
+      log "  ✗ Database backup failed - could not copy backup file"
+      ARCANE_SUCCESS=false
+    fi
+  else
+    # Fallback: direct file copy if Python backup fails
+    log "  ⚠ Python backup failed, trying direct file copy..."
+    if docker cp "arcane:/app/data/arcane.db" "$ARCANE_DB_FILE" 2>&1; then
+      ARCANE_DB_SIZE=$(du -h "$ARCANE_DB_FILE" | cut -f1)
+      log "  ✓ Database backed up (direct copy): db-${BACKUP_TYPE}-$DATE.sqlite3 ($ARCANE_DB_SIZE)"
+      SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+      BACKUP_STATUS="${BACKUP_STATUS}Arcane: ✓ SUCCESS\n"
+    else
+      log "  ✗ Database backup failed"
+      ARCANE_SUCCESS=false
+    fi
+  fi
+
+  if [ "$ARCANE_SUCCESS" = false ]; then
+    rm -f "$ARCANE_DB_FILE"
+    FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Arcane: ✗ FAILED\n"
+  fi
+else
+  log "  ✗ arcane container not running"
+  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+  BACKUP_STATUS="${BACKUP_STATUS}Arcane: ✗ FAILED\n"
+fi
+log ""
+fi
+
+# ============================================
+# PAPRA - SQLite Database + Documents
+# ============================================
+if should_backup "papra"; then
+log "Backing up Papra (database + documents)..."
+PAPRA_SUCCESS=true
+
+if [ -d "$APPS_BASE/docs/papra" ]; then
+  # 1. Backup SQLite database using online backup for consistency
+  PAPRA_DB_FILE="$BACKUP_DIR/papra/db-${BACKUP_TYPE}-$DATE.sqlite3"
+  PAPRA_DOCS_FILE=""
+
+  if docker ps --format "{{.Names}}" | grep -q "^papra$"; then
+    # No sqlite3 or python in the papra image — copy the db files directly.
+    # SQLite WAL mode guarantees that db + db-wal + db-shm together are always
+    # consistent, so a plain docker cp of all three is safe.
+    PAPRA_DB_WAL_FILE="$BACKUP_DIR/papra/db-${BACKUP_TYPE}-$DATE.sqlite3-wal"
+    PAPRA_DB_SHM_FILE="$BACKUP_DIR/papra/db-${BACKUP_TYPE}-$DATE.sqlite3-shm"
+
+    if docker cp "papra:/app/app-data/db/db.sqlite" "$PAPRA_DB_FILE" 2>&1; then
+      # docker cp preserves source mtime (last DB write), which may be days old.
+      # Touch the file to stamp it with now so the -mtime +3 cleanup doesn't
+      # immediately delete a freshly created backup.
+      touch "$PAPRA_DB_FILE"
+      PAPRA_DB_SIZE=$(du -h "$PAPRA_DB_FILE" | cut -f1)
+      log "  ✓ Database backed up: db-${BACKUP_TYPE}-$DATE.sqlite3 ($PAPRA_DB_SIZE)"
+      # Copy WAL/SHM files if present (needed for a consistent restore)
+      docker cp "papra:/app/app-data/db/db.sqlite-wal" "$PAPRA_DB_WAL_FILE" 2>/dev/null && \
+        { touch "$PAPRA_DB_WAL_FILE"; log "  ✓ WAL file backed up"; } || true
+      docker cp "papra:/app/app-data/db/db.sqlite-shm" "$PAPRA_DB_SHM_FILE" 2>/dev/null && \
+        { touch "$PAPRA_DB_SHM_FILE"; log "  ✓ SHM file backed up"; } || true
+    else
+      log "  ✗ Database backup failed - could not copy db file"
+      PAPRA_SUCCESS=false
+    fi
+  else
+    log "  ✗ papra container not running"
+    PAPRA_SUCCESS=false
+  fi
+
+  # 2. Backup documents directory (only if DB backup succeeded)
+  if [ "$PAPRA_SUCCESS" = true ]; then
+    PAPRA_DOCS_FILE="$BACKUP_DIR/papra/documents-${BACKUP_TYPE}-$DATE.tar.gz"
+
+    if [ -d "$APPS_BASE/docs/papra/documents" ]; then
+      tar -czf "$PAPRA_DOCS_FILE" \
+        -C "$APPS_BASE/docs/papra" documents 2>&1 | grep -v "Removing leading" || true
+
+      if [ -f "$PAPRA_DOCS_FILE" ]; then
+        PAPRA_DOCS_SIZE=$(du -h "$PAPRA_DOCS_FILE" | cut -f1)
+        log "  ✓ Documents backed up: documents-${BACKUP_TYPE}-$DATE.tar.gz ($PAPRA_DOCS_SIZE)"
+      else
+        log "  ✗ Documents backup failed"
+        PAPRA_SUCCESS=false
+      fi
+    else
+      log "  ℹ No documents directory found - skipping documents backup"
+    fi
+  fi
+
+  # Cleanup incomplete backups if any step failed
+  if [ "$PAPRA_SUCCESS" = false ]; then
+    rm -f "$PAPRA_DB_FILE" "$PAPRA_DB_WAL_FILE" "$PAPRA_DB_SHM_FILE" "$PAPRA_DOCS_FILE"
+  fi
+
+  if [ "$PAPRA_SUCCESS" = true ]; then
+    SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Papra: ✓ SUCCESS\n"
+  else
+    FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}Papra: ✗ FAILED\n"
+  fi
+else
+  log "  ✗ Papra data directory not found"
+  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+  BACKUP_STATUS="${BACKUP_STATUS}Papra: ✗ FAILED\n"
+fi
+log ""
+fi
+
+# ============================================
+# OCTOPRINT - Full Backup (Config + Plugins + Uploads)
+# ============================================
+if should_backup "octoprint"; then
+log "Backing up OctoPrint (full backup)..."
+OCTOPRINT_SUCCESS=true
+
+if docker ps --format "{{.Names}}" | grep -q "^octoprint$"; then
+  OCTOPRINT_FILE="$BACKUP_DIR/octoprint/full-${BACKUP_TYPE}-$DATE.tar.gz"
+  OCTOPRINT_TMP="$BACKUP_DIR/octoprint/tmp-$$"
+
+  # OctoPrint data files are owned by root:root 600 on the host (container runs as root).
+  # Use docker cp to pull the directory out of the container as a tar stream so we get
+  # full read access regardless of host-side permissions.
+  mkdir -p "$OCTOPRINT_TMP"
+
+  if docker cp "octoprint:/octoprint/octoprint/." "$OCTOPRINT_TMP" 2>&1 | tee -a "$LOG_FILE"; then
+    tar -czf "$OCTOPRINT_FILE" \
+      --exclude="logs" \
+      --exclude=".cache" \
+      --exclude="timelapse" \
+      -C "$OCTOPRINT_TMP" . 2>&1 | grep -v "Removing leading" || true
+
+    rm -rf "$OCTOPRINT_TMP"
+
+    if [ -f "$OCTOPRINT_FILE" ]; then
+      OCTOPRINT_SIZE=$(du -h "$OCTOPRINT_FILE" | cut -f1)
+      log "  ✓ Full backup: full-${BACKUP_TYPE}-$DATE.tar.gz ($OCTOPRINT_SIZE)"
+      log "    Includes: config.yaml, users.yaml, plugins/, uploads/"
+      log "    Excludes: logs/, .cache/, timelapse/"
+      SUCCESSFUL_BACKUPS=$((SUCCESSFUL_BACKUPS + 1))
+      BACKUP_STATUS="${BACKUP_STATUS}OctoPrint: ✓ SUCCESS\n"
+    else
+      log "  ✗ Backup failed - tar produced no output"
+      FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+      BACKUP_STATUS="${BACKUP_STATUS}OctoPrint: ✗ FAILED\n"
+    fi
+  else
+    rm -rf "$OCTOPRINT_TMP"
+    log "  ✗ docker cp failed"
+    FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+    BACKUP_STATUS="${BACKUP_STATUS}OctoPrint: ✗ FAILED\n"
+  fi
+else
+  log "  ✗ octoprint container not running"
+  FAILED_BACKUPS=$((FAILED_BACKUPS + 1))
+  BACKUP_STATUS="${BACKUP_STATUS}OctoPrint: ✗ FAILED (container not running)\n"
 fi
 log ""
 fi
