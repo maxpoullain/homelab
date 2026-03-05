@@ -1,0 +1,49 @@
+cron: "0 */6 * * *"
+runOnStart: true
+continueOnError: true
+printConfigOnly: false
+
+origin:
+    url: "http://192.168.1.8:3000"
+    webURL: "http://192.168.1.8:3000"
+    username: "max"
+    password: "${ORIGIN_PASSWORD}"
+    dhcpServerEnabled: true
+    interfaceName: "enp4s0"
+
+replicas:
+    - url: "http://192.168.1.9:3000"
+      webURL: "http://192.168.1.9:3000"
+      username: "max"
+      password: "${REPLICA1_PASSWORD}"
+      autoSetup: false
+      dhcpServerEnabled: true
+      interfaceName: "eth0"
+
+features:
+    dns:
+        accessLists: true
+        serverConfig: true
+        rewrites: true
+    dhcp:
+        serverConfig: false
+        staticLeases: false
+    generalSettings: true
+    protectionStatus: true
+    queryLogConfig: false
+    statsConfig: false
+    clientSettings: true
+    services: true
+    filters: true
+    theme: true
+    tlsConfig: true
+
+api:
+    port: 8080
+    username: "max"
+    password: ""
+    darkMode: true
+    # metrics:
+    #     enabled: true
+    #     scrapeInterval: "60s"
+    #     queryLogLimit: 100

@@ -1,47 +1,87 @@
 services:
-  tailscale:
-    image: tailscale/tailscale:latest
-    container_name: tailscale
-    hostname: corsair  # This will be your device name in Tailscale
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    network_mode: host
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    volumes:
-      - ./tailscale:/var/lib/tailscale
-      - /dev/net/tun:/dev/net/tun
-    environment:
-      - TS_STATE_DIR=/var/lib/tailscale
-      - TS_USERSPACE=false
-      - TS_ACCEPT_DNS=true
-      - TS_EXTRA_ARGS=--advertise-exit-node
-      # Optional: Enable subnet routing to access your entire network
-      # - TS_ROUTES=192.168.1.0/24
-    env_file:
-      - .env
+    tailscale:
+        image: tailscale/tailscale:latest
+        container_name: tailscale
+        hostname: corsair # This will be your device name in Tailscale
+        restart: unless-stopped
+        security_opt:
+            - no-new-privileges:true
+        network_mode: host
+        cap_add:
+            - NET_ADMIN
+            - SYS_MODULE
+        volumes:
+            - ./tailscale:/var/lib/tailscale
+            - /dev/net/tun:/dev/net/tun
+        environment:
+            - TS_STATE_DIR=/var/lib/tailscale
+            - TS_USERSPACE=false
+            - TS_ACCEPT_DNS=true
+            - TS_EXTRA_ARGS=--advertise-exit-node
+            # Optional: Enable subnet routing to access your entire network
+            # - TS_ROUTES=192.168.1.0/24
+        env_file:
+            - .env
 
-  adguard:
-    container_name: adguard
-    image: adguard/adguardhome:latest
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    # Must run as root for DHCP raw socket access
-    network_mode: host
-    volumes:
-      - ./adguard/work:/opt/adguardhome/work
-      - ./adguard/conf:/opt/adguardhome/conf
-    environment:
-      - TZ=Europe/Paris
-      - PUID=3000
-      - PGID=3002
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.adguard.entrypoints=https"
-      - "traefik.http.routers.adguard.rule=Host(`dns.corsair.tf`)"
-      - "traefik.http.routers.adguard.middlewares=security@file,private@file,auth@docker"
-      - "traefik.http.services.adguard.loadbalancer.server.url=http://172.17.0.1:3000"
+    adguard:
+        container_name: adguard
+        image: adguard/adguardhome:latest
+        restart: unless-stopped
+        security_opt:
+            - no-new-privileges:true
+        # Must run as root for DHCP raw socket access
+        network_mode: host
+        volumes:
+            - ./adguard/work:/opt/adguardhome/work
+            - ./adguard/conf:/opt/adguardhome/conf
+        environment:
+            - TZ=Europe/Paris
+            - PUID=3000
+            - PGID=3002
+        labels:
+            - "traefik.enable=true"
+            # DNS1
+            - "traefik.http.routers.adguard.entrypoints=https"
+            - "traefik.http.routers.adguard.rule=Host(`dns.corsair.tf`)"
+            - "traefik.http.routers.adguard.middlewares=security@file,private@file"
+            - "traefik.http.routers.adguard.service=adguard"
+            - "traefik.http.services.adguard.loadbalancer.server.url=http://192.168.1.8:3000"
+            # DNS2
+            - "traefik.http.routers.adguard2.entrypoints=https"
+            - "traefik.http.routers.adguard2.rule=Host(`dns2.corsair.tf`)"
+            - "traefik.http.routers.adguard2.middlewares=security@file,private@file"
+            - "traefik.http.routers.adguard2.service=adguard2"
+            - "traefik.http.services.adguard2.loadbalancer.server.url=http://192.168.1.9:3000"
 
+    adguard-sync:
+        image: ghcr.io/bakito/adguardhome-sync:latest
+        container_name: adguard-sync
+        restart: unless-stopped
+        security_opt:
+            - no-new-privileges:true
+        command: run --config /config/adguardhome-sync.yaml
+        volumes:
+            - ./adguard-sync/adguardhome-sync.yaml:/config/adguardhome-sync.yaml:ro
+        environment:
+            - LOG_LEVEL=info
+            - TZ=Europe/Paris
+            - PUID=3000
+            - PGID=3002
+        env_file:
+            - .env
+        networks:
+            - traefik
+        depends_on:
+            - adguard
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.adguardsync.entrypoints=https"
+            - "traefik.http.routers.adguardsync.rule=Host(`dns-sync.corsair.tf`)"
+            - "traefik.http.routers.adguardsync.middlewares=security@file,private@file,auth@docker"
+            - "traefik.http.routers.adguardsync.service=adguardsync"
+            - "traefik.http.services.adguardsync.loadbalancer.server.port=8080"
+            - "traefik.docker.network=traefik"
+
+networks:
+    traefik:
+        external: true
