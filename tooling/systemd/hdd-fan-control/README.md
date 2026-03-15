@@ -58,8 +58,8 @@ The fan is controlled by the following tiers. The first tier whose threshold is
 |--------------|-------|---------|-----------|
 | ≤ 35 °C      | 30    | 12 %    | Idle      |
 | ≤ 40 °C      | 60    | 24 %    | Cool      |
-| ≤ 43 °C      | 90    | 35 %    | Warm      |
-| ≤ 46 °C      | 140   | 55 %    | Hot       |
+| ≤ 43 °C      | 100   | 35 %    | Warm      |
+| ≤ 46 °C      | 145   | 55 %    | Hot       |
 | ≤ 50 °C      | 190   | 75 %    | VeryHot   |
 | ≤ 54 °C      | 230   | 90 %    | Critical  |
 | > 54 °C      | 255   | 100 %   | Max       |
@@ -71,7 +71,7 @@ final catch-all.
 ### Hysteresis
 
 When the temperature drops and would move to a lower tier, the script only commits
-to that lower tier if the temperature is at least `HYSTERESIS` (default: **2 °C**)
+to that lower tier if the temperature is at least `HYSTERESIS` (default: **1 °C**)
 below the current tier's threshold. This avoids rapid fan speed oscillation around
 a boundary.
 
