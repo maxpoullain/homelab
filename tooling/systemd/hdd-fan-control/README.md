@@ -1,344 +1,257 @@
 # HDD Fan Control
 
-Temperature-based fan control script for managing fan speed based on HDD temperatures.
+Temperature-based fan control for HDDs via PWM, using the `nct6798` sensor chip
+(exposed by the `nct6775` kernel module). Temperatures are read preferentially from
+the `drivetemp` kernel module, with `smartctl` as a fallback.
 
-## Installation
+---
 
-### 1. Enable PWM Control (if not already enabled)
+## How It Works
 
-First, you need to load the appropriate kernel module for PWM fan control. The most common module is `pwm-fan` or your motherboard's specific sensor module (e.g., `nct6775`, `it87`, `coretemp`).
+1. On each run the script scans `/sys/class/hwmon/hwmon*/name` to dynamically find
+   the hwmon device named `nct6798` — no hardcoded paths that break after a reboot.
+2. It reads drive temperatures from all hwmon devices named `drivetemp`
+   (millidegree values from the kernel, no SMART polling overhead).
+3. It maps the highest temperature to a PWM tier and writes the value to `pwm1`
+   on the resolved hwmon path.
+4. A **hysteresis guard** (default 2 °C) prevents the fan from rapidly stepping
+   back down after a brief cool-down, avoiding oscillation.
+5. State (current tier threshold) is persisted in `/run/hdd_fan_control_state`
+   across timer invocations within the same boot.
+
+---
+
+## Prerequisites
+
+### Kernel modules
+
+| Module      | Purpose                                          |
+|-------------|--------------------------------------------------|
+| `nct6775`   | Exposes the `nct6798` Super I/O chip via hwmon  |
+| `drivetemp` | Exposes HDD temperatures via hwmon (preferred)  |
+
+The systemd service loads `nct6775` automatically via `ExecStartPre`. To also load
+`drivetemp` on boot, add it to your modules file:
 
 ```bash
-# Check what sensor modules are available
-sensors-detect
-
-# Follow the prompts and load recommended modules
-# Common modules:
-sudo modprobe nct6775  # For Nuvoton chips
-# sudo modprobe it87     # For ITE chips
-# sudo modprobe w83627ehf # For Winbond chips
-
-# Make the module load on boot
-echo "nct6775" | sudo tee -a /etc/modules
-# Or for it87:
-# echo "it87" | sudo tee -a /etc/modules
+echo "drivetemp" | sudo tee /etc/modules-load.d/drivetemp.conf
 ```
 
-### 2. Find Your PWM and Fan Paths
+### Optional: smartmontools (fallback only)
 
-Locate the correct hwmon device and PWM/fan control paths:
-
-```bash
-# List all hwmon devices
-ls -la /sys/class/hwmon/
-
-# Find PWM controls
-find /sys/class/hwmon -name "pwm*" -type f
-
-# Find fan inputs (RPM sensors)
-find /sys/class/hwmon -name "fan*_input" -type f
-
-# Check the device name for each hwmon
-for i in /sys/class/hwmon/hwmon*/name; do 
-    echo "$i: $(cat $i)"
-done
-
-# Test which PWM controls which fan
-# Example: Check current PWM value
-cat /sys/class/hwmon/hwmon10/pwm2
-
-# Example: Check current fan RPM
-cat /sys/class/hwmon/hwmon10/fan2_input
-
-# Test by setting PWM value
-echo 1 | sudo tee /sys/class/hwmon/hwmon10/pwm2_enable  # Enable manual control
-echo 150 | sudo tee /sys/class/hwmon/hwmon10/pwm2       # Set to medium speed
-# Watch the RPM change to verify it's the correct fan
-watch -n 1 cat /sys/class/hwmon/hwmon10/fan2_input
-```
-
-### 3. Configure the Script
-
-Edit `hdd_fan_control.sh` and update the paths at the top of the file:
+If no `drivetemp` hwmon entries are found the script falls back to `smartctl`:
 
 ```bash
-# Edit these paths based on your system
-PWM_PATH="/sys/class/hwmon/hwmon10/pwm2"           # Your PWM control path
-PWM_ENABLE_PATH="/sys/class/hwmon/hwmon10/pwm2_enable"
-FAN_RPM_PATH="/sys/class/hwmon/hwmon10/fan2_input" # Your fan RPM sensor path
-
-# Update the HDD devices you want to monitor
-HDD_DEVICES=("/dev/sda" "/dev/sdb" "/dev/sdc" "/dev/sdd")
-```
-
-### 4. Install Required Tools
-
-```bash
-# Install smartmontools for reading HDD temperatures
 sudo apt-get install smartmontools   # Debian/Ubuntu
-# or
-sudo yum install smartmontools        # CentOS/RHEL
-# or
-sudo pacman -S smartmontools          # Arch Linux
+sudo dnf install smartmontools       # Fedora/RHEL
+sudo pacman -S smartmontools         # Arch Linux
 ```
 
-### 5. Test the Script
+---
 
-```bash
-# Make the script executable
-chmod +x hdd_fan_control.sh
+## Temperature Curve
 
-# Test without making changes
-sudo ./hdd_fan_control.sh -t
+The fan is controlled by the following tiers. The first tier whose threshold is
+≥ the current maximum drive temperature is applied.
 
-# Test with verbose output (requires root)
-sudo ./hdd_fan_control.sh -v
+| Max HDD Temp | PWM   | % Speed | Label     |
+|--------------|-------|---------|-----------|
+| ≤ 35 °C      | 30    | 12 %    | Idle      |
+| ≤ 40 °C      | 60    | 24 %    | Cool      |
+| ≤ 43 °C      | 90    | 35 %    | Warm      |
+| ≤ 46 °C      | 140   | 55 %    | Hot       |
+| ≤ 50 °C      | 190   | 75 %    | VeryHot   |
+| ≤ 54 °C      | 230   | 90 %    | Critical  |
+| > 54 °C      | 255   | 100 %   | Max       |
 
-# If everything looks good, run it normally
-sudo ./hdd_fan_control.sh
-```
+To tune the curve, edit `TEMP_CURVE` in `hdd_fan_control.sh`. Each entry is a
+string `"THRESHOLD PWM LABEL"` in ascending threshold order, with `999` as the
+final catch-all.
+
+### Hysteresis
+
+When the temperature drops and would move to a lower tier, the script only commits
+to that lower tier if the temperature is at least `HYSTERESIS` (default: **2 °C**)
+below the current tier's threshold. This avoids rapid fan speed oscillation around
+a boundary.
+
+The active tier threshold is saved to `/run/hdd_fan_control_state`. This file is
+in `tmpfs` and is recreated on each boot — intentionally, so the fan starts fresh
+after a reboot.
+
+---
 
 ## Configuration
 
-- **PWM Path**: `/sys/class/hwmon/hwmon10/pwm2`
-- **Fan RPM Path**: `/sys/class/hwmon/hwmon10/fan2_input`
-- **Monitored HDDs**: `/dev/sda`, `/dev/sdb`, `/dev/sdc`, `/dev/sdd`
-
-## Manual Fan Control
-
-### Set Fan Speed Manually
-
-To manually set the fan RPM, you need to write a PWM value (0-255) to the PWM control file:
+All configuration lives at the top of `hdd_fan_control.sh`:
 
 ```bash
-# Enable manual PWM control
-echo 1 | sudo tee /sys/class/hwmon/hwmon10/pwm2_enable
-
-# Set PWM value (0-255)
-echo <PWM_VALUE> | sudo tee /sys/class/hwmon/hwmon10/pwm2
+HWMON_CHIP_NAME="nct6798"   # hwmon name to search for
+PWM_CHANNEL="pwm1"          # PWM channel on that chip
+HYSTERESIS=1                # °C guard for stepping down
+HDD_DEVICES=(...)           # Fallback device list for smartctl
+TEMP_CURVE=(...)            # Temperature → PWM mapping
 ```
 
-### PWM to RPM Reference
+---
 
-Based on the script's temperature map (very quiet until 43°C, then aggressive ramp):
-
-| PWM Value | Approx. RPM | Speed Level |
-|-----------|-------------|-------------|
-| 28        | ~329 RPM    | Very Quiet  |
-| 35        | ~412 RPM    | Very Quiet  |
-| 55        | ~647 RPM    | Very Quiet  |
-| 80        | ~941 RPM    | Very Quiet  |
-| 105       | ~1235 RPM   | Starting Ramp |
-| 130       | ~1529 RPM   | Ramping Up  |
-| 150       | ~1765 RPM   | Aggressive  |
-| 170       | ~2000 RPM   | Aggressive  |
-| 185       | ~2176 RPM   | Very Aggressive |
-| 200       | ~2353 RPM   | Very Aggressive |
-| 215       | ~2529 RPM   | Very Aggressive |
-| 225       | ~2647 RPM   | Very Aggressive |
-| 235       | ~2765 RPM   | Near Max    |
-| 245       | ~2882 RPM   | Near Max    |
-| 252       | ~2965 RPM   | Almost Max  |
-| 255       | ~3000 RPM   | Maximum     |
-
-### Examples
+## Installation
 
 ```bash
-# Set fan to quiet mode (~412 RPM)
-echo 1 | sudo tee /sys/class/hwmon/hwmon10/pwm2_enable
-echo 35 | sudo tee /sys/class/hwmon/hwmon10/pwm2
-
-# Set fan to medium speed (~1529 RPM)
-echo 1 | sudo tee /sys/class/hwmon/hwmon10/pwm2_enable
-echo 130 | sudo tee /sys/class/hwmon/hwmon10/pwm2
-
-# Set fan to maximum speed (~3000 RPM)
-echo 1 | sudo tee /sys/class/hwmon/hwmon10/pwm2_enable
-echo 255 | sudo tee /sys/class/hwmon/hwmon10/pwm2
-
-# Check current fan RPM
-cat /sys/class/hwmon/hwmon10/fan2_input
-```
-
-## Using the Control Script
-
-### Run the script manually
-
-```bash
-# Run with root privileges (applies temperature-based fan control)
-sudo ./hdd_fan_control.sh
-
-# Verbose mode - show detailed temperature and fan information
-sudo ./hdd_fan_control.sh -v
-
-# Test mode - show what would be done without making changes
-sudo ./hdd_fan_control.sh -t
-
-# Show help and temperature thresholds
-./hdd_fan_control.sh -h
-```
-
-### Script Modes Explained
-
-#### Normal Mode
-```bash
-sudo ./hdd_fan_control.sh
-```
-- Reads all HDD temperatures
-- Determines the maximum temperature
-- Sets the appropriate PWM value based on temperature thresholds
-- Logs changes to `/var/log/hdd_fan_control.log`
-- Silent operation (no console output unless there's an error)
-
-#### Verbose Mode (`-v` or `--verbose`)
-```bash
-sudo ./hdd_fan_control.sh -v
-```
-Displays detailed information:
-- Individual temperature for each HDD drive
-- Maximum temperature across all drives
-- Current PWM value and percentage
-- Current fan RPM
-
-Example output:
-```
-HDD Temperatures:
-  /dev/sda: 42°C
-  /dev/sdb: 38°C
-  /dev/sdc: 45°C
-  /dev/sdd: 40°C
-Max Temperature: 45°C
-PWM Value: 145/255 (56%)
-Fan RPM: 1906
-```
-
-#### Test Mode (`-t` or `--test`)
-```bash
-./hdd_fan_control.sh -t
-```
-**Does NOT require root privileges** - safe to run without making changes:
-- Shows all HDD temperatures
-- Displays what the maximum temperature is
-- Shows what PWM value **would** be set
-- Does NOT actually change the fan speed
-- Useful for checking HDD temps and verifying the script logic
-
-Example output:
-```
-HDD Temperatures:
-  /dev/sda: 42°C
-  /dev/sdb: 38°C
-  /dev/sdc: 45°C
-  /dev/sdd: 40°C
-Max Temperature: 45°C
-Would set PWM to: 145
-```
-
-### Temperature Thresholds
-
-The script uses the following temperature-based PWM mapping (very quiet until 43°C, then aggressive ramp):
-
-- **≤30°C**: PWM 28 (~329 RPM) - Very quiet
-- **≤35°C**: PWM 35 (~412 RPM) - Very quiet  
-- **≤40°C**: PWM 55 (~647 RPM) - Very quiet
-- **≤43°C**: PWM 80 (~941 RPM) - Very quiet
-- **≤44°C**: PWM 105 (~1235 RPM) - Starting ramp
-- **≤45°C**: PWM 130 (~1529 RPM) - Ramping up
-- **≤46°C**: PWM 150 (~1765 RPM) - Aggressive
-- **≤47°C**: PWM 170 (~2000 RPM) - Aggressive
-- **≤48°C**: PWM 185 (~2176 RPM) - Very aggressive
-- **≤49°C**: PWM 200 (~2353 RPM) - Very aggressive
-- **≤50°C**: PWM 215 (~2529 RPM) - Very aggressive
-- **≤51°C**: PWM 225 (~2647 RPM) - Very aggressive
-- **≤52°C**: PWM 235 (~2765 RPM) - Near maximum
-- **≤53°C**: PWM 245 (~2882 RPM) - Near maximum
-- **≤54°C**: PWM 252 (~2965 RPM) - Almost maximum
-- **>54°C**: PWM 255 (~3000 RPM) - Maximum cooling
-
-## Setup as a Service
-
-The service uses a systemd timer to run the fan control script every 2 minutes.
-
-### Service Files
-
-- `hdd-fan-control.service` - The service unit that runs the script
-- `hdd-fan-control.timer` - Timer that triggers the service every 2 minutes (starts 1 minute after boot)
-
-### Installation
-
-```bash
-# Copy files to systemd directory
-sudo cp hdd_fan_control.sh /usr/local/bin/
+# 1. Copy the script
+sudo cp hdd_fan_control.sh /usr/local/bin/hdd_fan_control.sh
 sudo chmod +x /usr/local/bin/hdd_fan_control.sh
+
+# 2. Copy the systemd units
 sudo cp hdd-fan-control.service /etc/systemd/system/
-sudo cp hdd-fan-control.timer /etc/systemd/system/
+sudo cp hdd-fan-control.timer   /etc/systemd/system/
 
-# Enable and start the timer
+# 3. Load drivetemp on boot (recommended)
+echo "drivetemp" | sudo tee /etc/modules-load.d/drivetemp.conf
+
+# 4. Install logrotate config
+sudo cp hdd-fan-control.logrotate /etc/logrotate.d/hdd-fan-control
+
+# 5. Enable and start the timer
 sudo systemctl daemon-reload
-sudo systemctl enable hdd-fan-control.timer
-sudo systemctl start hdd-fan-control.timer
+sudo systemctl enable --now hdd-fan-control.timer
 ```
 
-### Service Management
+---
 
-```bash
-# Check timer status
-sudo systemctl status hdd-fan-control.timer
+## CLI Usage
 
-# Check when the timer will run next
-sudo systemctl list-timers hdd-fan-control.timer
+```
+Usage: hdd_fan_control.sh [OPTIONS]
 
-# View service logs
-sudo journalctl -u hdd-fan-control.service -f
+Options:
+  -s, --status     Show current temperatures, fan speed and resolved hwmon path
+  -v, --verbose    Run normally but also print detailed status to stdout
+  -t, --test       Test mode — show what would be done, no changes made
+  -h, --help       Show this help and temperature curve
 ```
 
-### Temporarily Disable Service for Testing
+### `--status` (read-only overview)
 
-When you want to manually test PWM settings without the service interfering:
+```
+========================================
+ HDD Fan Control — Status
+========================================
+HDD Temperatures (drivetemp):
+  Drive 1 (/sys/class/hwmon/hwmon7): 38°C
+  Drive 2 (/sys/class/hwmon/hwmon8): 36°C
+  Drive 3 (/sys/class/hwmon/hwmon9): 41°C
+  Drive 4 (/sys/class/hwmon/hwmon10): 39°C
+
+  Chip hwmon path : /sys/class/hwmon/hwmon6
+  Max HDD temp    : 41°C
+  Target tier     : Warm (≤43°C)
+  Target PWM      : 90 / 255 (35%)
+  Current PWM     : 90 / 255
+  Fan RPM         : 847 RPM
+========================================
+```
+
+### `--test` (dry run, no root required for reading)
 
 ```bash
-# Stop the timer (prevents automatic runs)
+sudo ./hdd_fan_control.sh --test
+```
+
+Shows resolved hwmon path, all drive temperatures, and the PWM that *would* be
+applied — without writing anything.
+
+### `--verbose` (normal run with extra output)
+
+```bash
+sudo ./hdd_fan_control.sh --verbose
+```
+
+Runs the full control loop and additionally prints the same information as
+`--status` to stdout after applying changes.
+
+---
+
+## Service Management
+
+```bash
+# Check the timer schedule
+systemctl list-timers hdd-fan-control.timer
+
+# Check the last run
+systemctl status hdd-fan-control.service
+
+# Follow logs in real time
+journalctl -u hdd-fan-control.service -f
+
+# View the script's own log file
+tail -f /var/log/hdd_fan_control.log
+
+# One-shot manual run
+sudo systemctl start hdd-fan-control.service
+
+# Stop automatic runs temporarily (for manual PWM testing)
 sudo systemctl stop hdd-fan-control.timer
 
-# Verify it's stopped
-sudo systemctl status hdd-fan-control.timer
-
-# Now you can manually test PWM values
-echo 1 | sudo tee /sys/class/hwmon/hwmon10/pwm2_enable
-echo 145 | sudo tee /sys/class/hwmon/hwmon10/pwm2
-
-# Monitor fan RPM while testing
-watch -n 1 cat /sys/class/hwmon/hwmon10/fan2_input
-
-# When done testing, restart the timer
+# Restart automatic runs
 sudo systemctl start hdd-fan-control.timer
 ```
 
-### Permanently Disable Service
+---
 
-If you want to disable automatic fan control:
+## Manual PWM Testing
 
-```bash
-# Disable timer (won't start on boot)
-sudo systemctl disable hdd-fan-control.timer
-
-# Stop it immediately
-sudo systemctl stop hdd-fan-control.timer
-```
-
-To re-enable later:
+While the timer is stopped you can test fan speeds manually:
 
 ```bash
-# Re-enable and start
-sudo systemctl enable hdd-fan-control.timer
-sudo systemctl start hdd-fan-control.timer
+# Find the current nct6798 hwmon path
+for i in /sys/class/hwmon/hwmon*/name; do echo "$i: $(cat $i)"; done
+
+# Example — assuming hwmon6 is nct6798:
+HW=/sys/class/hwmon/hwmon6
+
+# Enable manual PWM control
+echo 1 | sudo tee ${HW}/pwm1_enable
+
+# Set a specific PWM value (0–255)
+echo 140 | sudo tee ${HW}/pwm1
+
+# Monitor fan RPM
+watch -n 1 cat ${HW}/fan1_input
 ```
+
+---
 
 ## Logs
 
-The script logs its activity to `/var/log/hdd_fan_control.log`.
+```bash
+# Script log (one line per run)
+sudo tail -f /var/log/hdd_fan_control.log
+
+# systemd journal (stdout/stderr from each service run)
+sudo journalctl -u hdd-fan-control.service -n 50
+```
+
+Log entries look like:
+
+```
+2025-07-10 14:32:01 - Temp: 43°C | Tier: Warm (≤43°C) | PWM: 90/255 (no change) | RPM: 847
+2025-07-10 14:34:01 - Temp: 46°C | Tier: Hot (≤46°C) | PWM: 140/255 | RPM: 1320
+```
+
+### Log Rotation
+
+Log rotation is handled by logrotate via `hdd-fan-control.logrotate`:
+
+- Rotates **weekly**
+- Keeps **4 weeks** of history
+- Compressed with `gzip` (`delaycompress` keeps the most recent rotated file uncompressed for easy inspection)
+- Uses `copytruncate` — safe since the script opens the log file fresh on each run
+
+To test the logrotate config without waiting for the scheduled run:
 
 ```bash
-# View recent log entries
-sudo tail -f /var/log/hdd_fan_control.log
+sudo logrotate --debug /etc/logrotate.d/hdd-fan-control
+# Force an actual rotation (even if not due yet):
+sudo logrotate --force /etc/logrotate.d/hdd-fan-control
 ```

@@ -1,48 +1,111 @@
 #!/bin/bash
 
 # HDD Temperature-based Fan Control Script
-# Controls hwmon/pwm1 based on maximum HDD temperature
+# Controls fan speed via PWM based on maximum HDD temperature
+# Dynamically resolves the hwmon path for the nct6798 chip
 
-# Configuration - adjust these paths based on your system
-PWM_PATH="/sys/class/hwmon/hwmon10/pwm1"
-PWM_ENABLE_PATH="/sys/class/hwmon/hwmon10/pwm1_enable"
-FAN_RPM_PATH="/sys/class/hwmon/hwmon10/fan1_input"
+# === CONFIGURATION ===
+HWMON_CHIP_NAME="nct6798"
+PWM_CHANNEL="pwm1"
 LOG_FILE="/var/log/hdd_fan_control.log"
+STATE_FILE="/run/hdd_fan_control_state"
+HYSTERESIS=1  # °C — only step down a tier if temp dropped this many degrees below threshold
 
-# HDD devices to monitor
+# HDD devices to monitor (used as fallback if no drivetemp hwmon entries found)
 HDD_DEVICES=("/dev/sda" "/dev/sdb" "/dev/sdc" "/dev/sdd")
 
-# Temperature thresholds and corresponding PWM values
-# Very quiet below 43°C, then aggressive ramp to 55°C
-declare -A TEMP_MAP
-TEMP_MAP[30]=28    # ≤30°C: ~329 RPM (very quiet)
-TEMP_MAP[35]=35    # ≤35°C: ~412 RPM (very quiet)
-TEMP_MAP[40]=55    # ≤40°C: ~647 RPM (very quiet)
-TEMP_MAP[43]=80    # ≤43°C: ~941 RPM (very quiet)
-TEMP_MAP[44]=105   # ≤44°C: ~1235 RPM (starting ramp)
-TEMP_MAP[45]=130   # ≤45°C: ~1529 RPM (ramping up)
-TEMP_MAP[46]=150   # ≤46°C: ~1765 RPM (aggressive)
-TEMP_MAP[47]=170   # ≤47°C: ~2000 RPM (aggressive)
-TEMP_MAP[48]=185   # ≤48°C: ~2176 RPM (very aggressive)
-TEMP_MAP[49]=200   # ≤49°C: ~2353 RPM (very aggressive)
-TEMP_MAP[50]=215   # ≤50°C: ~2529 RPM (very aggressive)
-TEMP_MAP[51]=225   # ≤51°C: ~2647 RPM (very aggressive)
-TEMP_MAP[52]=235   # ≤52°C: ~2765 RPM (near maximum)
-TEMP_MAP[53]=245   # ≤53°C: ~2882 RPM (near maximum)
-TEMP_MAP[54]=252   # ≤54°C: ~2965 RPM (almost maximum)
-TEMP_MAP[55]=255   # >54°C: ~3000 RPM (maximum cooling)
+# Temperature curve: "THRESHOLD_CELSIUS PWM_VALUE LABEL"
+# Evaluated in order — first matching threshold wins
+# Final entry acts as catch-all (use 999 as threshold)
+TEMP_CURVE=(
+    "35  30  Idle"
+    "40  60  Cool"
+    "43  100  Warm"
+    "46  145 Hot"
+    "50  190 VeryHot"
+    "54  230 Critical"
+    "999 255 Max"
+)
 
-# Function to log messages
+# === GLOBALS (resolved at runtime) ===
+HWMON_PATH=""
+PWM_PATH=""
+PWM_ENABLE_PATH=""
+FAN_RPM_PATH=""
+
+# ===========================================================================
+# Logging
+# ===========================================================================
+
 log_message() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
 }
 
-# Function to get HDD temperature via SMART
-get_hdd_temp() {
+# ===========================================================================
+# Module + hwmon path resolution
+# ===========================================================================
+
+ensure_module() {
+    if ! lsmod | grep -q "^nct6775"; then
+        modprobe nct6775 2>/dev/null
+        sleep 1
+    fi
+}
+
+find_hwmon_path() {
+    local name_file hwmon_dir found=""
+
+    ensure_module
+
+    for name_file in /sys/class/hwmon/hwmon*/name; do
+        if [[ -r "$name_file" ]] && [[ "$(cat "$name_file" 2>/dev/null)" == "$HWMON_CHIP_NAME" ]]; then
+            found="${name_file%/name}"
+            break
+        fi
+    done
+
+    if [[ -z "$found" ]]; then
+        log_message "ERROR: hwmon device '$HWMON_CHIP_NAME' not found under /sys/class/hwmon/"
+        return 1
+    fi
+
+    HWMON_PATH="$found"
+    PWM_PATH="${HWMON_PATH}/${PWM_CHANNEL}"
+    PWM_ENABLE_PATH="${HWMON_PATH}/${PWM_CHANNEL}_enable"
+    FAN_RPM_PATH="${HWMON_PATH}/fan1_input"
+    return 0
+}
+
+# ===========================================================================
+# Temperature reading
+# ===========================================================================
+
+# Read temperatures from drivetemp hwmon entries (preferred)
+# Values are in millidegrees Celsius — divide by 1000
+get_temps_from_drivetemp() {
+    local temps=()
+    local name_file temp_file temp_raw
+
+    for name_file in /sys/class/hwmon/hwmon*/name; do
+        if [[ -r "$name_file" ]] && [[ "$(cat "$name_file" 2>/dev/null)" == "drivetemp" ]]; then
+            temp_file="${name_file%/name}/temp1_input"
+            if [[ -r "$temp_file" ]]; then
+                temp_raw=$(cat "$temp_file" 2>/dev/null)
+                if [[ -n "$temp_raw" && "$temp_raw" -gt 0 ]]; then
+                    temps+=("$(( temp_raw / 1000 ))")
+                fi
+            fi
+        fi
+    done
+
+    echo "${temps[@]}"
+}
+
+# Fallback: read temperature via smartctl for a single device
+get_hdd_temp_smartctl() {
     local device=$1
     local temp
 
-    # Try different SMART temperature attributes
     temp=$(smartctl -A "$device" 2>/dev/null | awk '/Temperature_Celsius/ {print $10}' | head -1)
     if [[ -z "$temp" ]]; then
         temp=$(smartctl -A "$device" 2>/dev/null | awk '/Airflow_Temperature/ {print $10}' | head -1)
@@ -51,19 +114,33 @@ get_hdd_temp() {
         temp=$(smartctl -A "$device" 2>/dev/null | awk '/Current Drive Temperature/ {print $4}' | head -1)
     fi
 
-    # Return temperature or 0 if not found
     echo "${temp:-0}"
 }
 
-# Function to get maximum HDD temperature
+# Returns the maximum temperature across all HDDs
+# Prefers drivetemp hwmon entries; falls back to smartctl
 get_max_hdd_temp() {
     local max_temp=0
-    local temp
+    local temps temp
 
+    # Try drivetemp first
+    read -ra temps <<< "$(get_temps_from_drivetemp)"
+
+    if [[ ${#temps[@]} -gt 0 ]]; then
+        for temp in "${temps[@]}"; do
+            if (( temp > max_temp )); then
+                max_temp=$temp
+            fi
+        done
+        echo "$max_temp"
+        return
+    fi
+
+    # Fallback: smartctl per device
     for device in "${HDD_DEVICES[@]}"; do
         if [[ -e "$device" ]]; then
-            temp=$(get_hdd_temp "$device")
-            if [[ "$temp" -gt "$max_temp" ]]; then
+            temp=$(get_hdd_temp_smartctl "$device")
+            if (( temp > max_temp )); then
                 max_temp=$temp
             fi
         fi
@@ -72,11 +149,67 @@ get_max_hdd_temp() {
     echo "$max_temp"
 }
 
-# Function to set PWM value
+# ===========================================================================
+# Temperature curve + hysteresis
+# ===========================================================================
+
+# Returns "THRESHOLD PWM LABEL" for a given temperature
+get_curve_entry_for_temp() {
+    local temp=$1
+    local entry threshold pwm label
+
+    for entry in "${TEMP_CURVE[@]}"; do
+        read -r threshold pwm label <<< "$entry"
+        if (( temp <= threshold )); then
+            echo "$threshold $pwm $label"
+            return
+        fi
+    done
+
+    # Should never reach here due to 999 catch-all, but be safe
+    echo "999 255 Max"
+}
+
+# Returns the saved threshold from the state file (or empty string)
+load_saved_threshold() {
+    if [[ -r "$STATE_FILE" ]]; then
+        cat "$STATE_FILE" 2>/dev/null
+    fi
+}
+
+save_threshold() {
+    echo "$1" > "$STATE_FILE" 2>/dev/null
+}
+
+# Apply hysteresis: if temperature would cause a step DOWN, only allow it
+# if temp has dropped at least HYSTERESIS degrees below the current tier threshold.
+get_pwm_with_hysteresis() {
+    local current_temp=$1
+    read -r target_threshold target_pwm target_label <<< "$(get_curve_entry_for_temp "$current_temp")"
+
+    local saved_threshold
+    saved_threshold=$(load_saved_threshold)
+
+    if [[ -n "$saved_threshold" ]] && (( target_threshold < saved_threshold )); then
+        # We're considering stepping down — apply hysteresis
+        local hysteresis_floor=$(( saved_threshold - HYSTERESIS ))
+        if (( current_temp > hysteresis_floor )); then
+            # Not cold enough yet — stay at current (saved) tier
+            read -r target_threshold target_pwm target_label <<< "$(get_curve_entry_for_temp "$saved_threshold")"
+        fi
+    fi
+
+    save_threshold "$target_threshold"
+    echo "$target_threshold $target_pwm $target_label"
+}
+
+# ===========================================================================
+# PWM control
+# ===========================================================================
+
 set_pwm() {
     local pwm_value=$1
 
-    # Enable PWM control if not already enabled
     if [[ ! -w "$PWM_ENABLE_PATH" ]]; then
         log_message "ERROR: Cannot write to PWM enable path: $PWM_ENABLE_PATH"
         return 1
@@ -84,9 +217,8 @@ set_pwm() {
 
     echo 1 > "$PWM_ENABLE_PATH" 2>/dev/null
 
-    # Set PWM value
     if [[ -w "$PWM_PATH" ]]; then
-        echo "$pwm_value" > "$PWM_PATH"
+        echo "$pwm_value" > "$PWM_PATH" 2>/dev/null
         return 0
     else
         log_message "ERROR: Cannot write to PWM path: $PWM_PATH"
@@ -94,7 +226,14 @@ set_pwm() {
     fi
 }
 
-# Function to get current fan RPM
+get_current_pwm() {
+    if [[ -r "$PWM_PATH" ]]; then
+        cat "$PWM_PATH" 2>/dev/null || echo "0"
+    else
+        echo "0"
+    fi
+}
+
 get_fan_rpm() {
     if [[ -r "$FAN_RPM_PATH" ]]; then
         cat "$FAN_RPM_PATH" 2>/dev/null || echo "0"
@@ -103,125 +242,190 @@ get_fan_rpm() {
     fi
 }
 
-# Function to determine PWM value based on temperature
-get_pwm_for_temp() {
-    local temp=$1
-    local pwm_value=255  # Default to maximum
+# ===========================================================================
+# Display helpers
+# ===========================================================================
 
-    # Find appropriate PWM value based on temperature thresholds
-    for threshold in $(echo "${!TEMP_MAP[@]}" | tr ' ' '\n' | sort -n); do
-        if [[ "$temp" -le "$threshold" ]]; then
-            pwm_value=${TEMP_MAP[$threshold]}
-            break
-        fi
-    done
-
-    echo "$pwm_value"
-}
-
-# Function to display HDD temperatures
 show_hdd_temps() {
-    echo "HDD Temperatures:"
-    for device in "${HDD_DEVICES[@]}"; do
-        if [[ -e "$device" ]]; then
-            temp=$(get_hdd_temp "$device")
-            echo "  $device: ${temp}°C"
-        else
-            echo "  $device: Not found"
+    local name_file temp_file temp_raw temp hwmon_dir idx=1
+    local found_drivetemp=false
+
+    echo "HDD Temperatures (drivetemp):"
+    for name_file in /sys/class/hwmon/hwmon*/name; do
+        if [[ -r "$name_file" ]] && [[ "$(cat "$name_file" 2>/dev/null)" == "drivetemp" ]]; then
+            found_drivetemp=true
+            hwmon_dir="${name_file%/name}"
+            temp_file="${hwmon_dir}/temp1_input"
+            if [[ -r "$temp_file" ]]; then
+                temp_raw=$(cat "$temp_file" 2>/dev/null)
+                temp=$(( temp_raw / 1000 ))
+                echo "  Drive ${idx} (${hwmon_dir}): ${temp}°C"
+            fi
+            (( idx++ ))
         fi
     done
+
+    if ! $found_drivetemp; then
+        echo "  (no drivetemp entries found — falling back to smartctl)"
+        for device in "${HDD_DEVICES[@]}"; do
+            if [[ -e "$device" ]]; then
+                temp=$(get_hdd_temp_smartctl "$device")
+                echo "  $device: ${temp}°C"
+            else
+                echo "  $device: not found"
+            fi
+        done
+    fi
 }
 
-# Main control function
-main() {
-    # Check if running as root
+# ===========================================================================
+# Main modes
+# ===========================================================================
+
+cmd_status() {
+    find_hwmon_path || exit 1
+
+    local max_temp
+    max_temp=$(get_max_hdd_temp)
+
+    read -r threshold pwm label <<< "$(get_curve_entry_for_temp "$max_temp")"
+    local pct=$(( pwm * 100 / 255 ))
+    local current_pwm current_rpm
+    current_pwm=$(get_current_pwm)
+    current_rpm=$(get_fan_rpm)
+
+    echo "========================================"
+    echo " HDD Fan Control — Status"
+    echo "========================================"
+    show_hdd_temps
+    echo ""
+    echo "  Chip hwmon path : $HWMON_PATH"
+    echo "  Max HDD temp    : ${max_temp}°C"
+    echo "  Target tier     : $label (≤${threshold}°C)"
+    echo "  Target PWM      : $pwm / 255 (${pct}%)"
+    echo "  Current PWM     : $current_pwm / 255"
+    echo "  Fan RPM         : $current_rpm RPM"
+    echo "========================================"
+}
+
+cmd_test() {
+    find_hwmon_path || exit 1
+
+    local max_temp
+    max_temp=$(get_max_hdd_temp)
+    read -r threshold pwm label <<< "$(get_curve_entry_for_temp "$max_temp")"
+
+    show_hdd_temps
+    echo ""
+    echo "Resolved hwmon path : $HWMON_PATH"
+    echo "Max Temperature     : ${max_temp}°C"
+    echo "Would set PWM to    : $pwm (tier: $label, threshold: ≤${threshold}°C)"
+}
+
+cmd_help() {
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  -s, --status     Show current temperatures, fan speed and resolved hwmon path"
+    echo "  -v, --verbose    Run normally but also print detailed status to stdout"
+    echo "  -t, --test       Test mode — show what would be done, no changes made"
+    echo "  -h, --help       Show this help message"
+    echo ""
+    echo "Temperature curve (hysteresis: ${HYSTERESIS}°C step-down guard):"
+    echo ""
+    printf "  %-12s %-8s %-10s %s\n" "Max Temp" "PWM" "% Speed" "Label"
+    printf "  %-12s %-8s %-10s %s\n" "--------" "---" "-------" "-----"
+    for entry in "${TEMP_CURVE[@]}"; do
+        read -r thr pwm lbl <<< "$entry"
+        local pct=$(( pwm * 100 / 255 ))
+        local thr_disp
+        if (( thr >= 999 )); then
+            thr_disp=">54°C"
+        else
+            thr_disp="≤${thr}°C"
+        fi
+        printf "  %-12s %-8s %-10s %s\n" "$thr_disp" "$pwm" "${pct}%" "$lbl"
+    done
+    echo ""
+    echo "Chip      : $HWMON_CHIP_NAME (module: nct6775)"
+    echo "PWM       : $PWM_CHANNEL"
+    echo "Log file  : $LOG_FILE"
+    echo "State file: $STATE_FILE"
+}
+
+cmd_main() {
+    local verbose=${1:-false}
+
+    # Must be root
     if [[ $EUID -ne 0 ]]; then
-        echo "This script must be run as root"
+        echo "ERROR: This script must be run as root" >&2
         exit 1
     fi
 
-    # Get maximum HDD temperature
+    find_hwmon_path || exit 1
+
+    local max_temp
     max_temp=$(get_max_hdd_temp)
 
     if [[ "$max_temp" -eq 0 ]]; then
-        log_message "WARNING: No HDD temperatures detected, setting fan to medium speed"
+        log_message "WARNING: No HDD temperatures detected — setting fan to safe medium speed (PWM 120)"
         set_pwm 120
         exit 1
     fi
 
-    # Determine required PWM value
-    required_pwm=$(get_pwm_for_temp "$max_temp")
+    read -r threshold pwm label <<< "$(get_pwm_with_hysteresis "$max_temp")"
 
-    # Get current PWM and fan RPM
-    current_pwm=$(cat "$PWM_PATH" 2>/dev/null || echo "0")
-    current_rpm=$(get_fan_rpm)
+    local current_pwm
+    current_pwm=$(get_current_pwm)
 
-    # Only change PWM if different (avoid unnecessary writes)
-    if [[ "$current_pwm" -ne "$required_pwm" ]]; then
-        if set_pwm "$required_pwm"; then
-            # Wait a moment for fan to respond
+    if [[ "$current_pwm" -ne "$pwm" ]]; then
+        if set_pwm "$pwm"; then
             sleep 2
+            local new_rpm
             new_rpm=$(get_fan_rpm)
-            log_message "Temp: ${max_temp}°C → PWM: $required_pwm → RPM: $new_rpm"
+            log_message "Temp: ${max_temp}°C | Tier: ${label} (≤${threshold}°C) | PWM: ${pwm}/255 | RPM: ${new_rpm}"
         else
-            log_message "ERROR: Failed to set PWM to $required_pwm"
+            log_message "ERROR: Failed to set PWM to $pwm"
             exit 1
         fi
+    else
+        log_message "Temp: ${max_temp}°C | Tier: ${label} (≤${threshold}°C) | PWM: ${pwm}/255 (no change) | RPM: $(get_fan_rpm)"
     fi
 
-    # If verbose mode requested
-    if [[ "$1" == "-v" || "$1" == "--verbose" ]]; then
+    if [[ "$verbose" == "true" ]]; then
         show_hdd_temps
-        echo "Max Temperature: ${max_temp}°C"
-        echo "PWM Value: $required_pwm/255 ($(( required_pwm * 100 / 255 ))%)"
-        echo "Fan RPM: $(get_fan_rpm)"
+        echo ""
+        echo "Resolved hwmon path : $HWMON_PATH"
+        echo "Max Temperature     : ${max_temp}°C"
+        echo "Tier                : $label (≤${threshold}°C)"
+        echo "PWM Value           : ${pwm}/255 ($(( pwm * 100 / 255 ))%)"
+        echo "Fan RPM             : $(get_fan_rpm) RPM"
     fi
 }
 
-# Handle command line arguments
+# ===========================================================================
+# Entry point
+# ===========================================================================
+
 case "${1:-}" in
-    -h|--help)
-        echo "Usage: $0 [OPTIONS]"
-        echo "Options:"
-        echo "  -v, --verbose    Show detailed temperature and fan information"
-        echo "  -t, --test       Test mode - show what would be done"
-        echo "  -h, --help       Show this help message"
-        echo ""
-        echo "Temperature thresholds (very quiet <43°C, then aggressive ramp to 55°C):"
-        for threshold in $(echo "${!TEMP_MAP[@]}" | tr ' ' '\n' | sort -n); do
-            pwm=${TEMP_MAP[$threshold]}
-            rpm_estimate=""
-            case $pwm in
-                28) rpm_estimate="~329 RPM" ;;
-                35) rpm_estimate="~412 RPM" ;;
-                55) rpm_estimate="~647 RPM" ;;
-                80) rpm_estimate="~941 RPM" ;;
-                105) rpm_estimate="~1235 RPM" ;;
-                130) rpm_estimate="~1529 RPM" ;;
-                150) rpm_estimate="~1765 RPM" ;;
-                170) rpm_estimate="~2000 RPM" ;;
-                185) rpm_estimate="~2176 RPM" ;;
-                200) rpm_estimate="~2353 RPM" ;;
-                215) rpm_estimate="~2529 RPM" ;;
-                225) rpm_estimate="~2647 RPM" ;;
-                235) rpm_estimate="~2765 RPM" ;;
-                245) rpm_estimate="~2882 RPM" ;;
-                252) rpm_estimate="~2965 RPM" ;;
-                255) rpm_estimate="~3000 RPM" ;;
-            esac
-            echo "  ≤${threshold}°C: PWM $pwm $rpm_estimate"
-        done
-        exit 0
+    -s|--status)
+        cmd_status
         ;;
     -t|--test)
-        max_temp=$(get_max_hdd_temp)
-        required_pwm=$(get_pwm_for_temp "$max_temp")
-        show_hdd_temps
-        echo "Max Temperature: ${max_temp}°C"
-        echo "Would set PWM to: $required_pwm"
-        exit 0
+        cmd_test
+        ;;
+    -v|--verbose)
+        cmd_main "true"
+        ;;
+    -h|--help)
+        cmd_help
+        ;;
+    "")
+        cmd_main "false"
         ;;
     *)
-        main "$@"
+        echo "Unknown option: $1" >&2
+        echo "Run '$0 --help' for usage." >&2
+        exit 1
         ;;
 esac

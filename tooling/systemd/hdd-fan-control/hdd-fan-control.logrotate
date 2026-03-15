@@ -1,0 +1,21 @@
+/var/log/hdd_fan_control.log {
+    # Rotate weekly
+    weekly
+
+    # Keep 4 weeks of history
+    rotate 4
+
+    # Compress rotated logs
+    compress
+    delaycompress
+
+    # Don't error if log file is missing (e.g. before first run)
+    missingok
+
+    # Don't rotate if empty
+    notifempty
+
+    # Truncate in place rather than moving — safe since the script
+    # opens the file fresh on each run (no persistent file handle)
+    copytruncate
+}

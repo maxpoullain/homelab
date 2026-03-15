@@ -4,6 +4,7 @@ After=multi-user.target
 
 [Service]
 Type=oneshot
+ExecStartPre=/sbin/modprobe nct6775
 ExecStart=/usr/local/bin/hdd_fan_control.sh
 User=root
 StandardOutput=journal
