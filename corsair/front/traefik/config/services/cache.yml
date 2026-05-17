@@ -1,0 +1,17 @@
+http:
+  routers:
+    cache:
+      entryPoints:
+        - https
+      rule: "Host(`cache.corsair.tf`)"
+      service: cache
+      priority: 1
+      middlewares:
+        - private@file
+        - security-soft@file
+
+  services:
+    cache:
+      loadBalancer:
+        servers:
+          - url: "http://100.100.42.42:8080"
