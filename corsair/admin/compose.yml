@@ -8,10 +8,10 @@ services:
     security_opt:
       - no-new-privileges:true
     group_add:
-      - "999"  # Replace with your host's Docker GID
+      - "999" # Replace with your host's Docker GID
     volumes:
       - ./arcane:/app/data
-      - /mnt/fast/apps/homelab:/mnt/fast/apps/homelab:ro
+      - /mnt/fast/apps/homelab/corsair:/mnt/fast/apps/homelab/corsair:ro
     env_file:
       - .env
     environment:
@@ -20,7 +20,7 @@ services:
       - PGID=3002
       - TZ=Europe/Paris
       - DOCKER_HOST=tcp://socket-proxy:2375
-      - PROJECTS_DIRECTORY=/mnt/fast/apps/homelab
+      - PROJECTS_DIRECTORY=/mnt/fast/apps/homelab/corsair
       - GPU_MONITORING_ENABLED=true
       - GPU_TYPE=intel
     networks:
