@@ -9,8 +9,8 @@ services:
     security_opt:
       - no-new-privileges:true
     group_add:
-      - "44"   # video group
-      - "107"  # render group
+      - "44" # video group
+      - "107" # render group
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
     networks:
@@ -33,7 +33,7 @@ services:
       - "traefik.http.routers.jellyfin.entrypoints=https"
       - "traefik.http.routers.jellyfin.rule=Host(`tv.corsair.tf`)"
       - "traefik.http.routers.jellyfin.middlewares=jellyfin"
-      - "traefik.http.routers.jellyfin.middlewares=private@file,security-soft@file"
+      - "traefik.http.routers.jellyfin.middlewares=security-soft@file"
       - "traefik.http.middlewares.jellyfin.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
       - "traefik.http.middlewares.jellyfin.headers.SSLRedirect=true"
       - "traefik.http.middlewares.jellyfin.headers.SSLHost=tv.corsair.tf"
@@ -112,7 +112,7 @@ services:
 
   redis:
     container_name: immich_redis
-    image: docker.io/valkey/valkey:9@sha256:546304417feac0874c3dd576e0952c6bb8f06bb4093ea0c9ca303c73cf458f63
+    image: docker.io/valkey/valkey:9@sha256:3b55fbaa0cd93cf0d9d961f405e4dfcc70efe325e2d84da207a0a8e6d8fde4f9
     healthcheck:
       test: redis-cli ping || exit 1
     restart: unless-stopped
@@ -131,7 +131,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_DB: ${DB_DATABASE_NAME}
-      POSTGRES_INITDB_ARGS: '--data-checksums'
+      POSTGRES_INITDB_ARGS: "--data-checksums"
     volumes:
       - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
     shm_size: 128mb
