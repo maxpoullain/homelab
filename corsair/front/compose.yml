@@ -49,7 +49,7 @@ services:
       - traefik
 
   tinyauth:
-    image: ghcr.io/steveiliop56/tinyauth:v4
+    image: ghcr.io/steveiliop56/tinyauth:v5
     container_name: tinyauth
     restart: unless-stopped
     security_opt:
@@ -59,8 +59,8 @@ services:
     env_file:
       - .env
     environment:
-      - BACKGROUND_IMAGE=/resources/background.jpg
-      - SESSION_EXPIRY=172800
+      - TINYAUTH_UI_BACKGROUNDIMAGE=/resources/background.jpg
+      - TINYAUTH_AUTH_SESSIONEXPIRY=172800
     volumes:
       - ./tinyauth/resources:/data/resources
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -73,8 +73,6 @@ services:
       - traefik.http.services.auth.loadbalancer.server.port=3000
       - traefik.http.middlewares.auth.forwardauth.address=http://tinyauth:3000/api/auth/traefik
       # ACLs
-      - tinyauth.apps.dockhand.config.domain=admin.corsair.tf
-      - tinyauth.apps.dockhand.users.allow=max
       - tinyauth.apps.beszel.config.domain=status.corsair.tf
       - tinyauth.apps.beszel.users.allow=max
       - tinyauth.apps.traefik.config.domain=traefik.corsair.tf
@@ -87,8 +85,6 @@ services:
       - tinyauth.apps.shows.users.allow=max
       - tinyauth.apps.movies.config.domain=movies.corsair.tf
       - tinyauth.apps.movies.users.allow=max
-      - tinyauth.apps.books.config.domain=books.corsair.tf
-      - tinyauth.apps.books.users.allow=max
 
 networks:
   traefik:
