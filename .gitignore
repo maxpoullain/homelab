@@ -31,6 +31,8 @@
 !**/front/crowdsec/config/notifications/
 **/front/crowdsec/config/notifications/*
 !**/front/crowdsec/config/notifications/ha.yaml
+**/front/tinyauth/*
+!**/front/tinyauth/resources/
 **/front/traefik/acme/*
 **/front/traefik/logs/*
 **/front/traefik/config/security/middlewares.yml

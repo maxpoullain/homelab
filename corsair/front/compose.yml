@@ -62,7 +62,7 @@ services:
       - TINYAUTH_UI_BACKGROUNDIMAGE=/resources/background.jpg
       - TINYAUTH_AUTH_SESSIONEXPIRY=172800
     volumes:
-      - ./tinyauth/resources:/data/resources
+      - ./tinyauth:/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - traefik.enable=true
@@ -73,8 +73,6 @@ services:
       - traefik.http.services.auth.loadbalancer.server.port=3000
       - traefik.http.middlewares.auth.forwardauth.address=http://tinyauth:3000/api/auth/traefik
       # ACLs
-      - tinyauth.apps.beszel.config.domain=status.corsair.tf
-      - tinyauth.apps.beszel.users.allow=max
       - tinyauth.apps.traefik.config.domain=traefik.corsair.tf
       - tinyauth.apps.traefik.users.allow=max
       - tinyauth.apps.seedbox.config.domain=seedbox.corsair.tf
