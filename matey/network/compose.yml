@@ -29,8 +29,9 @@ services:
         # Must run as root for DHCP raw socket access
         network_mode: host
         volumes:
-            - ./adguard/work:/opt/adguardhome/work
             - ./adguard/conf:/opt/adguardhome/conf
+        tmpfs:
+            - /opt/adguardhome/work:size=50m,mode=0755
         environment:
             - TZ=Europe/Paris
             - PUID=1001
