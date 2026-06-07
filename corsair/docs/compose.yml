@@ -44,7 +44,7 @@ services:
       # custom configurations
       - ${UPLOAD_LOCATION}:/root/.affine/storage
       - ${CONFIG_LOCATION}:/root/.affine/config
-    command: ['sh', '-c', 'node ./scripts/self-host-predeploy.js']
+    command: ["sh", "-c", "node ./scripts/self-host-predeploy.js"]
     env_file:
       - .env
     environment:
@@ -63,7 +63,7 @@ services:
     image: redis
     container_name: affine_redis
     healthcheck:
-      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -80,13 +80,13 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
-      POSTGRES_INITDB_ARGS: '--data-checksums'
+      POSTGRES_INITDB_ARGS: "--data-checksums"
       # you better set a password for you database
       # or you may add 'POSTGRES_HOST_AUTH_METHOD=trust' to ignore postgres security policy
       POSTGRES_HOST_AUTH_METHOD: trust
     healthcheck:
       test:
-        ['CMD', 'pg_isready', '-U', "${DB_USERNAME}", '-d', "${DB_DATABASE}"]
+        ["CMD", "pg_isready", "-U", "${DB_USERNAME}", "-d", "${DB_DATABASE}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -124,7 +124,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.papra.entrypoints=https"
       - "traefik.http.routers.papra.rule=Host(`archive.corsair.tf`)"
-      - "traefik.http.routers.papra.middlewares=security@file,private@file,auth@docker"
+      - "traefik.http.routers.papra.middlewares=security@file,private@file"
       - "traefik.http.routers.papra.service=papra"
       - "traefik.http.services.papra.loadbalancer.server.port=1221"
       - "traefik.docker.network=traefik"
