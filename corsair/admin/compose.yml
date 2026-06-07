@@ -85,7 +85,7 @@ services:
       # Main router for / (with auth)
       - "traefik.http.routers.beszel.entrypoints=https"
       - "traefik.http.routers.beszel.rule=Host(`status.corsair.tf`)"
-      - "traefik.http.routers.beszel.middlewares=security@file,private@file,auth@docker"
+      - "traefik.http.routers.beszel.middlewares=security@file,private@file"
       - "traefik.http.routers.beszel.service=beszel"
       # API router for /api (without auth)
       - "traefik.http.routers.beszel-api.entrypoints=https"
