@@ -1,0 +1,19 @@
+http:
+  routers:
+    aviation:
+      entryPoints:
+        - https
+      rule: "Host(`aviation.corsair.tf`)"
+      service: aviation
+      priority: 1
+      middlewares:
+        - auth@docker
+        - private@file
+        - security@file
+
+  services:
+    aviation:
+      loadBalancer:
+        passHostHeader: false
+        servers:
+          - url: "http://192.168.1.9:8080"
