@@ -11,6 +11,8 @@ services:
       - traefik
     volumes:
       - /mnt/fast/dbs/homelab/vaultwarden:/data/
+    tmpfs:
+      - /data/icon_cache
     environment:
       DOMAIN: "https://vault.corsair.tf"
       SIGNUPS_ALLOWED: "false"

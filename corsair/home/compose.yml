@@ -37,7 +37,8 @@ services:
     volumes:
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
+    tmpfs:
+      - /mosquitto/log
     environment:
       PUID: 3000
       PGID: 3002
@@ -53,7 +54,7 @@ services:
     security_opt:
       - no-new-privileges:true
     group_add:
-        - dialout
+      - dialout
     devices:
       - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_14787df09829ec11a6986d7840c9ce8d-if00-port0:/dev/ttyUSB0
     volumes:

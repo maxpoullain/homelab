@@ -86,6 +86,8 @@ services:
       - net.ipv6.conf.all.disable_ipv6=1
     networks:
       - 7seas
+    tmpfs:
+      - /tmp:exec,size=256M
     environment:
       - PGID=3002
       - PUID=3000
@@ -234,7 +236,7 @@ services:
       - "traefik.docker.network=traefik"
       - "traefik.http.routers.seerr.entrypoints=https"
       - "traefik.http.routers.seerr.rule=Host(`seerr.corsair.tf`)"
-      - "traefik.http.routers.seerr.middlewares=security@file,private@file"
+      - "traefik.http.routers.seerr.middlewares=security-soft@file"
       - "traefik.http.routers.seerr.service=seerr"
       - "traefik.http.services.seerr.loadbalancer.server.port=5055"
 
