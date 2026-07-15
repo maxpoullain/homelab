@@ -34,7 +34,7 @@ services:
     volumes:
       - ./adguard/conf:/opt/adguardhome/conf
     tmpfs:
-      - /opt/adguardhome/work:size=50m,mode=0755
+      - /opt/adguardhome/work:size=100m,mode=0755
     environment:
       - TZ=Europe/Paris
       - PUID=3000
