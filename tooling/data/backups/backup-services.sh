@@ -966,8 +966,10 @@ log ""
 # Ensure backup files are owned by max:homelab
 chown -R max:homelab "$BACKUP_DIR" 2>/dev/null || true
 
-# Exit with error code if any backups failed
-if [ $FAILED_BACKUPS -gt 0 ]; then
+# Exit with error code only on a systemic failure (e.g. all backups failed).
+# Partial failures are already recorded in the log/summary above and
+# shouldn't fail the cron job outright.
+if [ "$FAILED_BACKUPS" -gt 0 ] && [ "$SUCCESSFUL_BACKUPS" -eq 0 ]; then
   exit 1
 else
   exit 0
