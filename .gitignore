@@ -46,7 +46,7 @@
 **/media/jellyfin/*
 **/network/adguard/*
 **/network/tailscale/*
-**/misc/octoprint/*
+**/misc/*
 tooling/data/backups/backup-services.log
 tooling/data/backups/backup-services.log.old
 tooling/data/backups/backup-truenas.log

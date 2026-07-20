@@ -20,6 +20,25 @@ services:
       - "traefik.http.services.octoprint.loadbalancer.server.port=80"
       - "traefik.docker.network=traefik"
 
+  filebrowser:
+    container_name: filebrowser
+    image: gtstef/filebrowser:stable
+    volumes:
+      - /mnt/tank/users/max/filebrowser:/max # Do not use a root "/" directory or include the "/var" folder
+      - ./filebrowser:/home/filebrowser/data
+    user: "3000:3000"
+    restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.files.entrypoints=https"
+      - "traefik.http.routers.files.rule=Host(`files.corsair.tf`)"
+      - "traefik.http.routers.files.middlewares=security@file,private@file"
+      - "traefik.http.routers.files.service=files"
+      - "traefik.http.services.files.loadbalancer.server.port=80"
+      - "traefik.docker.network=traefik"
+
 networks:
   traefik:
     external: true
