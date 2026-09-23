@@ -72,7 +72,10 @@ services:
       - traefik
     volumes:
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - /mnt/tank/media/photos:/usr/src/app/upload/library
+      - ${THUMB_LOCATION}:/usr/src/app/upload/thumbs
+      - ${ENCODED_VIDEO_LOCATION}:/usr/src/app/upload/encoded-video
+      - ${PROFILE_LOCATION}:/usr/src/app/upload/profile
+      - ${BACKUP_LOCATION}:/usr/src/app/upload/backups
       - /mnt/tank/media/photos/Max:/library/Max:ro
       - /mnt/tank/media/photos/Sixtine:/library/Sixtine:ro
       - /mnt/tank/media/photos/JD:/library/JD:ro
@@ -112,9 +115,9 @@ services:
 
   redis:
     container_name: immich_redis
-    image: docker.io/valkey/valkey:9@sha256:3b55fbaa0cd93cf0d9d961f405e4dfcc70efe325e2d84da207a0a8e6d8fde4f9
+    image: docker.io/valkey/valkey:9@sha256:3acc0687f2a2e1091fae6450d7842dd658c941338cf0a873ddd9e14b9e4ea4dd
     healthcheck:
-      test: redis-cli ping || exit 1
+      test: redis-cli ping | grep -q PONG || exit 1
     restart: unless-stopped
     stop_grace_period: 5s
     cpus: 1
