@@ -12,7 +12,7 @@ http:
                     crowdsecMode: live
                     crowdsecAppsecEnabled: false
                     crowdsecAppsecHost: crowdsec:7422
-                    crowdsecLapiKey: ENC[AES256_GCM,data:QyGx+1SpHDoFvj6ZWLMk4ucmp95t4RtCOp+zNQTlAVHIcJ7PNPUhfDBaaQ==,iv:UrpZdSci1SJGnhgjn/mqnZlfIubAV7xg1FTR4TYWRyE=,tag:NcSMFbd0Ep8lVhi6c2WD7g==,type:str]
+                    crowdsecLapiKey: ENC[AES256_GCM,data:34iOTvbYW7Bm4XYKfeMukCaBB4uIBtUWWA1qsvNTrZfceB/2BVn7UWLN5Q==,iv:7I2g+YpXpd3f4JNwfMXyJ+D72bybJOYuqunnu40mRVE=,tag:by0dT/wJcQpWAvttqkFGng==,type:str]
                     crowdsecLapiHost: crowdsec:8080
                     clientTrustedIPs:
                         # Tailscale CGNAT range
@@ -138,13 +138,13 @@ sops:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBISGJodmlldG1rT0loanRK
-            ei82d0UvUTR5dENVcHRnT3kwb2JTL2w0amgwCkFaREh1VWFvQis4L0NKc09FN0Fr
-            TFdidEprS3BTNGUySm95ZkM0b1ZYdHcKLS0tIGFhU01QTHUwd2IwVXp4U0FlVXVh
-            SzF2OFkrWmJLRDZyb2RTOUNRQkUyT3cKLEV1kN58W+b7eHvmm/o/38PV/Dl8eOH5
-            e9s3O/nvceAb589Uk2R37Cm5KSdcn/Iy2u/FIrMXCuwnEpTPQnGOYQ==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBHTE9ibEJtVWZDc1E1eVpw
+            US9WMVcxN2JGTzNrRDhQaTJuTEZpRkhmWXpvCjZ0WHBXMmZ0U0toaTA2OTMzUXJC
+            bWI4N21qV0MvWWZFVDlDQm1iTnBMQzAKLS0tIHJ3TWp5WjJjbDlKTDl1WGpGMk1D
+            QVJrRjhySERGbVdpZ05KMHA5QmMyRzgKcVXUS+L09QESi6NwFZSRMzrkckN6YC/Q
+            Iae9jjj5v+utYSMjy7AUiGtocmXrcG3b5OkJr/zJYfIFSv1R5sjQ1g==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-01-12T13:56:56Z"
-    mac: ENC[AES256_GCM,data:jRcBcOIVNSw205ErK9LSY67aiPg3SXaCLdrKkbjKxIFAEGSpfxD+MnfXkPq5PlTnjy+qVFj6ScxgNYc9LV5apnVj/t6/6yxTdLD4p3ixLhl9XqcUr3pWh+6rxBuEZRC+teTEdHMKib8RsBSgsHT5czxKgVGUaMsrGGU/CFawhW4=,iv:u98p7VQfKAoRB6uMt0OjLEKcCdex4tQDqnJKsAyhJOI=,tag:8BraKUPLp9zAKRuu+3+JJw==,type:str]
-    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*DB_PASSWORD.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*KEY.*|.*DNS.*|.*POST_UP.*|.*PRE_DOWN.*|.*crowdsecLapiKey.*|.*TS_AUTHKEY.*|.*OVH_APPLICATION_KEY.*|.*OVH_APPLICATION_SECRET.*|.*OVH_CONSUMER_KEY.*|.*SECRET_KEY.*|.*ADMIN_TOKEN.*|.*YGG_USERNAME.*|.*YGG_PASSWORD.*|.*PEERPORT.*|.*AUTO_LOGIN.*)$
-    version: 3.11.0
+    lastmodified: "2026-09-23T18:04:33Z"
+    mac: ENC[AES256_GCM,data:ScXEqL5RuNzIbC5o7i849Eo61LsbvF5xUSyBuU+R2/LSzJrnwfCkDzA+B4y8qv/Fi2OSlN6ZYaKfC1KW02CYV6GfygEVzongv4BeB5yeFaB3EpuSc3u5T9bfI1u3QVGi0q8ncxURgAqo811DLLtJmKSnrJzJl7yl6dHEmHKfiNA=,iv:ctKaquM9UuQrqTiV294/bTy1Va1jqSPBBCFUPnUFXaQ=,tag:79eDhQxqLk5ZROeHEPRI6g==,type:str]
+    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*DB_PASSWORD.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*KEY.*|.*DNS.*|.*POST_UP.*|.*PRE_DOWN.*|.*crowdsecLapiKey.*|.*TS_AUTHKEY.*|.*OVH_APPLICATION_KEY.*|.*OVH_APPLICATION_SECRET.*|.*OVH_CONSUMER_KEY.*|.*SECRET_KEY.*|.*ADMIN_TOKEN.*|.*YGG_USERNAME.*|.*YGG_PASSWORD.*|.*PEERPORT.*|.*AUTO_LOGIN.*|.*SECRET.*|.*CLIENTID.*|.*FEEDER.*)$
+    version: 3.12.1
