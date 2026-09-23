@@ -1,10 +1,11 @@
 # Docs
 
 ```
-docker network create --driver bridge affine
+docker network create --driver bridge bookstack
 ```
 
 ```
-sops -d encrypted.env > .env
+sops -d encrypted.bookstack.env > bookstack.env
+sops -d encrypted.papra.env > papra.env
 docker compose up -d
 ```

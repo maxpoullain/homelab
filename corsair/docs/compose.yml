@@ -30,11 +30,11 @@ services:
       - traefik
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.docs.entrypoints=https"
-      - "traefik.http.routers.docs.rule=Host(`docs.corsair.tf`)"
-      - "traefik.http.routers.docs.middlewares=security@file"
-      - "traefik.http.routers.docs.service=docs"
-      - "traefik.http.services.docs.loadbalancer.server.port=3010"
+      - "traefik.http.routers.docs2.entrypoints=https"
+      - "traefik.http.routers.docs2.rule=Host(`docs2.corsair.tf`)"
+      - "traefik.http.routers.doc2.middlewares=security@file"
+      - "traefik.http.routers.docs2.service=docs2"
+      - "traefik.http.services.docs2.loadbalancer.server.port=3010"
       - "traefik.docker.network=traefik"
 
   affine_migration:
@@ -129,8 +129,70 @@ services:
       - "traefik.http.services.papra.loadbalancer.server.port=1221"
       - "traefik.docker.network=traefik"
 
+  bookstack:
+    container_name: bookstack
+    image: lscr.io/linuxserver/bookstack:latest
+    restart: unless-stopped
+    depends_on:
+      bookstack-db:
+        condition: service_healthy
+    env_file:
+      - bookstack.env
+    environment:
+      - PUID=3000
+      - PGID=3002
+      - TZ=Europe/Paris
+      - APP_URL=https://docs.corsair.tf
+      - DB_HOST=bookstack_db
+      - DB_PORT=3306
+      - DB_DATABASE=bookstack
+      - AUTH_METHOD=oidc
+      - AUTH_AUTO_INITIATE=true
+      - OIDC_NAME=CorsairAuth
+      - OIDC_DISPLAY_NAME_CLAIMS=name
+      - OIDC_ISSUER=https://login.corsair.tf
+      - OIDC_ISSUER_DISCOVER=true
+      - OIDC_END_SESSION_ENDPOINT=true
+    volumes:
+      - ./bookstack:/config
+    networks:
+      - bookstack
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bookstack.entrypoints=https"
+      - "traefik.http.routers.bookstack.rule=Host(`docs.corsair.tf`)"
+      - "traefik.http.routers.bookstack.middlewares=security@file"
+      - "traefik.http.routers.bookstack.service=bookstack"
+      - "traefik.http.services.bookstack.loadbalancer.server.port=80"
+      - "traefik.docker.network=traefik"
+
+  bookstack-db:
+    container_name: bookstack_db
+    image: lscr.io/linuxserver/mariadb:latest
+    restart: unless-stopped
+    env_file:
+      - bookstack.env
+    environment:
+      - PUID=3000
+      - PGID=3002
+      - TZ=Europe/Paris
+      - MYSQL_DATABASE=bookstack
+    volumes:
+      - /mnt/fast/dbs/homelab/bookstack:/config
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-uroot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - bookstack
+
 networks:
   affine:
+    external: true
+  bookstack:
     external: true
   traefik:
     external: true

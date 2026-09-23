@@ -19,6 +19,8 @@
 **/adsb/ultrafeeder/*
 **/docs/affine/config/*
 **/docs/affine/storage/*
+**/docs/bookstack.env
+**/docs/bookstack/*
 **/docs/papra.env
 **/docs/papra/*
 **/dashy/config/conf.yml
