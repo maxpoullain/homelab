@@ -27,7 +27,7 @@ features:
         rewrites: true
     dhcp:
         serverConfig: false
-        staticLeases: false
+        staticLeases: true
     generalSettings: true
     protectionStatus: true
     queryLogConfig: false

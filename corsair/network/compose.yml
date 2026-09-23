@@ -33,8 +33,9 @@ services:
     network_mode: host
     volumes:
       - ./adguard/conf:/opt/adguardhome/conf
+      - ./adguard/work:/opt/adguardhome/work
     tmpfs:
-      - /opt/adguardhome/work:size=100m,mode=0755
+      - /opt/adguardhome/tmp:size=200m,mode=0755
     environment:
       - TZ=Europe/Paris
       - PUID=3000
