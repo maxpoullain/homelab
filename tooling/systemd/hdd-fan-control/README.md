@@ -14,7 +14,7 @@ the `drivetemp` kernel module, with `smartctl` as a fallback.
    (millidegree values from the kernel, no SMART polling overhead).
 3. It maps the highest temperature to a PWM tier and writes the value to `pwm1`
    on the resolved hwmon path.
-4. A **hysteresis guard** (default 2 °C) prevents the fan from rapidly stepping
+4. A **hysteresis guard** (default 1 °C) prevents the fan from rapidly stepping
    back down after a brief cool-down, avoiding oscillation.
 5. State (current tier threshold) is persisted in `/run/hdd_fan_control_state`
    across timer invocations within the same boot.
@@ -56,13 +56,11 @@ The fan is controlled by the following tiers. The first tier whose threshold is
 
 | Max HDD Temp | PWM   | % Speed | Label     |
 |--------------|-------|---------|-----------|
-| ≤ 35 °C      | 30    | 12 %    | Idle      |
-| ≤ 40 °C      | 60    | 24 %    | Cool      |
-| ≤ 43 °C      | 100   | 35 %    | Warm      |
-| ≤ 46 °C      | 145   | 55 %    | Hot       |
-| ≤ 50 °C      | 190   | 75 %    | VeryHot   |
-| ≤ 54 °C      | 230   | 90 %    | Critical  |
-| > 54 °C      | 255   | 100 %   | Max       |
+| ≤ 43 °C      | 60    | 23 %    | Idle      |
+| ≤ 45 °C      | 100   | 39 %    | Warm      |
+| ≤ 47 °C      | 145   | 57 %    | Hot       |
+| ≤ 49 °C      | 200   | 78 %    | VeryHot   |
+| ≥ 50 °C      | 255   | 100 %   | Max       |
 
 To tune the curve, edit `TEMP_CURVE` in `hdd_fan_control.sh`. Each entry is a
 string `"THRESHOLD PWM LABEL"` in ascending threshold order, with `999` as the
@@ -145,9 +143,9 @@ HDD Temperatures (drivetemp):
 
   Chip hwmon path : /sys/class/hwmon/hwmon6
   Max HDD temp    : 41°C
-  Target tier     : Warm (≤43°C)
-  Target PWM      : 90 / 255 (35%)
-  Current PWM     : 90 / 255
+  Target tier     : Idle (≤43°C)
+  Target PWM      : 60 / 255 (23%)
+  Current PWM     : 60 / 255
   Fan RPM         : 847 RPM
 ========================================
 ```
@@ -235,8 +233,8 @@ sudo journalctl -u hdd-fan-control.service -n 50
 Log entries look like:
 
 ```
-2025-07-10 14:32:01 - Temp: 43°C | Tier: Warm (≤43°C) | PWM: 90/255 (no change) | RPM: 847
-2025-07-10 14:34:01 - Temp: 46°C | Tier: Hot (≤46°C) | PWM: 140/255 | RPM: 1320
+2025-07-10 14:32:01 - Temp: 41°C | Tier: Idle (≤43°C) | PWM: 60/255 (no change) | RPM: 847
+2025-07-10 14:34:01 - Temp: 46°C | Tier: Hot (≤47°C) | PWM: 145/255 | RPM: 1320
 ```
 
 ### Log Rotation

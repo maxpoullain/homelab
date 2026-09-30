@@ -18,12 +18,10 @@ HDD_DEVICES=("/dev/sda" "/dev/sdb" "/dev/sdc" "/dev/sdd")
 # Evaluated in order — first matching threshold wins
 # Final entry acts as catch-all (use 999 as threshold)
 TEMP_CURVE=(
-    "35  30  Idle"
-    "40  60  Cool"
-    "43  100  Warm"
-    "46  145 Hot"
-    "50  190 VeryHot"
-    "54  230 Critical"
+    "43  60  Idle"
+    "45  100 Warm"
+    "47  145 Hot"
+    "49  200 VeryHot"
     "999 255 Max"
 )
 
@@ -170,6 +168,22 @@ get_curve_entry_for_temp() {
     echo "999 255 Max"
 }
 
+# Formats a threshold for display, e.g. "≤43°C". The final catch-all entry
+# (threshold 999) is never shown literally — instead it's rendered as
+# "≥N°C" using one degree above the second-highest tier's threshold.
+format_threshold() {
+    local threshold=$1
+
+    if (( threshold >= 999 )); then
+        local count=${#TEMP_CURVE[@]}
+        local prev_threshold
+        read -r prev_threshold _ <<< "${TEMP_CURVE[$(( count - 2 ))]}"
+        echo "≥$(( prev_threshold + 1 ))°C"
+    else
+        echo "≤${threshold}°C"
+    fi
+}
+
 # Returns the saved threshold from the state file (or empty string)
 load_saved_threshold() {
     if [[ -r "$STATE_FILE" ]]; then
@@ -301,7 +315,7 @@ cmd_status() {
     echo ""
     echo "  Chip hwmon path : $HWMON_PATH"
     echo "  Max HDD temp    : ${max_temp}°C"
-    echo "  Target tier     : $label (≤${threshold}°C)"
+    echo "  Target tier     : $label ($(format_threshold "$threshold"))"
     echo "  Target PWM      : $pwm / 255 (${pct}%)"
     echo "  Current PWM     : $current_pwm / 255"
     echo "  Fan RPM         : $current_rpm RPM"
@@ -319,7 +333,7 @@ cmd_test() {
     echo ""
     echo "Resolved hwmon path : $HWMON_PATH"
     echo "Max Temperature     : ${max_temp}°C"
-    echo "Would set PWM to    : $pwm (tier: $label, threshold: ≤${threshold}°C)"
+    echo "Would set PWM to    : $pwm (tier: $label, threshold: $(format_threshold "$threshold"))"
 }
 
 cmd_help() {
@@ -340,7 +354,7 @@ cmd_help() {
         local pct=$(( pwm * 100 / 255 ))
         local thr_disp
         if (( thr >= 999 )); then
-            thr_disp=">54°C"
+            thr_disp="≥50°C"
         else
             thr_disp="≤${thr}°C"
         fi
@@ -383,13 +397,13 @@ cmd_main() {
             sleep 2
             local new_rpm
             new_rpm=$(get_fan_rpm)
-            log_message "Temp: ${max_temp}°C | Tier: ${label} (≤${threshold}°C) | PWM: ${pwm}/255 | RPM: ${new_rpm}"
+            log_message "Temp: ${max_temp}°C | Tier: ${label} ($(format_threshold "$threshold")) | PWM: ${pwm}/255 | RPM: ${new_rpm}"
         else
             log_message "ERROR: Failed to set PWM to $pwm"
             exit 1
         fi
     else
-        log_message "Temp: ${max_temp}°C | Tier: ${label} (≤${threshold}°C) | PWM: ${pwm}/255 (no change) | RPM: $(get_fan_rpm)"
+        log_message "Temp: ${max_temp}°C | Tier: ${label} ($(format_threshold "$threshold")) | PWM: ${pwm}/255 (no change) | RPM: $(get_fan_rpm)"
     fi
 
     if [[ "$verbose" == "true" ]]; then
@@ -397,7 +411,7 @@ cmd_main() {
         echo ""
         echo "Resolved hwmon path : $HWMON_PATH"
         echo "Max Temperature     : ${max_temp}°C"
-        echo "Tier                : $label (≤${threshold}°C)"
+        echo "Tier                : $label ($(format_threshold "$threshold"))"
         echo "PWM Value           : ${pwm}/255 ($(( pwm * 100 / 255 ))%)"
         echo "Fan RPM             : $(get_fan_rpm) RPM"
     fi
