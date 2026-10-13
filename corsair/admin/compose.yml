@@ -115,6 +115,7 @@ services:
       - /dev/nvme0:/dev/nvme0
       - /dev/nvme1:/dev/nvme1
       - /dev/dri/card0:/dev/dri/card0
+      - /dev/zfs:/dev/zfs # required for zpool/zfs commands (ZFS pool monitoring)
     volumes:
       - ./beszel/beszel_agent_data:/var/lib/beszel-agent
       - ./beszel/beszel_socket:/beszel_socket
@@ -129,7 +130,8 @@ services:
       SYSTEM_NAME: Corsair
       LISTEN: /beszel_socket/beszel.sock
       FILESYSTEM: "/extra-filesystems/sdb3__Boot"
-      EXTRA_FILESYSTEMS: "sdb3__Boot:sdb3"
+      # EXTRA_FILESYSTEMS: "sdb3__Boot:sdb3"
+      SMART_DEVICES: "/dev/sda:sat,/dev/sdb:sat,/dev/sdc:sat,/dev/sdd:sat"
       PRIMARY_SENSOR: coretemp_package_id_0
       #LOG_LEVEL: debug
 
