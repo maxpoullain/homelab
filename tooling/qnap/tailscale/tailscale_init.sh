@@ -1,8 +1,8 @@
 #!/bin/sh
 #
 # Tailscale Startup Script for QNAP TS-431
-# Version: 1.0
-# Tailscale Version: 1.90.6
+# Version: 1.1
+# Tailscale Version: 1.104.1
 #
 # This script manages the Tailscale daemon on QNAP systems that don't support
 # the official QPKG due to older QTS versions.
@@ -27,8 +27,24 @@ BOOT_LOG="$TAILSCALE_DIR/var/boot.log"
 # Using userspace-networking because kernel lacks TUN module support
 TAILSCALE_OPTS="--state=$STATE_FILE --socket=$SOCKET --tun=userspace-networking"
 
+# Full command registered with QNAP's daemon_mgr watchdog. start and stop
+# MUST pass this identical string — daemon_mgr matches on it to find the
+# right registry entry. If stop's string doesn't match what start
+# registered, daemon_mgr won't flip the entry to "stop", and the watchdog
+# relaunches the daemon within a second or two of killall, looking just
+# like stop silently failed.
+DAEMON_CMD="QNAP_QPKG=tailscale $TAILSCALE_BIN $TAILSCALE_OPTS >> $TAILSCALE_LOG 2>&1"
+
 # Boot delay flag to avoid delay on manual restarts
 BOOT_DELAY_FLAG="/tmp/.tailscale_boot_delay_done"
+
+# True if a tailscaled process is already running.
+# QNAP's daemon_mgr watchdog can relaunch tailscaled on its own (polling
+# /etc/daemon_mgr.conf every ~30s), independently of this script. Without
+# this check, "start" can race the watchdog and launch a second daemon.
+is_running() {
+  pidof tailscaled > /dev/null 2>&1
+}
 
 # Default action if none specified
 ACTION=${1:-start}
@@ -39,7 +55,15 @@ echo "$(date): Script called with parameter: '$ACTION'" >> $BOOT_LOG
 case "$ACTION" in
   start)
     echo "$(date): Starting Tailscale..." >> $BOOT_LOG
-    
+
+    # Don't launch a second daemon if one (e.g. the daemon_mgr watchdog)
+    # is already running. Doing the stale-socket cleanup below against a
+    # live daemon would just orphan it.
+    if is_running; then
+      echo "$(date): Tailscale is already running, nothing to do" >> $BOOT_LOG
+      exit 0
+    fi
+
     # Wait for system to be fully ready during boot
     # This delay only happens once after boot, not on manual restarts
     if [ ! -f "$BOOT_DELAY_FLAG" ]; then
@@ -59,15 +83,18 @@ case "$ACTION" in
     fi
     
     # Start Tailscale daemon using QNAP's daemon manager
-    # The daemon_mgr ensures proper process management and logging
+    # The daemon_mgr ensures proper process management and logging.
+    # Redirected and backgrounded: daemon_mgr's client call blocks in the
+    # foreground until the daemon exits, which hangs a non-interactive
+    # caller (e.g. `ssh host tailscale_init.sh start`).
     echo "$(date): Executing daemon_mgr..." >> $BOOT_LOG
-    /sbin/daemon_mgr tailscaled start "$TAILSCALE_BIN $TAILSCALE_OPTS >> $TAILSCALE_LOG 2>&1" &
+    /sbin/daemon_mgr tailscaled start "$DAEMON_CMD" > /dev/null 2>&1 &
     
     # Wait for daemon to initialize
     sleep 3
     
     # Verify that tailscaled actually started
-    if ps | grep -v grep | grep tailscaled > /dev/null; then
+    if is_running; then
       echo "$(date): Tailscale started successfully" >> $BOOT_LOG
     else
       echo "$(date): WARNING - Tailscale may not have started" >> $BOOT_LOG
@@ -78,8 +105,11 @@ case "$ACTION" in
   stop)
     echo "$(date): Stopping Tailscale..." >> $BOOT_LOG
     
-    # Stop via daemon manager
-    /sbin/daemon_mgr tailscaled stop "$TAILSCALE_BIN"
+    # Stop via daemon manager. Must pass the exact string registered by
+    # "start" ($DAEMON_CMD) or daemon_mgr won't match the entry, won't flip
+    # it to "stop", and its watchdog will relaunch the daemon right after
+    # the killall below — making stop look like it silently failed.
+    /sbin/daemon_mgr tailscaled stop "$DAEMON_CMD"
     
     # Ensure process is killed (fallback)
     killall tailscaled 2>/dev/null
@@ -99,7 +129,7 @@ case "$ACTION" in
     
   status)
     # Check if tailscaled is running
-    if ps | grep -v grep | grep tailscaled > /dev/null; then
+    if is_running; then
       echo "Tailscale is running"
       echo ""
       echo "Process:"
@@ -113,7 +143,7 @@ case "$ACTION" in
       fi
     else
       echo "Tailscale is not running"
-      return 1
+      exit 1
     fi
     ;;
     
@@ -134,7 +164,7 @@ case "$ACTION" in
       $TAILSCALE_CLI --socket=$SOCKET ip -4
     else
       echo "Tailscale is not running"
-      return 1
+      exit 1
     fi
     ;;
     
