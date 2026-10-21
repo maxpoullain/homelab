@@ -15,6 +15,7 @@ services:
       DOMAIN: "https://vault.corsair.tf"
       SIGNUPS_ALLOWED: "false"
       INVITATIONS_ALLOWED: "true"
+      IP_HEADER: "X-Real-IP"
     env_file: .env
     labels:
       - "traefik.enable=true"
