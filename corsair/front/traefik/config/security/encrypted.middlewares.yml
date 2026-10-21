@@ -12,19 +12,19 @@ http:
                     crowdsecMode: live
                     crowdsecAppsecEnabled: false
                     crowdsecAppsecHost: crowdsec:7422
-                    crowdsecLapiKey: ENC[AES256_GCM,data:34iOTvbYW7Bm4XYKfeMukCaBB4uIBtUWWA1qsvNTrZfceB/2BVn7UWLN5Q==,iv:7I2g+YpXpd3f4JNwfMXyJ+D72bybJOYuqunnu40mRVE=,tag:by0dT/wJcQpWAvttqkFGng==,type:str]
+                    crowdsecLapiKey: ENC[AES256_GCM,data:MeUQwriAHfMshW2JV7Jg5avQzD/bSYDxszFbhg52z4Imm+acBACDBOVQ/A==,iv:B+tPH0CgB3bbRANY/rYWf33h/BKGoTqM46KaQZ2tRms=,tag:o4v6VHN+wc7zOYjG8K2oeg==,type:str]
                     crowdsecLapiHost: crowdsec:8080
                     clientTrustedIPs:
-                        # Tailscale CGNAT range
-                        - 100.64.0.0/10
-                        # Private networks (192.168.x.x)
-                        - 192.168.0.0/16
-                        # Private networks (10.x.x.x)
-                        - 10.0.0.0/8
-                        # Private networks (172.16-31.x.x)
-                        - 172.16.0.0/12
-                        # Localhost
-                        - 127.0.0.1/32
+                        - ENC[AES256_GCM,data:T6a7iQGawgtBdQjejmP1W7Iroum1gA==,iv:bauQFNZbTMy+NVq5BClqIloqUWqHa/5g1UgY54Gdyjg=,tag:pCEYF2AtAZrlJrBYEKWGQQ==,type:comment]
+                        - ENC[AES256_GCM,data:+WOuzxC/C44li9rm3w==,iv:Ys53CjXaSdRVdHZOos9nafecXmCCkYVXdu31w/Oo1N4=,tag:prkU3ir951vpqUWI4DQSfQ==,type:str]
+                        - ENC[AES256_GCM,data:flMvnH/n/RL2s6oK/TS6aXugVA0YwDZj0IvxbupPMQ==,iv:yB+xpPiQG1zFoSEDnsBT9/n0a8lX3ng7UCSTWylyBog=,tag:WCOYUxndPO50jLugFUZO9A==,type:comment]
+                        - ENC[AES256_GCM,data:DfZmz9B9T0aeHQOFsTc=,iv:YPXn2XDG7pk5iTOyJXs0bDPQ2ztxTU4tO1KnWqA6vwc=,tag:0diA2dq1XrLNPcq/lOhrVw==,type:str]
+                        - ENC[AES256_GCM,data:Y/RQmvp6ioPUOLzEVag1awgR3vKj7JpD1lGHlg==,iv:6V82fH7APILzEfo+XLiCRD/JmDBBZHgtJKOrUKBBoTI=,tag:JMBJ8fDujw6TBvrMnDTU7w==,type:comment]
+                        - ENC[AES256_GCM,data:Xt2WPZPIMxh5BQ==,iv:qAY4GfpolzHVGrUL82i8X8cLCgt9SJWqbw6YizUrM64=,tag:h0vWAkHpseUM7eho8l03dw==,type:str]
+                        - ENC[AES256_GCM,data:eVQPkhQrI6I4J0iFMa1wkybivLjyLzvL0Q9mqFDAMkWO,iv:I/RLDjMmuXsGbVekJHDdbw0saOGlL1AxASwUtf7XD2M=,tag:DFSSeF6Pgl5wFvmGFDx6Fw==,type:comment]
+                        - ENC[AES256_GCM,data:1dZV6+snPIwbV5bgQw==,iv:/G6P1rBkCCwPR4vfbLHMoUnIsgx1KAPE/arpjktnQ9M=,tag:/nqHa3Ij8a1ho4iVM2U/fQ==,type:str]
+                        - ENC[AES256_GCM,data:IFHXc9uKnYc+Sg==,iv:FhdTPp0BfguAh2LD36tjjKl8O2hL9iskPnKUwm69heU=,tag:k8MqLRbmaQ7n/r/qTUcHbw==,type:comment]
+                        - ENC[AES256_GCM,data:xgUM3L1otYncVGkp,iv:zJ2VN7PO2bfHl3di5MkfZ8GcEzF1ifBUMlg3WDldI/E=,tag:TW0dkxAuuTcZQq+m0T1ycQ==,type:str]
         # Rate limiting
         rate-limit:
             rateLimit:
@@ -55,11 +55,13 @@ http:
                     unknownCountryApiResponse: nil
                     blackListMode: false
                     allowedIPAddresses:
-                        # Tailscale CGNAT range  
+                        # Tailscale CGNAT range
                         - 100.64.0.0/10
                     countries:
                         # FRANCE
                         - FR
+                        # CROATIA
+                        - HR
         # Security headers - Strict (for normal services)
         security-headers:
             headers:
@@ -138,13 +140,13 @@ sops:
         - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBHTE9ibEJtVWZDc1E1eVpw
-            US9WMVcxN2JGTzNrRDhQaTJuTEZpRkhmWXpvCjZ0WHBXMmZ0U0toaTA2OTMzUXJC
-            bWI4N21qV0MvWWZFVDlDQm1iTnBMQzAKLS0tIHJ3TWp5WjJjbDlKTDl1WGpGMk1D
-            QVJrRjhySERGbVdpZ05KMHA5QmMyRzgKcVXUS+L09QESi6NwFZSRMzrkckN6YC/Q
-            Iae9jjj5v+utYSMjy7AUiGtocmXrcG3b5OkJr/zJYfIFSv1R5sjQ1g==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBlTUNSellIdVh1bnV5K0hs
+            SG1Vc1hFekNWK21sSHdnM1NOd2wwcFRzV21JCnc3MWFLR0w1MHo4RGJPaHZEZy9v
+            R0cyOGI1LzhpQld1ZjZUMHJoRk9RWEkKLS0tIEZvRWhxWlBab1k1VmNrc3RTK0ds
+            WDc4blJHUU13cXVCc2VYSlc1S2F0QzQKjeKWhQ1xLdkHHkCFyDEPiM5VJclWCEaI
+            OjVu97I1yJ4gfU5y4ymMfoz9yj5GrHFSCEqPLM2I+4dqw675IGPRNQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-09-23T18:04:33Z"
-    mac: ENC[AES256_GCM,data:ScXEqL5RuNzIbC5o7i849Eo61LsbvF5xUSyBuU+R2/LSzJrnwfCkDzA+B4y8qv/Fi2OSlN6ZYaKfC1KW02CYV6GfygEVzongv4BeB5yeFaB3EpuSc3u5T9bfI1u3QVGi0q8ncxURgAqo811DLLtJmKSnrJzJl7yl6dHEmHKfiNA=,iv:ctKaquM9UuQrqTiV294/bTy1Va1jqSPBBCFUPnUFXaQ=,tag:79eDhQxqLk5ZROeHEPRI6g==,type:str]
-    encrypted_regex: ^(.*hash.*|.*apiKey.*|.*password.*|.*DB_PASSWORD.*|.*USER.*|.*PASS.*|.*users.*|.*TOKEN.*|.*KEY.*|.*DNS.*|.*POST_UP.*|.*PRE_DOWN.*|.*crowdsecLapiKey.*|.*TS_AUTHKEY.*|.*OVH_APPLICATION_KEY.*|.*OVH_APPLICATION_SECRET.*|.*OVH_CONSUMER_KEY.*|.*SECRET_KEY.*|.*ADMIN_TOKEN.*|.*YGG_USERNAME.*|.*YGG_PASSWORD.*|.*PEERPORT.*|.*AUTO_LOGIN.*|.*SECRET.*|.*CLIENTID.*|.*FEEDER.*)$
+    lastmodified: "2026-10-21T12:07:56Z"
+    mac: ENC[AES256_GCM,data:LmP5dpsU9FohReJQArhMA4+iuUugmVzhm+oU/pbIFid3q13ehA4UeIHCOVheHpirHYFBrXu02d9yOihcjLdckuWoktb+wSX85rCj7iNqKGfBbIp70t88jmoJvoABK/YhvEdOjkoyirEjCZknRxgtghkUOjmb72Nh52BFUxxT+Hw=,iv:j8Zom6oecLvW0ak2Qmnqe4gdXM0y26FA2i9B0F5UO70=,tag:Ev0fJ++Ut+4ra/4tuCMQDg==,type:str]
+    encrypted_regex: ^(?i)(.*auto_login.*|.*client.*|.*dns.*|.*feeder.*|.*hash.*|.*key.*|.*oidc.*|.*pass.*|.*peerport.*|.*post_up.*|.*pre_down.*|.*secret.*|.*token.*|.*user.*)$
     version: 3.12.1

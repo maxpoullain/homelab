@@ -39,63 +39,63 @@ services:
       - "traefik.http.services.files.loadbalancer.server.port=80"
       - "traefik.docker.network=traefik"
 
-  homelable:
-    container_name: homelable
-    image: ghcr.io/pouzor/homelable-frontend:latest
-    restart: unless-stopped
-    depends_on:
-      - homelable-backend
-    networks:
-      - traefik
-      - homelable
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.homelable.entrypoints=https"
-      - "traefik.http.routers.homelable.rule=Host(`homelable.corsair.tf`)"
-      - "traefik.http.routers.homelable.middlewares=security@file,private@file"
-      - "traefik.http.routers.homelable.service=homelable"
-      - "traefik.http.services.homelable.loadbalancer.server.port=80"
-      - "traefik.docker.network=traefik"
+  # homelable:
+  #   container_name: homelable
+  #   image: ghcr.io/pouzor/homelable-frontend:latest
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - homelable-backend
+  #   networks:
+  #     - traefik
+  #     - homelable
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.homelable.entrypoints=https"
+  #     - "traefik.http.routers.homelable.rule=Host(`homelable.corsair.tf`)"
+  #     - "traefik.http.routers.homelable.middlewares=security@file,private@file"
+  #     - "traefik.http.routers.homelable.service=homelable"
+  #     - "traefik.http.services.homelable.loadbalancer.server.port=80"
+  #     - "traefik.docker.network=traefik"
 
-  homelable-backend:
-    container_name: homelable_backend
-    image: ghcr.io/pouzor/homelable-backend:latest
-    restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      SQLITE_PATH: /app/data/homelab.db
-      CORS_ORIGINS: '["https://homelable.corsair.tf"]'
-    volumes:
-      - ./homelable:/app/data
-    networks:
-      homelable:
-        aliases:
-          - backend
-    cap_add:
-      - NET_RAW
+  # homelable-backend:
+  #   container_name: homelable_backend
+  #   image: ghcr.io/pouzor/homelable-backend:latest
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     SQLITE_PATH: /app/data/homelab.db
+  #     CORS_ORIGINS: '["https://homelable.corsair.tf"]'
+  #   volumes:
+  #     - ./homelable:/app/data
+  #   networks:
+  #     homelable:
+  #       aliases:
+  #         - backend
+  #   cap_add:
+  #     - NET_RAW
 
-  homelable-mcp:
-    container_name: homelable_mcp
-    image: ghcr.io/pouzor/homelable-mcp:latest
-    restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      BACKEND_URL: "http://backend:8000"
-    depends_on:
-      - homelable-backend
-    networks:
-      - traefik
-      - homelable
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.homelable-mcp.entrypoints=https"
-      - "traefik.http.routers.homelable-mcp.rule=Host(`mcp.homelable.corsair.tf`)"
-      - "traefik.http.routers.homelable-mcp.middlewares=security@file,private@file"
-      - "traefik.http.routers.homelable-mcp.service=homelable-mcp"
-      - "traefik.http.services.homelable-mcp.loadbalancer.server.port=8001"
-      - "traefik.docker.network=traefik"
+  # homelable-mcp:
+  #   container_name: homelable_mcp
+  #   image: ghcr.io/pouzor/homelable-mcp:latest
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     BACKEND_URL: "http://backend:8000"
+  #   depends_on:
+  #     - homelable-backend
+  #   networks:
+  #     - traefik
+  #     - homelable
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.homelable-mcp.entrypoints=https"
+  #     - "traefik.http.routers.homelable-mcp.rule=Host(`mcp.homelable.corsair.tf`)"
+  #     - "traefik.http.routers.homelable-mcp.middlewares=security@file,private@file"
+  #     - "traefik.http.routers.homelable-mcp.service=homelable-mcp"
+  #     - "traefik.http.services.homelable-mcp.loadbalancer.server.port=8001"
+  #     - "traefik.docker.network=traefik"
 
   trek:
     image: mauriceboe/trek:latest
