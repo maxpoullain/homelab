@@ -1,3 +1,6 @@
+# ── Scratch / tmp ──────────────────────────────────────────
+/plans/
+
 # ── App state / runtime data (alphabetical by path) ──────
 **/7seas/pia/*
 !**/7seas/pia/port.sh
