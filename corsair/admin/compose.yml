@@ -13,7 +13,7 @@ services:
       - ./arcane:/app/data
       - /mnt/fast/apps/homelab/corsair:/mnt/fast/apps/homelab/corsair:ro
     env_file:
-      - .env
+      - arcane.env
     environment:
       - APP_URL=https://docker.corsair.tf
       - PUID=3000
@@ -78,7 +78,7 @@ services:
       - ./beszel/beszel_data:/beszel_data
       - ./beszel/beszel_socket:/beszel_socket
     env_file:
-      - .env
+      - beszel.env
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
@@ -125,7 +125,7 @@ services:
       # give the device a custom name with double underscores
       # - /mnt/media/.beszel:/extra-filesystems/sdc1__Media:ro
     env_file:
-      - .env
+      - beszel.env
     environment:
       SYSTEM_NAME: Corsair
       LISTEN: /beszel_socket/beszel.sock

@@ -1,5 +1,6 @@
-**/secrets.env
-**/.env
+**/*.env
+!**/encrypted.*.env
+!**/encrypted*.env
 **/7seas/ygg.env
 **/7seas/pia/*
 !**/7seas/pia/encrypted.env
@@ -54,8 +55,4 @@ tooling/data/backups/backup-services.log
 tooling/data/backups/backup-services.log.old
 tooling/data/backups/backup-truenas.log
 tooling/data/backups/backup-truenas.log.old
-tooling/dns/duckdns/duck.env
-tooling/dns/duckdns/duck.log
 **/vault/vaultwarden/*
-**/wiki/otter/settings.cfg
-**/wiki/otter/db.sqlite

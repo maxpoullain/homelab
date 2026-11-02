@@ -21,7 +21,7 @@ services:
       # Optional: Enable subnet routing to access your entire network
       # - TS_ROUTES=192.168.1.0/24
     env_file:
-      - .env
+      - tailscale.env
 
   adguard:
     container_name: adguard
@@ -70,7 +70,7 @@ services:
       - PUID=3000
       - PGID=3002
     env_file:
-      - .env
+      - adguard.env
     networks:
       - traefik
     depends_on:

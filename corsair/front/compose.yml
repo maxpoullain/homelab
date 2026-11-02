@@ -11,7 +11,7 @@ services:
     networks:
       - traefik
     env_file:
-      - .env
+      - traefik.env
     volumes:
       - ./traefik:/etc/traefik/
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -57,7 +57,7 @@ services:
     networks:
       - traefik
     env_file:
-      - .env
+      - tinyauth.env
     environment:
       - TINYAUTH_UI_BACKGROUNDIMAGE=/resources/background.jpg
       - TINYAUTH_AUTH_SESSIONEXPIRY=172800
