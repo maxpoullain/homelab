@@ -28,7 +28,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.papra.entrypoints=https"
-      - "traefik.http.routers.papra.rule=Host(`archive.corsair.tf`)"
+      - "traefik.http.routers.papra.rule=Host(`archives.corsair.tf`)"
       - "traefik.http.routers.papra.middlewares=security@file,private@file"
       - "traefik.http.routers.papra.service=papra"
       - "traefik.http.services.papra.loadbalancer.server.port=1221"
