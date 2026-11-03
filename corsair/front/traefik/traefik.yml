@@ -23,9 +23,6 @@ accessLog:
         X-Forwarded-For: keep
         X-Real-Ip: keep
 
-serversTransport:
-  insecureSkipVerify: true
-
 providers:
   docker:
     endpoint: "unix:///var/run/docker.sock"
@@ -40,28 +37,18 @@ entryPoints:
   http:
     address: ":80"
     http:
+      aliasHeadersStrategy: delete
       redirections:
         entryPoint:
           to: https
           scheme: https
           permanent: true
-    forwardedHeaders:
-      trustedIPs:
-        - "100.64.0.0/10"   # Tailscale
-        - "192.168.0.0/16"  # Local networks
-        - "172.16.0.0/12"   # Docker networks
-        - "127.0.0.1/32"    # Localhost
   https:
     address: ":443"
     http:
+      aliasHeadersStrategy: delete
       tls:
         certResolver: acme
-    forwardedHeaders:
-      trustedIPs:
-        - "100.64.0.0/10"   # Tailscale
-        - "192.168.0.0/16"  # Local networks
-        - "172.16.0.0/12"   # Docker networks
-        - "127.0.0.1/32"    # Localhost
 
 api:
   dashboard: true
@@ -92,21 +79,13 @@ certificatesResolvers:
       httpChallenge:
         entryPoint: http
 
-# Define the wildcard certificate globally
-tls:
-  stores:
-    default:
-      defaultCertificate:
-        certFile: /etc/traefik/certs/default.crt
-        keyFile: /etc/traefik/certs/default.key
-
 # Experimental plugins
 experimental:
   plugins:
     # CrowdSec Bouncer Plugin
     crowdsec-bouncer:
       moduleName: "github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin"
-      version: "v1.7.1"
+      version: "v1.8.1"
     # GeoBlock Plugin
     geoblock:
       moduleName: "github.com/PascalMinder/geoblock"

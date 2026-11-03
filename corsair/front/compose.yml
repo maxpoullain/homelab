@@ -6,8 +6,8 @@ services:
     security_opt:
       - no-new-privileges:true
     ports:
-      - 80:80
-      - 443:443
+      - 0.0.0.0:80:80
+      - 0.0.0.0:443:443
     networks:
       - traefik
     env_file:
@@ -23,7 +23,6 @@ services:
       - traefik.http.routers.traefik.tls.domains[0].sans=*.corsair.tf
       - traefik.http.routers.traefik.middlewares=private@file,security@file,auth@docker
       - traefik.http.routers.traefik.service=api@internal
-      - traefik.http.services.traefik.loadbalancer.server.port=443
       - traefik.http.routers.traefik-metrics.entrypoints=https
       - traefik.http.routers.traefik-metrics.rule=(Host(`traefik.corsair.tf`) && Path(`/metrics`))
       - traefik.http.routers.traefik-metrics.middlewares=private@file,security@file,auth@docker
@@ -72,6 +71,8 @@ services:
       - traefik.http.routers.auth.middlewares=security@file
       - traefik.http.services.auth.loadbalancer.server.port=3000
       - traefik.http.middlewares.auth.forwardauth.address=http://tinyauth:3000/api/auth/traefik
+      - traefik.http.middlewares.auth.forwardauth.trustForwardHeader=true
+      - traefik.http.middlewares.auth.forwardauth.maxResponseBodySize=1048576
       # ACLs
       - tinyauth.apps.traefik.config.domain=traefik.corsair.tf
       - tinyauth.apps.traefik.users.allow=max
