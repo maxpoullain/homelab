@@ -7,8 +7,7 @@ http:
       service: livebox
       priority: 1
       middlewares:
-        - private@file
-        - security@file
+        - security-private@file
 
   services:
     livebox:

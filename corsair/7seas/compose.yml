@@ -38,7 +38,7 @@ services:
       - "traefik.docker.network=traefik"
       - "traefik.http.routers.seedbox.entrypoints=https"
       - "traefik.http.routers.seedbox.rule=Host(`seedbox.corsair.tf`)"
-      - "traefik.http.routers.seedbox.middlewares=security@file,private@file,auth@docker"
+      - "traefik.http.routers.seedbox.middlewares=security-private@file,auth@docker"
       - "traefik.http.routers.seedbox.service=seedbox"
       - "traefik.http.services.seedbox.loadbalancer.server.port=9091"
       - "com.getarcaneapp.arcane.updater=false"
@@ -121,12 +121,12 @@ services:
       # Main router for / (with auth)
       - "traefik.http.routers.prowlarr.entrypoints=https"
       - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.corsair.tf`)"
-      - "traefik.http.routers.prowlarr.middlewares=security@file,private@file,auth@docker"
+      - "traefik.http.routers.prowlarr.middlewares=security-private@file,auth@docker"
       - "traefik.http.routers.prowlarr.service=prowlarr"
       # API router for /api (without auth)
       - "traefik.http.routers.prowlarr-api.entrypoints=https"
       - "traefik.http.routers.prowlarr-api.rule=Host(`prowlarr.corsair.tf`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.prowlarr-api.middlewares=security@file,private@file"
+      - "traefik.http.routers.prowlarr-api.middlewares=security-private@file"
       - "traefik.http.routers.prowlarr-api.service=prowlarr"
       - "traefik.http.routers.prowlarr-api.priority=100"
       # Service definition
@@ -158,12 +158,12 @@ services:
       # Main router for / (with auth)
       - "traefik.http.routers.shows.entrypoints=https"
       - "traefik.http.routers.shows.rule=Host(`shows.corsair.tf`)"
-      - "traefik.http.routers.shows.middlewares=security@file,private@file,auth@docker"
+      - "traefik.http.routers.shows.middlewares=security-private@file,auth@docker"
       - "traefik.http.routers.shows.service=shows"
       # API router for /api (without auth)
       - "traefik.http.routers.shows-api.entrypoints=https"
       - "traefik.http.routers.shows-api.rule=Host(`shows.corsair.tf`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.shows-api.middlewares=security@file,private@file"
+      - "traefik.http.routers.shows-api.middlewares=security-private@file"
       - "traefik.http.routers.shows-api.service=shows"
       - "traefik.http.routers.shows-api.priority=100"
       # Service definition
@@ -195,12 +195,12 @@ services:
       # Main router for / (with auth)
       - "traefik.http.routers.movies.entrypoints=https"
       - "traefik.http.routers.movies.rule=Host(`movies.corsair.tf`)"
-      - "traefik.http.routers.movies.middlewares=security@file,private@file,auth@docker"
+      - "traefik.http.routers.movies.middlewares=security-private@file,auth@docker"
       - "traefik.http.routers.movies.service=movies"
       # API router for /api (without auth)
       - "traefik.http.routers.movies-api.entrypoints=https"
       - "traefik.http.routers.movies-api.rule=Host(`movies.corsair.tf`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.movies-api.middlewares=security@file,private@file"
+      - "traefik.http.routers.movies-api.middlewares=security-private@file"
       - "traefik.http.routers.movies-api.service=movies"
       - "traefik.http.routers.movies-api.priority=100"
       # Service definition

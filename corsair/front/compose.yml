@@ -21,11 +21,11 @@ services:
       - traefik.http.routers.traefik.rule=(Host(`traefik.corsair.tf`) && !Path(`/metrics`))
       - traefik.http.routers.traefik.tls.domains[0].main=corsair.tf
       - traefik.http.routers.traefik.tls.domains[0].sans=*.corsair.tf
-      - traefik.http.routers.traefik.middlewares=private@file,security@file,auth@docker
+      - traefik.http.routers.traefik.middlewares=security-private@file,auth@docker
       - traefik.http.routers.traefik.service=api@internal
       - traefik.http.routers.traefik-metrics.entrypoints=https
       - traefik.http.routers.traefik-metrics.rule=(Host(`traefik.corsair.tf`) && Path(`/metrics`))
-      - traefik.http.routers.traefik-metrics.middlewares=private@file,security@file,auth@docker
+      - traefik.http.routers.traefik-metrics.middlewares=security-private@file,auth@docker
       - traefik.http.routers.traefik-metrics.service=prometheus@internal
 
   crowdsec:

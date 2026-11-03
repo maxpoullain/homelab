@@ -7,8 +7,7 @@ http:
       service: cache
       priority: 1
       middlewares:
-        - private@file
-        - security-soft@file
+        - security-private-soft@file
 
   services:
     cache:

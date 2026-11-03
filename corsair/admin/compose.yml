@@ -30,7 +30,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.arcane.entrypoints=https"
       - "traefik.http.routers.arcane.rule=Host(`docker.corsair.tf`)"
-      - "traefik.http.routers.arcane.middlewares=private@file,security-soft@file"
+      - "traefik.http.routers.arcane.middlewares=security-private-soft@file"
       - "traefik.http.routers.arcane.service=arcane"
       - "traefik.http.services.arcane.loadbalancer.server.port=3552"
       - "traefik.docker.network=traefik"
@@ -85,12 +85,12 @@ services:
       # Main router for / (with auth)
       - "traefik.http.routers.beszel.entrypoints=https"
       - "traefik.http.routers.beszel.rule=Host(`status.corsair.tf`)"
-      - "traefik.http.routers.beszel.middlewares=security@file,private@file"
+      - "traefik.http.routers.beszel.middlewares=security-private@file"
       - "traefik.http.routers.beszel.service=beszel"
       # API router for /api (without auth)
       - "traefik.http.routers.beszel-api.entrypoints=https"
       - "traefik.http.routers.beszel-api.rule=Host(`status.corsair.tf`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.beszel-api.middlewares=security@file,private@file"
+      - "traefik.http.routers.beszel-api.middlewares=security-private@file"
       - "traefik.http.routers.beszel-api.service=beszel"
       - "traefik.http.routers.beszel-api.priority=100"
       # Service definition

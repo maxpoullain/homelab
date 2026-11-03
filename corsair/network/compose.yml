@@ -45,13 +45,13 @@ services:
       # DNS1
       - "traefik.http.routers.adguard.entrypoints=https"
       - "traefik.http.routers.adguard.rule=Host(`dns.corsair.tf`)"
-      - "traefik.http.routers.adguard.middlewares=security@file,private@file"
+      - "traefik.http.routers.adguard.middlewares=security-private@file"
       - "traefik.http.routers.adguard.service=adguard"
       - "traefik.http.services.adguard.loadbalancer.server.url=http://192.168.1.8:3000"
       # DNS2
       - "traefik.http.routers.adguard2.entrypoints=https"
       - "traefik.http.routers.adguard2.rule=Host(`dns2.corsair.tf`)"
-      - "traefik.http.routers.adguard2.middlewares=security@file,private@file"
+      - "traefik.http.routers.adguard2.middlewares=security-private@file"
       - "traefik.http.routers.adguard2.service=adguard2"
       - "traefik.http.services.adguard2.loadbalancer.server.url=http://192.168.1.9:3000"
 
@@ -79,7 +79,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.adguardsync.entrypoints=https"
       - "traefik.http.routers.adguardsync.rule=Host(`dns-sync.corsair.tf`)"
-      - "traefik.http.routers.adguardsync.middlewares=security@file,private@file,auth@docker"
+      - "traefik.http.routers.adguardsync.middlewares=security-private@file,auth@docker"
       - "traefik.http.routers.adguardsync.service=adguardsync"
       - "traefik.http.services.adguardsync.loadbalancer.server.port=8080"
       - "traefik.docker.network=traefik"

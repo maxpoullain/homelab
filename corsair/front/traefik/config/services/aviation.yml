@@ -7,9 +7,8 @@ http:
       service: aviation
       priority: 1
       middlewares:
+        - security-private@file
         - auth@docker
-        - private@file
-        - security@file
 
   services:
     aviation:
