@@ -1,5 +1,6 @@
 ---
 source: docker
+docker_host: tcp://docker-socket-ro:2375
 use_container_labels: true
 
 ---

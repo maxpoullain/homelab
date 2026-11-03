@@ -4,6 +4,10 @@
 docker network create --driver bridge traefik
 ```
 
+> The `traefik` network is external, so it must be created by hand. The `socket` network
+> (internal, used by `docker-socket-ro`) is created automatically by `docker compose up`
+> as `front_socket`; do not create it manually.
+
 ```
 #  docker exec crowdsec cscli bouncers add traefik -o raw 
 sops -d encrypted.traefik.env > traefik.env

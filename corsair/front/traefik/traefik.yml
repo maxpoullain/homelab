@@ -25,7 +25,7 @@ accessLog:
 
 providers:
   docker:
-    endpoint: "unix:///var/run/docker.sock"
+    endpoint: "tcp://docker-socket-ro:2375"
     watch: true
     exposedByDefault: false
 
@@ -45,6 +45,9 @@ entryPoints:
           permanent: true
   https:
     address: ":443"
+    transport:
+      respondingTimeouts:
+        readTimeout: 3600s  # Traefik v3 defaults to 60s, too short for large Immich uploads
     http:
       aliasHeadersStrategy: delete
       tls:

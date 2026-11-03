@@ -1,4 +1,29 @@
 services:
+  # Read-only Docker API for Traefik / CrowdSec / tinyauth (instead of mounting docker.sock in each).
+  # Only GET endpoints for containers, events, info, networks. No POST/exec/delete.
+  docker-socket-ro:
+    image: lscr.io/linuxserver/socket-proxy:latest
+    container_name: docker-socket-ro
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /run
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - CONTAINERS=1
+      - ALLOW_LOGS=1 # CrowdSec docker acquisition reads container logs
+      - EVENTS=1
+      - NETWORKS=1
+      - INFO=1
+      - PING=1
+      - VERSION=1
+      - POST=0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - socket
+
   traefik:
     container_name: traefik
     image: traefik:v3
@@ -10,11 +35,11 @@ services:
       - 0.0.0.0:443:443
     networks:
       - traefik
+      - socket
     env_file:
       - traefik.env
     volumes:
       - ./traefik:/etc/traefik/
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.entrypoints=https
@@ -43,9 +68,9 @@ services:
       - ./crowdsec/config:/etc/crowdsec
       - ./crowdsec/data:/var/lib/crowdsec/data
       - ./traefik/logs:/var/log/traefik:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - traefik
+      - socket
 
   tinyauth:
     image: ghcr.io/tinyauthapp/tinyauth:v5
@@ -55,14 +80,15 @@ services:
       - no-new-privileges:true
     networks:
       - traefik
+      - socket
     env_file:
       - tinyauth.env
     environment:
       - TINYAUTH_UI_BACKGROUNDIMAGE=/resources/background.jpg
       - TINYAUTH_AUTH_SESSIONEXPIRY=172800
+      - DOCKER_HOST=tcp://docker-socket-ro:2375
     volumes:
       - ./tinyauth:/data
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.auth.entrypoints=https
@@ -88,3 +114,5 @@ services:
 networks:
   traefik:
     external: true
+  socket:
+    internal: true # no internet, only reachable by services that join it
