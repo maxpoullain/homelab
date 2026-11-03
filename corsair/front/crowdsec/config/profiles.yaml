@@ -5,7 +5,8 @@ filters:
 decisions:
   - type: ban
     duration: 4h
-#duration_expr: Sprintf('%dh', (GetDecisionsCount(Alert.GetValue()) + 1) * 4)
+# escalating: 4h, 8h, 12h... per previous decision on the same value, capped at 7 days (168h)
+duration_expr: "Sprintf('%dh', GetDecisionsCount(Alert.GetValue()) >= 41 ? 168 : (GetDecisionsCount(Alert.GetValue()) + 1) * 4)"
 notifications:
 # - homeassistant_webhook
 #   - slack_default  # Set the webhook in /etc/crowdsec/notifications/slack.yaml before enabling this.
@@ -21,7 +22,8 @@ filters:
 decisions:
   - type: ban
     duration: 4h
-#duration_expr: Sprintf('%dh', (GetDecisionsCount(Alert.GetValue()) + 1) * 4)
+# escalating: 4h, 8h, 12h... per previous decision on the same value, capped at 7 days (168h)
+duration_expr: "Sprintf('%dh', GetDecisionsCount(Alert.GetValue()) >= 41 ? 168 : (GetDecisionsCount(Alert.GetValue()) + 1) * 4)"
 notifications:
 # - homeassistant_webhook
 #   - slack_default  # Set the webhook in /etc/crowdsec/notifications/slack.yaml before enabling this.

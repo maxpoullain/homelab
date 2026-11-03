@@ -1,0 +1,12 @@
+# AppSec in LOG-ONLY mode: rules are evaluated and matches are logged/alerted,
+# but nothing is blocked (default_remediation: allow).
+# Matching scenarios are also put in simulation mode in simulation.yaml so no bans are issued.
+# To enforce later: set default_remediation: ban, remove the appsec-* entries from simulation.yaml.
+name: log-only
+default_remediation: allow
+inband_rules:
+ - crowdsecurity/base-config
+ - crowdsecurity/vpatch-*
+ - crowdsecurity/generic-*
+outofband_rules:
+ - crowdsecurity/experimental-*

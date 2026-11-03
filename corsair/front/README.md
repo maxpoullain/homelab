@@ -5,7 +5,7 @@ docker network create --driver bridge traefik
 ```
 
 ```
-#  docker exec crowdsec cscli bouncers add traefik-bouncer -o raw 
+#  docker exec crowdsec cscli bouncers add traefik -o raw 
 sops -d encrypted.traefik.env > traefik.env
 sops -d encrypted.tinyauth.env > tinyauth.env
 sops -d traefik/secrets/encrypted.middlewares.yml > traefik/config/security/middlewares.yml
