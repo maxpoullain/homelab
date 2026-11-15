@@ -8,7 +8,7 @@ services:
     #   "new" aggregators, and, if desired, also to ADSBExchange
     # - it includes mlat-client to send MLAT data to these aggregators
     # - it includes an MLAT Hub to consolidate MLAT results and make them available to the built-in map and other services
-    image: ghcr.io/sdr-enthusiasts/docker-adsb-ultrafeeder:latest
+    image: ghcr.io/sdr-enthusiasts/docker-adsb-ultrafeeder:latest-build-985
     container_name: ultrafeeder
     hostname: ultrafeeder
     restart: unless-stopped
