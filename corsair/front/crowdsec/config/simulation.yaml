@@ -1,6 +1,3 @@
 simulation: false
-exclusions:
-  # AppSec in log-only mode: alerts are recorded but decisions are simulated (not enforced)
-  - crowdsecurity/appsec-vpatch
-  - crowdsecurity/appsec-native
-  - crowdsecurity/appsec-generic-test
+exclusions: []
+# AppSec is enforcing (appsec-* scenarios produce real ban decisions).

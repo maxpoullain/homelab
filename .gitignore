@@ -25,7 +25,7 @@
 !**/front/crowdsec/config/simulation.yaml
 !**/front/crowdsec/config/appsec-configs/
 **/front/crowdsec/config/appsec-configs/*
-!**/front/crowdsec/config/appsec-configs/log-only.yaml
+!**/front/crowdsec/config/appsec-configs/enforce.yaml
 !**/front/crowdsec/config/notifications/
 **/front/crowdsec/config/notifications/*
 !**/front/crowdsec/config/notifications/ha.yaml
