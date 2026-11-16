@@ -2,12 +2,14 @@
 /plans/
 
 # ── App state / runtime data (alphabetical by path) ──────
+**/7seas/flood/*
+**/7seas/gluetun/*
+!**/7seas/gluetun/post-up.sh
+!**/7seas/gluetun/transmission-init/
+!**/7seas/gluetun/transmission-init/10-peer-port.sh
 **/7seas/pia/*
 !**/7seas/pia/port.sh
-**/7seas/prowlarr/*
-!**/7seas/prowlarr/Definitions/
-**/7seas/prowlarr/Definitions/*
-!**/7seas/prowlarr/Definitions/Custom/
+**/7seas/prowlarr/
 **/7seas/radarr/
 **/7seas/seerr/
 **/7seas/sonarr/

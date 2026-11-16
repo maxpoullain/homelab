@@ -1,37 +1,84 @@
 services:
-  wireguard:
-    container_name: wireguard
-    image: thrnz/docker-wireguard-pia:latest
+  gluetun:
+    container_name: gluetun
+    image: qmcgaw/gluetun:v3.41.3
     restart: unless-stopped
     cpus: 0.5
     mem_limit: 512m
-    healthcheck:
-      test: ping -c 1 www.google.com || exit 1
-      start_period: 12s
-      interval: 30s
-      timeout: 10s
-      retries: 3
     security_opt:
       - no-new-privileges:true
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.default.disable_ipv6=1
-      - net.ipv6.conf.all.disable_ipv6=1
-      - net.ipv6.conf.lo.disable_ipv6=1
-    networks:
-      - traefik
-      - 7seas
-    volumes:
-      - ./pia:/pia
-      - .env/:/secrets.env
     cap_add:
       - NET_ADMIN
-      - SYS_MODULE
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    networks:
+      - 7seas
+    volumes:
+      - ./gluetun:/gluetun
     env_file:
-      - ./pia/.env
+      - ./gluetun/.env
     environment:
       - PUID=3000
       - PGID=3002
+      - TZ=Europe/Paris
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - VPN_TYPE=wireguard
+      - SERVER_COUNTRIES=Switzerland
+      - VPN_PORT_FORWARDING=on
+      - PORT_FORWARD_ONLY=on
+      # Runs on every connection: MAM dynamic seedbox + Transmission peer port.
+      - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c '/gluetun/post-up.sh {{PORT}}'
+    labels:
+      - "com.getarcaneapp.arcane.updater=false"
+
+  transmission:
+    container_name: transmission
+    image: linuxserver/transmission:4.1.3
+    restart: unless-stopped
+    cpus: 4
+    mem_limit: 2048m
+    security_opt:
+      - no-new-privileges:true
+    network_mode: "service:gluetun"
+    depends_on:
+      gluetun:
+        condition: service_healthy
+        restart: true
+    volumes:
+      - "./transmission:/config"
+      - "./transmission/watch:/watch"
+      - "./gluetun/port:/port:ro"
+      - "./gluetun/transmission-init:/custom-cont-init.d:ro"
+      - "/mnt/fast/downloads/seedbox:/downloads"
+      - "/mnt/tank/media/downloads:/tank/downloads"
+      - "/mnt/tank/media/tv/:/tank/tv"
+      - "/mnt/tank/media/movies/:/tank/movies"
+      - "/mnt/tank/media/books/raw:/tank/books"
+    environment:
+      - PUID=3000
+      - PGID=3002
+      - TZ=Europe/Paris
+
+  flood:
+    container_name: flood
+    image: jesec/flood:4.16.4
+    restart: unless-stopped
+    user: "3000:3002"
+    cpus: 0.5
+    mem_limit: 256m
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - traefik
+      - 7seas
+    depends_on:
+      transmission:
+        condition: service_started
+    volumes:
+      - "./flood:/flood"
+      - "/mnt/fast/downloads/seedbox:/downloads"
+    command: --auth none --port 3000 --rundir /flood --trurl http://gluetun:9091/transmission/rpc --truser= --trpass= --allowedpath /downloads
+    environment:
       - TZ=Europe/Paris
     labels:
       - "traefik.enable=true"
@@ -40,37 +87,8 @@ services:
       - "traefik.http.routers.seedbox.rule=Host(`seedbox.corsair.tf`)"
       - "traefik.http.routers.seedbox.middlewares=security-private@file,auth@docker"
       - "traefik.http.routers.seedbox.service=seedbox"
-      - "traefik.http.services.seedbox.loadbalancer.server.port=9091"
+      - "traefik.http.services.seedbox.loadbalancer.server.port=3000"
       - "com.getarcaneapp.arcane.updater=false"
-
-  transmission:
-    container_name: transmission
-    image: linuxserver/transmission:4.0.6
-    restart: unless-stopped
-    cpus: 4
-    mem_limit: 2048m
-    security_opt:
-      - no-new-privileges:true
-    network_mode: "service:wireguard"
-    depends_on:
-      wireguard:
-        condition: service_healthy
-        restart: true
-    volumes:
-      - "./transmission:/config"
-      - "./transmission/watch:/watch"
-      - "/mnt/fast/downloads/seedbox:/downloads"
-      - "/mnt/tank/media/downloads:/tank/downloads"
-      - "/mnt/tank/media/tv/:/tank/tv"
-      - "/mnt/tank/media/movies/:/tank/movies"
-      - "/mnt/tank/media/books/raw:/tank/books"
-    env_file:
-      - .env
-    environment:
-      - PUID=3000
-      - PGID=3002
-      - TZ=Europe/Paris
-      - TRANSMISSION_WEB_UI=flood-for-transmission
 
   flaresolverr:
     container_name: flaresolverr
@@ -142,6 +160,7 @@ services:
       - no-new-privileges:true
     networks:
       - traefik
+      - 7seas
     depends_on:
       - prowlarr
     volumes:
@@ -179,6 +198,7 @@ services:
       - no-new-privileges:true
     networks:
       - traefik
+      - 7seas
     depends_on:
       - prowlarr
     volumes:
