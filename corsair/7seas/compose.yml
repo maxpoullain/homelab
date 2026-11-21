@@ -77,7 +77,8 @@ services:
     volumes:
       - "./flood:/flood"
       - "/mnt/fast/downloads/seedbox:/downloads"
-    command: --auth none --port 3000 --rundir /flood --trurl http://gluetun:9091/transmission/rpc --truser= --trpass= --allowedpath /downloads
+      - "/mnt/tank/media/downloads:/tank/downloads"
+    command: --auth none --port 3000 --rundir /flood --trurl http://gluetun:9091/transmission/rpc --truser= --trpass= --allowedpath /downloads,/tank/downloads
     environment:
       - TZ=Europe/Paris
     labels:
