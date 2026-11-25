@@ -1,0 +1,47 @@
+# ImmichFrame settings (file mode: read once at container start)
+# Create the API key in Immich: Account Settings -> API Keys
+# Permissions: album.read, album.statistics, asset.view, asset.read, asset.statistics,
+#              face.read, memory.read, person.read, person.statistics, tag.read
+General:
+    # Nord dark palette
+    PrimaryColor: '#ECEFF4'
+    SecondaryColor: '#2E3440CC'
+    Style: none
+    ClockFormat: HH:mm
+    ClockDateFormat: eee d MMMM
+    PhotoDateFormat: dd/MM/yyyy
+    ImageLocationFormat: City,Country
+    Layout: single
+    UnitSystem: metric
+    # Weather: uncomment and fill in to enable
+    WeatherApiKey: ENC[AES256_GCM,data:ES1ZXGJnoEFmnFyGNbvR5uOb6vBQwcuPwreEYr7UksU=,iv:aeWjUFFPqEowWL/qiXG5iSw3BSTmPx1E3jLTDBVRW8o=,tag:1JktEW8tB1yR2G3ccC6NZg==,type:str]
+    WeatherLatLong: ENC[AES256_GCM,data:fClJMexSWnsc0/tDGAYO,iv:9Vn/a7OrRhc02XVabFbo9luTsvxBQI+7ukq7EzNPSGQ=,tag:EaJj8Hi4ztlAK4hxmzkU4w==,type:str]
+    WeatherIconUrl: https://openweathermap.org/img/wn/{IconId}@2x.png
+    # Calendar: paste the Google Calendar "Secret address in iCal format"
+    Webcalendars:
+        - ENC[AES256_GCM,data:zW1nCt6zYvy2Zl+ta7dxl8LinkH2T9hXUo8oAth8HlY7C0w7U6aYaJ816f29dOH2gtPqcuy1Uv+Faxy1kxLUpt+nyyfccRBANFAK14mQ54pTFmZuDspgwa2S9P1ICU8M56iUhN0OVwEXjUjuhk21r0hYopH5I25WYn/Z2sZBBKhNUCmpnIq5508Sl4MUO4CpEOkeEUToIkawkAY6+JRsaKta5cDVrfQIQ3qDnDJWGDi6YC4GhIgu/es=,iv:9kHnnNNqoyPqM+SYMklJoP2PP/1mpixb6AUlGcIgWP4=,tag:YAlAE7fd7XtJmdVtTPmZhQ==,type:str]
+Accounts:
+    - ImmichServerUrl: http://immich_server:2283
+      ApiKey: ENC[AES256_GCM,data:biFq8kYD3qhjrXZIHDWKmxmXyw19C5cx9QIRs/T5oS3RqhjQQD8qRgC+,iv:IMUpDxhiXHLdxXUGf0GFEBU/bX2tFurCXPva04fojEQ=,tag:Ln3HhtxLy64DMnuKoh6fpg==,type:str]
+      ShowFavorites: false
+      ShowMemories: true
+    # Wife's account: replace the placeholder with her API key
+    - ImmichServerUrl: http://immich_server:2283
+      ApiKey: ENC[AES256_GCM,data:3zOIHO0ppeFvp1HhNlvvxnvmVeLpAp/TPv8bDtdvXoTBTgyR8Tq4Ax35,iv:xPNtAeJXlUAlZ4j9U/3YYkiHOWJVdILRduVzk8V21Fw=,tag:vCgFnFmFbCfoBREWMP5atQ==,type:str]
+      ShowFavorites: false
+      ShowMemories: true
+sops:
+    age:
+        - recipient: age146kmjfn0h64zzchtp908lx7ln8mg8agt0ree7yurvev34veaqp5s0j9kaw
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBjMzFMaSt6M2FhbU1Rbmt3
+            N1hzQkR2N0hnQldkNlFqbGwvWDQ2dktsbENJCkh6M1lqajlhZFQzWDV4YmppMkpu
+            NVNGbzVUenJjV1VtR3hFQ2JqcDhtTXMKLS0tIEdGUnNvSFVwRUdsZTB3cFhZek9J
+            clM1aktXZ3FIZm4yWG8xL2EzaGxmZ0kKhZFXbyVpu//rdhgp1cbfOKoyj+G9ylR9
+            Zcn5Nv9fh6NOhBO5mScv/QKln1LYTCd7QrZKuL0DGo+VNkZqKnysyA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-11-25T08:16:36Z"
+    mac: ENC[AES256_GCM,data:ycxspOPkb39Fnqbv3HEqK7vE67mKY4IdMgJVT6Fb9wegLs6o8SYesudlEdWzDgV3Wr+W79ga6ZVVMoYAhq+yrvh1oqFH70tNhyDxHPyTmki10PNIAjvcRDMaSHR62EfEVGO9hwSw9we/ViV5PkLmU9LImR3m001atBCWJO8k03g=,iv:WY6GJ0AnHDu2Fzq4m79RFvvWfwxk/lpNq8o6swZoukY=,tag:BFjkp+eLqp5hoSkMKu+GGA==,type:str]
+    encrypted_regex: ^(?i)(.*auto_login.*|.*calendar.*|.*client.*|.*custom.*|.*dns.*|.*feeder.*|.*hash.*|.*key.*|.*latlong.*|.*oidc.*|.*pass.*|.*peerport.*|.*post_up.*|.*pre_down.*|.*provider.*|.*secret.*|.*token.*|.*user.*)$
+    version: 3.12.1

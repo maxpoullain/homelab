@@ -129,6 +129,30 @@ services:
     networks:
       - immich
 
+  immichframe:
+    container_name: immichframe
+    image: ghcr.io/immichframe/immichframe:latest
+    restart: unless-stopped
+    mem_limit: 512m
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - immich
+      - traefik
+    volumes:
+      - ./immichframe/config:/app/Config:ro
+    environment:
+      - IMMICHFRAME_CONFIG_SOURCE=file
+      - TZ=Europe/Paris
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frame.entrypoints=https"
+      - "traefik.http.routers.frame.rule=Host(`frame.corsair.tf`)"
+      - "traefik.http.routers.frame.middlewares=security-private@file"
+      - "traefik.http.routers.frame.service=frame"
+      - "traefik.http.services.frame.loadbalancer.server.port=8080"
+      - "traefik.docker.network=traefik"
+
 volumes:
   model-cache:
 

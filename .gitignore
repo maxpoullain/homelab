@@ -53,5 +53,6 @@ tooling/data/backups/*.log*
 # ── Secrets: plaintext ignored, SOPS-encrypted (encrypted.*) tracked ──
 # Keep this block LAST so no rule above can override the whitelist.
 *.env
+**/media/immichframe/config/Settings.yml
 **/front/traefik/config/security/middlewares.yml
 !encrypted.*
