@@ -259,6 +259,30 @@ services:
       - "traefik.http.routers.seerr.service=seerr"
       - "traefik.http.services.seerr.loadbalancer.server.port=5055"
 
+  cross-seed:
+    container_name: cross-seed
+    image: ghcr.io/cross-seed/cross-seed:6
+    command: daemon
+    restart: unless-stopped
+    user: "3000:3002"
+    cpus: 0.5
+    mem_limit: 512m
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - 7seas
+    depends_on:
+      transmission:
+        condition: service_started
+    env_file:
+      - ./cross-seed/.env
+    volumes:
+      - "./cross-seed:/config"
+      - "/mnt/fast/downloads/seedbox:/downloads"
+      - "/mnt/tank/media/downloads:/tank/downloads"
+    labels:
+      - "com.getarcaneapp.arcane.updater=false"
+
 networks:
   traefik:
     external: true
