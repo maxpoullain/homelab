@@ -254,7 +254,7 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
       - "traefik.http.routers.seerr.entrypoints=https"
-      - "traefik.http.routers.seerr.rule=Host(`seerr.corsair.tf`)"
+      - "traefik.http.routers.seerr.rule=Host(`seerr.corsair.tf`) || Host(`seerr.lan.corsair.tf`)"
       - "traefik.http.routers.seerr.middlewares=security-soft@file"
       - "traefik.http.routers.seerr.service=seerr"
       - "traefik.http.services.seerr.loadbalancer.server.port=5055"

@@ -27,7 +27,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jellyfin.entrypoints=https"
-      - "traefik.http.routers.jellyfin.rule=Host(`tv.corsair.tf`)"
+      - "traefik.http.routers.jellyfin.rule=Host(`tv.corsair.tf`) || Host(`tv.lan.corsair.tf`)"
       - "traefik.http.routers.jellyfin.middlewares=security-soft@file"
       - "traefik.http.routers.jellyfin.service=jellyfin"
       - "traefik.http.services.jellyfin.loadBalancer.server.port=8096"
@@ -71,7 +71,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.photos.entrypoints=https"
-      - "traefik.http.routers.photos.rule=Host(`photos.corsair.tf`)"
+      - "traefik.http.routers.photos.rule=Host(`photos.corsair.tf`) || Host(`photos.lan.corsair.tf`)"
       - "traefik.http.routers.photos.middlewares=security-soft@file"
       - "traefik.docker.network=traefik"
       - "crowdsec.enable=true"
